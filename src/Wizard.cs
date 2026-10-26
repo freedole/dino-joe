@@ -172,6 +172,7 @@ namespace DinoJoe
         int color1, color2;
         bool glasses;
         string packs;
+        bool packsTouched;
         bool autostart;
 
         int step;
@@ -465,7 +466,9 @@ namespace DinoJoe
         void StepPacks()
         {
             Header("s.packs", "s.packs.sub");
-            List<Pack> list = Packs.All();
+            List<Pack> list = new List<Pack>();
+            foreach (Pack x in Packs.All()) if (!x.IsPersonality && Packs.LangCompatible(x.Lang)) list.Add(x);
+            if (!packsTouched) packs = Packs.DefaultPacks();
             if (list.Count == 0) { Lbl(Lang.Get("s.packs.none"), 12, 12, 400, 24).ForeColor = Color.Gray; return; }
             ModernCheckList cl = new ModernCheckList();
             cl.SetBounds(10, 8, 425, 300);
@@ -479,6 +482,7 @@ namespace DinoJoe
                 List<string> ids = new List<string>();
                 for (int i = 0; i < list.Count; i++) if (cl.GetItemChecked(i)) ids.Add(list[i].Id);
                 packs = string.Join(",", ids.ToArray());
+                packsTouched = true;
             };
             content.Controls.Add(cl);
         }

@@ -133,7 +133,7 @@ namespace DinoJoe
             {
                 foreach (Pack p in Packs.All())
                 {
-                    if (!p.Enabled || !Directory.Exists(p.FunDir)) continue;
+                    if (!p.Active || !Directory.Exists(p.FunDir)) continue;
                     double mul = p.Weight;
                     foreach (string f in Directory.GetFiles(p.FunDir, "*.txt"))
                     {

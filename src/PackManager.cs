@@ -63,6 +63,7 @@ namespace DinoJoe
             {
                 if (loading) return;
                 Pack p = (Pack)e.Item.Tag;
+                if (p.IsPersonality) { loading = true; e.Item.Checked = p.Active; loading = false; return; }   // prati ličnost
                 Packs.SetEnabled(p.Id, e.Item.Checked);
                 Dirty();
             };
@@ -153,10 +154,11 @@ namespace DinoJoe
                 it.SubItems.Add(p.JokeCount.ToString());
                 it.SubItems.Add(p.Lang);
                 it.SubItems.Add(p.Version);
-                it.SubItems.Add(Lang.Get(p.Builtin ? "pk.builtin" : "pk.user"));
+                it.SubItems.Add(p.IsPersonality ? Lang.Get("pk.personality") + ": " + Personality.Find(p.Personality).Name : Lang.Get(p.Builtin ? "pk.builtin" : "pk.user"));
                 it.SubItems.Add(WeightName(p.Weight));
                 it.ToolTipText = p.Desc + (p.Author.Length > 0 ? "  (" + p.Author + ")" : "");
-                it.Checked = p.Enabled;
+                it.Checked = p.Active;
+                if (p.IsPersonality || !Packs.LangCompatible(p.Lang)) it.ForeColor = Theme.TextMuted;
                 it.Tag = p;
                 lv.Items.Add(it);
             }

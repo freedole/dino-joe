@@ -118,6 +118,7 @@ namespace DinoJoe
             Add("pk.col.ver", "Verzija", "Verzija", "Verzija", "Version");
             Add("pk.col.src", "Izvor", "Izvor", "Izvor", "Source");
             Add("pk.col.weight", "Težina", "Težina", "Težina", "Weight");
+            Add("pk.personality", "ličnost", "ličnost", "osobnost", "personality");
             Add("pk.builtin", "ugrađen", "ugrađen", "ugrađen", "built-in");
             Add("pk.user", "dodat", "dodat", "dodan", "added");
             Add("pk.w.low", "Malo", "Malo", "Malo", "Low");
@@ -404,7 +405,7 @@ namespace DinoJoe
         public static int Color1;          // indeks u Palette.All
         public static int Color2 = -1;     // -1 = automatski (od palete)
         public static bool Glasses;
-        public static string Packs = "odjordje-classic";   // id-ovi uključenih paketa, zarezom
+        public static string Packs = "odjordje-classic,dino-joe-basic-sr";   // id-ovi uključenih paketa, zarezom
         public static string PackWeights = "";              // id:2,id2:0.5 (1 = normalno)
         public static string ActiveProfile = "";
 

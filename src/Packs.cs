@@ -20,7 +20,19 @@ namespace DinoJoe
         public readonly Dictionary<string, string> Ini = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         public int JokeCount;
 
+        public string Personality = "";   // paket ličnosti: aktivan samo uz tu ličnost
         public bool Enabled { get { return Packs.IsEnabled(Id); } }
+        public bool IsPersonality { get { return Personality.Length > 0; } }
+        /// Da li se fore iz paketa trenutno koriste.
+        public bool Active
+        {
+            get
+            {
+                if (!Packs.LangCompatible(Lang)) return false;
+                if (IsPersonality) return Personality == Settings.PersonalityId;
+                return Enabled;
+            }
+        }
         public double Weight { get { return Packs.GetWeight(Id); } }
         // jokes\*.txt (stari format: fore\*.txt)
         public string FunDir
@@ -120,6 +132,7 @@ namespace DinoJoe
             p.Lang = p.Get("lang", "jezik", "");
             p.Version = p.Get("version", "verzija", "");
             p.Author = p.Get("author", "autor", "");
+            p.Personality = p.Get("personality", null, "");
             try
             {
                 if (Directory.Exists(p.FunDir))
@@ -160,6 +173,22 @@ namespace DinoJoe
             string r = b.ToString().Trim('-', '_');
             if (r.Length > 60) r = r.Substring(0, 60);
             return r.Length > 0 ? r : "paket";
+        }
+
+        /// en paketi idu uz engleski, ostali (sr/bs/hr) uz naše jezike; prazno = svi
+        public static bool LangCompatible(string lang)
+        {
+            if (string.IsNullOrEmpty(lang)) return true;
+            bool en = lang.StartsWith("en", StringComparison.OrdinalIgnoreCase);
+            return en == DinoJoe.Lang.IsEnglish;
+        }
+
+        /// Podrazumijevani paketi za trenutni jezik (svi ugrađeni, osim paketa ličnosti).
+        public static string DefaultPacks()
+        {
+            List<string> ids = new List<string>();
+            foreach (Pack p in All()) if (p.Builtin && !p.IsPersonality && LangCompatible(p.Lang)) ids.Add(p.Id);
+            return string.Join(",", ids.ToArray());
         }
 
         // ---------------- uključeni paketi i težine ----------------
