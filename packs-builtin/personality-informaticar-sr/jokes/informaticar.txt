@@ -1,0 +1,32 @@
+# Ličnost: Informatičar
+# One joke per line. Lines starting with # are ignored.
+Ja nisam lijen. Ja sam u energy saving modu.
+Korisnik kaže "ništa nisam dirao". Log kaže drugačije.
+Najčešća greška u sistemu nalazi se između stolice i tastature.
+DNS je kriv. Ako nije DNS, opet je DNS.
+Ne postoji "brza izmjena u produkciji". Postoji samo "duga noć".
+Moja omiljena pjesma je zvuk ventilatora na serveru.
+Dokumentaciju ću napisati. Kasnije. Kad izumrem drugi put.
+Kad nešto radi, ne diraj. Kad ne radi, ne diraj ni tad dok ne popiješ kafu.
+Helpdesk tiket: "ne radi internet". Opis: "ne radi". Prilog: nema.
+Šifra mora imati veliko slovo, broj, znak i suzu korisnika.
+Ja ne kasnim. Ja imam latenciju.
+"Samo sam kliknuo OK" je početak svake tragedije.
+Imam 99 problema i svi su "hitni".
+Sistem administrator je kao sudija: primijete ga samo kad nešto krene naopako.
+Server salu zovem "kod kuće". Toplo je i bruji.
+Najbolji firewall je kabl izvučen iz zida.
+Backup postoji samo ako ga je neko bar jednom vratio.
+Pitaju me jesam li probao Linux. Ja sam probao Kredu.
+Kad kažem "radi", mislim "trenutno radi".
+Kolege misle da hakujem. Ja samo otvaram Command Prompt.
+"Kad si već informatičar, popravi mi štampač." Mogu i frižider, kad smo već tu.
+Kad ne znam odgovor, kažem "zavisi od konfiguracije".
+Dvije stvari su beskonačne: svemir i broj otvorenih tiketa.
+Najbrže riješen problem je onaj koji se sam riješio dok sam išao do korisnika.
+Moj kalendar: ponedjeljak patch, utorak gašenje požara, srijeda isto.
+Sigurnosna politika kaže: ne klikći na linkove. Korisnik kaže: a ovaj je bio crven.
+Ja ne radim od 8 do 4. Ja radim dok ne proradi.
+"Kad si zadnji put restartovao?" Pitanje i za kompjuter i za mene.
+Uptime je moj ponos. Restart je moja tajna.
+Ako želiš da te informatičar voli, ne zovi ga u petak u 15h.

@@ -825,6 +825,7 @@ namespace DinoJoe
         ToolStripMenuItem miSleep, miAutostart, miGlasses, miLike, miBlock, miProfiles;
         string lastJoke;   // zadnja ispričana fora (za 👍 / 👎)
         readonly Needs needs = new Needs();
+        readonly Triggers triggers = new Triggers();
         StatusForm statusForm;
         double needsSaveT;
         ToolStripMenuItem[] miSize, miTalk;
@@ -1588,12 +1589,14 @@ namespace DinoJoe
             if (pose.Bubble == null && !thinking && !(chat != null && chat.Visible) && st != State.Sleep && st != State.Drag && st != State.Fall)
             {
                 DateTime n = DateTime.Now;
+                string trig;
                 if (n.Hour != lastHourGreeted && n.Minute == 0)
                 {
                     lastHourGreeted = n.Hour;
                     if (n.Hour == 12) Say(Profile.GetPick("podne", Lang.Get("g.noon")));
                     else if (n.Hour == 15 && n.DayOfWeek != DayOfWeek.Saturday && n.DayOfWeek != DayOfWeek.Sunday) Say(Profile.GetPick("kraj_radnog", Lang.Get("g.endwork")));
                 }
+                else if ((trig = triggers.Step(Dt)) != null) { Say(trig); SetState(State.Happy, 1.5); }
                 else if (needs[needs.Lowest] < 30 && !needs.Vacation && sinceTalk > (Needs.Hardcore ? 45 : 100) && rnd.Next(200) == 0) Say(NeedLine(needs.Lowest));
                 else if (sinceTalk > nextTalk) TellJoke(false);
             }
