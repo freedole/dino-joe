@@ -824,6 +824,9 @@ namespace DinoJoe
         ContextMenuStrip menu;
         ToolStripMenuItem miSleep, miAutostart, miGlasses, miLike, miBlock, miProfiles;
         string lastJoke;   // zadnja ispričana fora (za 👍 / 👎)
+        readonly Needs needs = new Needs();
+        StatusForm statusForm;
+        double needsSaveT;
         ToolStripMenuItem[] miSize, miTalk;
 
         float dpiK, sizeMul = 1f, k;
@@ -872,6 +875,7 @@ namespace DinoJoe
             try { Directory.CreateDirectory(dir0); } catch { }
             statePath = Path.Combine(dir0, "state.txt");
             LoadState();
+            needs.Load();
             pose.Female = Settings.Female;
             pose.Glasses = Settings.Glasses;
             ai = new AiConfig(dir0);
@@ -903,6 +907,66 @@ namespace DinoJoe
 
             SetState(State.Happy, 2.5);
             Say(Program.JustSetUp ? Lang.Get("pet.hello") : Greeting());
+        }
+
+        // ---------------- potrebe / status ----------------
+        string NeedLine(Need n) { return Pick(Lang.Get("need.say." + Needs.Keys[(int)n]).Split('|')); }
+
+        void OpenStatus()
+        {
+            if (statusForm != null && !statusForm.IsDisposed) { statusForm.Activate(); return; }
+            statusForm = new StatusForm(needs, Profile.Name);
+            statusForm.ActionClicked += delegate(string a) { DoAction(a); };
+            statusForm.FormClosed += delegate { statusForm = null; needs.Save(); };
+            statusForm.Show();
+        }
+
+        void DoAction(string a)
+        {
+            switch (a)
+            {
+                case "feed": Feed(); break;
+                case "water": GiveWater(); break;
+                case "pet": Pet(); break;
+                case "play": Play(); break;
+                case "sleep": if (pose.State != State.Sleep) ToggleSleep(); break;
+                case "bath": Bath(); break;
+            }
+            needs.Save();
+        }
+
+        void GiveWater()
+        {
+            forcedSleep = false;
+            needs.Add(Need.Water, 40);
+            Say(Lang.Get("say.water"));
+            SetState(State.Happy, 1.6);
+        }
+
+        void Play()
+        {
+            forcedSleep = false;
+            if (needs[Need.Energy] < 10) { Say(Lang.Get("say.tired")); return; }
+            needs.Add(Need.Fun, 30); needs.Add(Need.Energy, -6); needs.Add(Need.Love, 5); needs.Add(Need.Hygiene, -4);
+            heartsStart = pose.T;
+            Say(rnd.Next(2) == 0 ? Lang.Get("say.play") : PickJoke());
+            SetState(rnd.Next(2) == 0 ? State.Happy : State.Roar, 2);
+        }
+
+        void Bath()
+        {
+            forcedSleep = false;
+            needs.Add(Need.Hygiene, 100);
+            Say(Lang.Get("say.bath"));
+            SetState(State.Happy, 2);
+        }
+
+        void RunAway()
+        {
+            needs.RanAway = true;
+            needs.Save();
+            Hide();
+            tray.ShowBalloonTip(6000, Profile.Name, Lang.Get("say.ranaway"), ToolTipIcon.Warning);
         }
 
         void OpenPacks()
@@ -969,6 +1033,7 @@ namespace DinoJoe
             base.OnShown(e);
             Present();
             timer.Start();
+            if (needs.RanAway) { Hide(); tray.ShowBalloonTip(5000, Profile.Name, Lang.Get("say.ranaway"), ToolTipIcon.Warning); }
         }
 
         void ApplySize()
@@ -990,8 +1055,12 @@ namespace DinoJoe
             menu.Items.Add(miChat);
             menu.Items.Add(new ToolStripSeparator());
             menu.Items.Add("Ispričaj foru", null, delegate { TellJoke(true); });
-            menu.Items.Add("Nahrani", null, delegate { Feed(); });
-            menu.Items.Add("Pomazi", null, delegate { Pet(); });
+            menu.Items.Add(Lang.Get("st.menu"), null, delegate { OpenStatus(); });
+            menu.Items.Add(Lang.Get("act.feed"), null, delegate { DoAction("feed"); });
+            menu.Items.Add(Lang.Get("act.water"), null, delegate { DoAction("water"); });
+            menu.Items.Add(Lang.Get("act.pet"), null, delegate { DoAction("pet"); });
+            menu.Items.Add(Lang.Get("act.play"), null, delegate { DoAction("play"); });
+            menu.Items.Add(Lang.Get("act.bath"), null, delegate { DoAction("bath"); });
             menu.Items.Add("Riči!", null, delegate { Roar(); });
             menu.Items.Add("Pozovi pile", null, delegate { CallChick(); });
             miGlasses = new ToolStripMenuItem("Naočale", null, delegate { ToggleGlasses(); });
@@ -1196,12 +1265,14 @@ namespace DinoJoe
         {
             if (pose.State == State.Sleep) { forcedSleep = false; SetState(State.Idle, 2); }
             Say(PickJoke());
+            needs.Add(Need.Fun, manual ? 4 : 1.5);
             if (manual || rnd.Next(3) == 0) SetState(State.Happy, 1.6);
         }
 
         void Feed()
         {
-            int h = Hunger();
+            int h = 100 - (int)needs[Need.Food];
+            needs.Add(Need.Food, 35);
             lastFed = DateTime.Now; SaveState();
             forcedSleep = false;
             heartsStart = pose.T;
@@ -1212,6 +1283,7 @@ namespace DinoJoe
         void Pet()
         {
             forcedSleep = false;
+            needs.Add(Need.Love, 25);
             heartsStart = pose.T;
             Say("Prrr... <3");
             SetState(State.Happy, 2);
@@ -1252,6 +1324,15 @@ namespace DinoJoe
             fx = p.X - cw / 2.0; fy = wa.Top; vy = 0;
             forcedSleep = false;
             SetState(State.Fall, 0);
+            if (needs.RanAway)
+            {
+                needs.RanAway = false;
+                needs.Add(Need.Food, 25); needs.Add(Need.Water, 25); needs.Add(Need.Health, 20);
+                needs.Save();
+                Show();
+                Say(Lang.Get("say.back"));
+                return;
+            }
             Say("Evo me!");
         }
 
@@ -1381,6 +1462,8 @@ namespace DinoJoe
             bool night = hour >= 23 || hour < 6;
             int r = rnd.Next(100);
             if (night && r < 55) { SetState(State.Sleep, 40 + rnd.Next(80)); return; }
+            if (needs[Need.Energy] < 20 && r < 60) { SetState(State.Sleep, 60 + rnd.Next(120)); return; }
+            if (needs.Sick && r < 45) { SetState(State.Sit, 8 + rnd.Next(10)); return; }
             if (r < 52) SetState(State.Walk, 3 + rnd.Next(7));
             else if (r < 70) SetState(State.Idle, 2 + rnd.Next(4));
             else if (r < 85) SetState(State.Sit, 4 + rnd.Next(10));
@@ -1391,6 +1474,13 @@ namespace DinoJoe
         // ---------------- petlja ----------------
         void Step()
         {
+            // potrebe
+            needs.Tick(Dt, pose.State == State.Sleep);
+            needsSaveT += Dt;
+            if (needsSaveT > 60) { needsSaveT = 0; needs.Save(); }
+            if (needs.RanAway) return;
+            if (needs.ShouldRunAway && pose.Bubble == null) { RunAway(); return; }
+
             pose.T += Dt; stateT += Dt; sinceTalk += Dt;
             Rectangle wa = CurrentArea();
             double ground = GroundFor(wa);
@@ -1491,7 +1581,7 @@ namespace DinoJoe
                     if (n.Hour == 12) Say(Profile.GetPick("podne", "Podne! Pauza? Može sve osim piletine."));
                     else if (n.Hour == 15 && n.DayOfWeek != DayOfWeek.Saturday && n.DayOfWeek != DayOfWeek.Sunday) Say(Profile.GetPick("kraj_radnog", "15h. Ko je zadnji, gasi svjetlo."));
                 }
-                else if (Hunger() >= 70 && sinceTalk > 120 && rnd.Next(300) == 0) Say("Gladan sam! (dupli klik)");
+                else if (needs[needs.Lowest] < 30 && !needs.Vacation && sinceTalk > (Needs.Hardcore ? 45 : 100) && rnd.Next(200) == 0) Say(NeedLine(needs.Lowest));
                 else if (sinceTalk > nextTalk) TellJoke(false);
             }
 
@@ -1567,6 +1657,7 @@ namespace DinoJoe
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
             SaveState();
+            needs.Save();
             timer.Stop();
             if (tray != null) { tray.Visible = false; tray.Dispose(); }
             if (chat != null) chat.Dispose();

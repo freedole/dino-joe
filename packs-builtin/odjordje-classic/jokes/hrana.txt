@@ -1,5 +1,5 @@
 ﻿# SPECIJALNO: kad ga nahraniš
-# Jedna fora po liniji. Linije sa # se ignorišu.
+# One joke per line. Lines starting with # are ignored.
 Njam njam!
 NJAM! Konačno!
 Ovo nije piletina, je l' da?

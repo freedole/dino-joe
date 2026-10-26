@@ -22,7 +22,29 @@ namespace DinoJoe
 
         public bool Enabled { get { return Packs.IsEnabled(Id); } }
         public double Weight { get { return Packs.GetWeight(Id); } }
-        public string FunDir { get { return Path.Combine(Dir, "fore"); } }
+        // jokes\*.txt (stari format: fore\*.txt)
+        public string FunDir
+        {
+            get
+            {
+                string j = Path.Combine(Dir, "jokes");
+                if (Directory.Exists(j)) return j;
+                string f = Path.Combine(Dir, "fore");
+                return Directory.Exists(f) ? f : j;
+            }
+        }
+
+        /// Vrijednost iz pack.ini po engleskom ključu, uz rezervni stari (srpski) ključ.
+        public string Get(string key, string oldKey, string def)
+        {
+            string v;
+            if (Ini.TryGetValue(key, out v) && v.Length > 0) return v;
+            if (oldKey != null && Ini.TryGetValue(oldKey, out v) && v.Length > 0) return v;
+            return def;
+        }
+
+        public string CatWeight(string cat) { return Get("weight." + cat, "tezina." + cat, "10"); }
+        public string CatKeywords(string cat) { return Get("keywords." + cat, "kljucne." + cat, ""); }
     }
 
     static class Packs
@@ -38,6 +60,7 @@ namespace DinoJoe
         static string ProfilesPath { get { return Path.Combine(DataDir, "profiles.txt"); } }
 
         static readonly HashSet<string> blocked = new HashSet<string>();
+        static readonly Dictionary<string, string> blockedText = new Dictionary<string, string>();   // hash -> tekst fore
         static readonly HashSet<string> liked = new HashSet<string>();
         static bool hashesLoaded;
 
@@ -75,21 +98,28 @@ namespace DinoJoe
             p.Id = Path.GetFileName(dir);
             string ini = Path.Combine(dir, "pack.ini");
             ReadIni(ini, p.Ini);
-            string kl = Path.Combine(dir, "kljucne.ini");
-            if (File.Exists(kl))
+            // keywords.ini (stari naziv: kljucne.ini): kategorija=rijec1,rijec2
+            foreach (string kname in new string[] { "keywords.ini", "kljucne.ini" })
             {
+                string kl = Path.Combine(dir, kname);
+                if (!File.Exists(kl)) continue;
                 Dictionary<string, string> k = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
                 ReadIni(kl, k);
                 foreach (KeyValuePair<string, string> kv in k)
-                    p.Ini[kv.Key.StartsWith("kljucne.", StringComparison.OrdinalIgnoreCase) ? kv.Key : "kljucne." + kv.Key] = kv.Value;
+                {
+                    string key = kv.Key;
+                    if (key.StartsWith("kljucne.", StringComparison.OrdinalIgnoreCase)) key = key.Substring(8);
+                    if (key.StartsWith("keywords.", StringComparison.OrdinalIgnoreCase)) key = key.Substring(9);
+                    p.Ini["keywords." + key] = kv.Value;
+                }
             }
-            string v;
-            if (p.Ini.TryGetValue("id", out v) && v.Length > 0) p.Id = SafeId(v);
-            p.Name = p.Ini.TryGetValue("naziv", out v) && v.Length > 0 ? v : p.Id;
-            if (p.Ini.TryGetValue("opis", out v)) p.Desc = v;
-            if (p.Ini.TryGetValue("jezik", out v)) p.Lang = v;
-            if (p.Ini.TryGetValue("verzija", out v)) p.Version = v;
-            if (p.Ini.TryGetValue("autor", out v)) p.Author = v;
+            string v = p.Get("id", null, "");
+            if (v.Length > 0) p.Id = SafeId(v);
+            p.Name = p.Get("name", "naziv", p.Id);
+            p.Desc = p.Get("description", "opis", "");
+            p.Lang = p.Get("lang", "jezik", "");
+            p.Version = p.Get("version", "verzija", "");
+            p.Author = p.Get("author", "autor", "");
             try
             {
                 if (Directory.Exists(p.FunDir))
@@ -198,10 +228,25 @@ namespace DinoJoe
             LoadSet(LikedPath, liked);
         }
 
+        // format linije: hash<TAB>tekst fore (tekst je opcion, služi za listu "Vrati blokirane")
         static void LoadSet(string path, HashSet<string> set)
         {
             set.Clear();
-            try { if (File.Exists(path)) foreach (string l in File.ReadAllLines(path)) { string t = l.Trim(); if (t.Length > 0 && !t.StartsWith("#")) set.Add(t); } }
+            bool isBlocked = path == BlockedPath;
+            if (isBlocked) blockedText.Clear();
+            try
+            {
+                if (File.Exists(path))
+                    foreach (string l in File.ReadAllLines(path, Encoding.UTF8))
+                    {
+                        string t = l.Trim().TrimStart('\uFEFF');
+                        if (t.Length == 0 || t.StartsWith("#")) continue;
+                        int tab = t.IndexOf('\t');
+                        string h = tab > 0 ? t.Substring(0, tab) : t;
+                        set.Add(h);
+                        if (isBlocked && tab > 0) blockedText[h] = t.Substring(tab + 1);
+                    }
+            }
             catch { }
         }
 
@@ -210,20 +255,46 @@ namespace DinoJoe
             try
             {
                 Directory.CreateDirectory(DataDir);
-                List<string> l = new List<string>(set);
-                l.Insert(0, "# Dino Joe - hash fora (SHA1, prvih 8 bajtova)");
-                File.WriteAllLines(path, l.ToArray());
+                List<string> l = new List<string>();
+                l.Add("# Dino Joe - hash fora (SHA1, prvih 8 bajtova)<TAB>tekst");
+                bool isBlocked = path == BlockedPath;
+                foreach (string h in set)
+                {
+                    string txt;
+                    l.Add(isBlocked && blockedText.TryGetValue(h, out txt) ? h + "\t" + txt : h);
+                }
+                File.WriteAllLines(path, l.ToArray(), new UTF8Encoding(true));
             }
             catch { }
+        }
+
+        /// Lista blokiranih: hash -> tekst (ili null ako tekst nije sačuvan).
+        public static List<KeyValuePair<string, string>> BlockedList()
+        {
+            LoadHashes();
+            List<KeyValuePair<string, string>> list = new List<KeyValuePair<string, string>>();
+            foreach (string h in blocked)
+            {
+                string t;
+                list.Add(new KeyValuePair<string, string>(h, blockedText.TryGetValue(h, out t) ? t : null));
+            }
+            return list;
+        }
+
+        public static void Unblock(IEnumerable<string> hashes)
+        {
+            LoadHashes();
+            foreach (string h in hashes) { blocked.Remove(h); blockedText.Remove(h); }
+            SaveSet(BlockedPath, blocked);
         }
 
         public static bool IsBlocked(string line) { LoadHashes(); return blocked.Contains(Hash(line)); }
         public static bool IsLiked(string line) { LoadHashes(); return liked.Contains(Hash(line)); }
         public static int BlockedCount { get { LoadHashes(); return blocked.Count; } }
 
-        public static void Block(string line) { LoadHashes(); string h = Hash(line); blocked.Add(h); liked.Remove(h); SaveSet(BlockedPath, blocked); SaveSet(LikedPath, liked); }
+        public static void Block(string line) { LoadHashes(); string h = Hash(line); blocked.Add(h); blockedText[h] = line.Trim(); liked.Remove(h); SaveSet(BlockedPath, blocked); SaveSet(LikedPath, liked); }
         public static void Like(string line) { LoadHashes(); string h = Hash(line); liked.Add(h); blocked.Remove(h); SaveSet(LikedPath, liked); SaveSet(BlockedPath, blocked); }
-        public static void UnblockAll() { LoadHashes(); blocked.Clear(); SaveSet(BlockedPath, blocked); }
+        public static void UnblockAll() { LoadHashes(); blocked.Clear(); blockedText.Clear(); SaveSet(BlockedPath, blocked); }
 
         // ---------------- uvoz .dinopack (zip) ----------------
         /// Vraća instalirani paket ili baca izuzetak sa porukom za korisnika.

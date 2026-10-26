@@ -1,5 +1,5 @@
 ﻿# IT
-# Jedna fora po liniji. Linije sa # se ignorišu.
+# One joke per line. Lines starting with # are ignored.
 ping... pong!
 sudo nahrani me
 Jesi li uradio backup?

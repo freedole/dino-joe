@@ -93,7 +93,11 @@ namespace DinoJoe
                 try { Directory.CreateDirectory(Packs.UserDir); System.Diagnostics.Process.Start("explorer.exe", "\"" + Packs.UserDir + "\""); } catch { }
             };
             btUnblock.SetBounds(328, 428, 190, 30);
-            btUnblock.Click += delegate { Packs.UnblockAll(); UpdateUnblock(); Changed = true; };
+            btUnblock.Click += delegate
+            {
+                using (BlockedForm f = new BlockedForm()) { f.ShowDialog(this); if (f.Changed) Changed = true; }
+                UpdateUnblock();
+            };
             Controls.Add(btUnblock);
             Button bClose = Btn(Lang.Get("pk.close"), 598, 428, 110);
             bClose.Click += delegate { Close(); };
@@ -241,6 +245,74 @@ namespace DinoJoe
             if (cbProfile.SelectedIndex <= 0) return;
             Packs.DeleteProfile(cbProfile.SelectedItem.ToString());
             ReloadProfiles();
+        }
+    }
+
+    // ======================================================================
+    //  BLOKIRANE FORE: čekiraj šta se vraća
+    // ======================================================================
+    class BlockedForm : Form
+    {
+        readonly CheckedListBox list = new CheckedListBox();
+        List<KeyValuePair<string, string>> items;
+        public bool Changed;
+
+        public BlockedForm()
+        {
+            Text = Lang.Get("bl.title");
+            Font = new Font("Segoe UI", 9.5f);
+            FormBorderStyle = FormBorderStyle.FixedDialog;
+            MaximizeBox = false; MinimizeBox = false;
+            StartPosition = FormStartPosition.CenterParent;
+            AutoScaleMode = AutoScaleMode.Dpi;
+            ClientSize = new Size(620, 420);
+            TopMost = true;
+
+            Label l = new Label(); l.Text = Lang.Get("bl.sub"); l.SetBounds(12, 10, 596, 22); Controls.Add(l);
+            list.CheckOnClick = true;
+            list.HorizontalScrollbar = true;
+            list.SetBounds(12, 36, 596, 324);
+            Controls.Add(list);
+
+            CheckBox all = new CheckBox();
+            all.Text = Lang.Get("bl.checkall");
+            all.SetBounds(12, 374, 150, 28);
+            all.CheckedChanged += delegate { for (int i = 0; i < list.Items.Count; i++) list.SetItemChecked(i, all.Checked); };
+            Controls.Add(all);
+
+            Button restore = new Button(); restore.Text = Lang.Get("bl.restore"); restore.SetBounds(240, 372, 150, 32);
+            restore.Click += delegate { Restore(false); };
+            Controls.Add(restore);
+            Button restoreAll = new Button(); restoreAll.Text = Lang.Get("bl.restoreall"); restoreAll.SetBounds(396, 372, 110, 32);
+            restoreAll.Click += delegate { Restore(true); };
+            Controls.Add(restoreAll);
+            Button close = new Button(); close.Text = Lang.Get("pk.close"); close.SetBounds(512, 372, 96, 32);
+            close.Click += delegate { Close(); };
+            Controls.Add(close);
+            CancelButton = close;
+
+            Reload();
+        }
+
+        void Reload()
+        {
+            items = Packs.BlockedList();
+            items.Sort(delegate(KeyValuePair<string, string> a, KeyValuePair<string, string> b) { return string.Compare(a.Value ?? "~", b.Value ?? "~", StringComparison.CurrentCultureIgnoreCase); });
+            list.Items.Clear();
+            foreach (KeyValuePair<string, string> kv in items)
+                list.Items.Add(kv.Value ?? Lang.Get("bl.unknown") + " (" + kv.Key + ")");
+        }
+
+        void Restore(bool all)
+        {
+            List<string> hashes = new List<string>();
+            for (int i = 0; i < items.Count; i++)
+                if (all || list.GetItemChecked(i)) hashes.Add(items[i].Key);
+            if (hashes.Count == 0) return;
+            Packs.Unblock(hashes);
+            Changed = true;
+            Reload();
+            if (items.Count == 0) Close();
         }
     }
 

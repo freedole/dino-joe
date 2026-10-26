@@ -122,10 +122,7 @@ namespace DinoJoe
                         string cat = Path.GetFileNameWithoutExtension(f);
                         Dictionary<string, List<string>> one = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
                         AddFile(one, cat, f);
-                        string w, k;
-                        if (!p.Ini.TryGetValue("tezina." + cat, out w)) w = "10";
-                        if (!p.Ini.TryGetValue("kljucne." + cat, out k)) k = "";
-                        AddCat(p.Id + "/" + cat, one[cat], w, k, mul);
+                        AddCat(p.Id + "/" + cat, one[cat], p.CatWeight(cat), p.CatKeywords(cat), mul);
                     }
                 }
             }

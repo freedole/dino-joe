@@ -1,5 +1,5 @@
 ﻿# SPECIJALNO: kad ga klikneš
-# Jedna fora po liniji. Linije sa # se ignorišu.
+# One joke per line. Lines starting with # are ignored.
 Hej!
 Ne bockaj, imam ljuske.
 Rawr!

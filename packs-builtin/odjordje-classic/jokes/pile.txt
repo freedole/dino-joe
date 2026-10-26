@@ -1,5 +1,5 @@
 ﻿# SPECIJALNO: kad dođe pile
-# Jedna fora po liniji. Linije sa # se ignorišu.
+# One joke per line. Lines starting with # are ignored.
 Ovo je moj praunuk. Pozdravi ga.
 Pile, ne trči! Pazi na kombajn!
 Vidi ga, isti đed.

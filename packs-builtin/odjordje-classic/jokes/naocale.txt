@@ -1,5 +1,5 @@
 ﻿# SPECIJALNO: kad stavi naočale
-# Jedna fora po liniji. Linije sa # se ignorišu.
+# One joke per line. Lines starting with # are ignored.
 Četvorooki? Da, i šta?
 Four eyes, two arms. Kratke.
 Sad vidim i tvoje bugove.

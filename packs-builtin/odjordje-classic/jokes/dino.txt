@@ -1,5 +1,5 @@
 ﻿# Dino / izumiranje
-# Jedna fora po liniji. Linije sa # se ignorišu.
+# One joke per line. Lines starting with # are ignored.
 All my friends are dead.
 All my friends are dead. Osim tebe. I kokošaka.
 Svi moji drugari su izumrli. Ostali smo ja i Excel.

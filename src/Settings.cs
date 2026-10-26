@@ -149,6 +149,49 @@ namespace DinoJoe
             Add("pk.profiles", "Profil", "Profil", "Profil", "Profile");
             Add("pk.switched", "Profil: {0}", "Profil: {0}", "Profil: {0}", "Profile: {0}");
 
+            // blokirane fore
+            Add("bl.title", "Blokirane fore", "Blokirane fore", "Blokirane fore", "Blocked jokes");
+            Add("bl.sub", "Označi fore koje želiš vratiti:", "Označi fore koje želiš da vratiš:", "Označi fore koje želiš vratiti:", "Check the jokes you want back:");
+            Add("bl.checkall", "Označi sve", "Označi sve", "Označi sve", "Check all");
+            Add("bl.restore", "Vrati označene", "Vrati označene", "Vrati označene", "Restore checked");
+            Add("bl.restoreall", "Vrati sve", "Vrati sve", "Vrati sve", "Restore all");
+            Add("bl.unknown", "(stara blokada, tekst nije sačuvan)", "(stara blokada, tekst nije sačuvan)", "(stara blokada, tekst nije spremljen)", "(old block, text not saved)");
+
+            // status i potrebe
+            Add("need.food", "Hrana", "Hrana", "Hrana", "Food");
+            Add("need.water", "Voda", "Voda", "Voda", "Water");
+            Add("need.energy", "Energija", "Energija", "Energija", "Energy");
+            Add("need.love", "Mazenje", "Maženje", "Maženje", "Cuddles");
+            Add("need.fun", "Zabava", "Zabava", "Zabava", "Fun");
+            Add("need.hygiene", "Higijena", "Higijena", "Higijena", "Hygiene");
+            Add("need.health", "Zdravlje", "Zdravlje", "Zdravlje", "Health");
+            Add("st.title", "status", "status", "status", "status");
+            Add("st.menu", "Status...", "Status...", "Status...", "Status...");
+            Add("st.happy", "Zadovoljstvo", "Zadovoljstvo", "Zadovoljstvo", "Happiness");
+            Add("st.worry", "Briga", "Briga", "Briga", "Worry");
+            Add("st.vacation", "Godišnji odmor (pauziraj potrebe)", "Godišnji odmor (pauziraj potrebe)", "Godišnji odmor (pauziraj potrebe)", "Vacation (pause needs)");
+            Add("st.onvacation", "Na godišnjem odmoru 🏖", "Na godišnjem odmoru 🏖", "Na godišnjem odmoru 🏖", "On vacation 🏖");
+            Add("st.sick", "Nije mu dobro 🤒", "Nije mu dobro 🤒", "Nije mu dobro 🤒", "Not feeling well 🤒");
+            Add("act.feed", "Nahrani", "Nahrani", "Nahrani", "Feed");
+            Add("act.water", "Napoji", "Napoji", "Napoji", "Give water");
+            Add("act.pet", "Pomazi", "Pomazi", "Pomazi", "Pet");
+            Add("act.play", "Igraj se", "Igraj se", "Igraj se", "Play");
+            Add("act.sleep", "Uspavaj", "Uspavaj", "Uspavaj", "Sleep");
+            Add("act.bath", "Okupaj", "Okupaj", "Okupaj", "Bath");
+            Add("say.water", "Glup glup glup... Aaah!", "Glup glup glup... Aaah!", "Glup glup glup... Aaah!", "Glug glug glug... Aaah!");
+            Add("say.play", "Hajmo! Ti juri meteor, ja bježim!", "Hajmo! Ti juri meteor, ja bežim!", "Idemo! Ti juri meteor, ja bježim!", "Let's go! You chase the meteor, I run!");
+            Add("say.bath", "Blub blub! Sad mirišem kao fosil iz parfimerije.", "Blub blub! Sad mirišem kao fosil iz parfimerije.", "Blub blub! Sad mirišem kao fosil iz parfumerije.", "Splish splash! Now I smell like a fossil from a perfume shop.");
+            Add("say.tired", "Pretvaram se da nisam umoran. Ne ide mi.", "Pretvaram se da nisam umoran. Ne ide mi.", "Pretvaram se da nisam umoran. Ne ide mi.", "I'm pretending I'm not tired. It's not working.");
+            Add("need.say.food", "Ne kažem da sam gladan, ali onaj kursor liči na kobasicu.|Gladan sam! (dupli klik)|Stomak mi krči kao stari hard disk.", "Ne kažem da sam gladan, ali onaj kursor liči na kobasicu.|Gladan sam! (dupli klik)|Stomak mi krči kao stari hard disk.", "Ne kažem da sam gladan, ali onaj kursor sliči na kobasicu.|Gladan sam! (dupli klik)|Trbuh mi krči kao stari hard disk.", "Not saying I'm hungry, but that cursor looks like a sausage.|I'm hungry! (double-click)|My stomach growls like an old hard drive.");
+            Add("need.say.water", "Žedan sam kao pustinja u Kredi.|Daj malo vode, suho mi je ko na serveru bez ventilatora.", "Žedan sam kao pustinja u Kredi.|Daj malo vode, suvo mi je ko na serveru bez ventilatora.", "Žedan sam kao pustinja u Kredi.|Daj malo vode, suho mi je ko na serveru bez ventilatora.", "I'm as thirsty as a Cretaceous desert.|Water please, I'm drier than a server without fans.");
+            Add("need.say.energy", "Oči mi se zatvaraju brže nego tebi tabovi.|*zijev* Može li jedna dremka?", "Oči mi se zatvaraju brže nego tebi tabovi.|*zev* Može li jedna dremka?", "Oči mi se zatvaraju brže nego tebi tabovi.|*zijev* Može li jedno drijemanje?", "My eyes close faster than your tabs.|*yawn* Nap time?");
+            Add("need.say.love", "Dobro. Niko me ne mazi. Idem da se mazim sa Recycle Binom.|Jesi zaboravio da postojim? Ja jesam fosil, ali ipak.", "Dobro. Niko me ne mazi. Idem da se mazim sa Recycle Binom.|Jesi zaboravio da postojim? Ja jesam fosil, ali ipak.", "Dobro. Nitko me ne mazi. Idem se maziti s Recycle Binom.|Jesi zaboravio da postojim? Ja jesam fosil, ali ipak.", "Fine. Nobody pets me. I'll cuddle the Recycle Bin.|Forgot I exist? I am a fossil, but still.");
+            Add("need.say.fun", "Dosadno mi je. Hoćemo se igrati?|Ajde nešto zanimljivo, ovaj Excel me ubija.", "Dosadno mi je. Hoćemo da se igramo?|Ajde nešto zanimljivo, ovaj Excel me ubija.", "Dosadno mi je. Hoćemo se igrati?|Ajde nešto zanimljivo, ovaj Excel me ubija.", "I'm bored. Wanna play?|Something fun please, this Excel is killing me.");
+            Add("need.say.hygiene", "Mirišem kao muzej poslije ponoći. Okupaj me.|Malo sam blatnjav. Od Krede.", "Mirišem kao muzej posle ponoći. Okupaj me.|Malo sam blatnjav. Od Krede.", "Mirišem kao muzej poslije ponoći. Okupaj me.|Malo sam blatnjav. Od Krede.", "I smell like a museum after midnight. Bath please.|I'm a bit muddy. Cretaceous mud.");
+            Add("need.say.health", "Nije mi dobro... Trebam hranu, vodu i kupku.|Kašljem kao stari laptop.", "Nije mi dobro... Treba mi hrana, voda i kupka.|Kašljem kao stari laptop.", "Nije mi dobro... Trebam hranu, vodu i kupku.|Kašljem kao stari laptop.", "Not feeling well... I need food, water and a bath.|Coughing like an old laptop.");
+            Add("say.ranaway", "Otišao sam. Niko me ne pazi. (tray -> Dozovi ovamo)", "Otišao sam. Niko me ne pazi. (tray -> Dozovi ovamo)", "Otišao sam. Nitko me ne pazi. (tray -> Dozovi ovamo)", "I left. Nobody takes care of me. (tray -> Summon)");
+            Add("say.back", "Vratio sam se... Ali sad me pazi, važi?", "Vratio sam se... Ali sad me pazi, važi?", "Vratio sam se... Ali sad me pazi, može?", "I'm back... but take care of me now, okay?");
+
             // bosanski izuzeci
             BsOverride["wiz.settings"] = "Dino Joe - postavke";
             BsOverride["menu.settings"] = "Postavke...";
