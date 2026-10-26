@@ -192,9 +192,85 @@ namespace DinoJoe
             Add("say.ranaway", "Otišao sam. Niko me ne pazi. (tray -> Dozovi ovamo)", "Otišao sam. Niko me ne pazi. (tray -> Dozovi ovamo)", "Otišao sam. Nitko me ne pazi. (tray -> Dozovi ovamo)", "I left. Nobody takes care of me. (tray -> Summon)");
             Add("say.back", "Vratio sam se... Ali sad me pazi, važi?", "Vratio sam se... Ali sad me pazi, važi?", "Vratio sam se... Ali sad me pazi, može?", "I'm back... but take care of me now, okay?");
 
+            // meni i govor ljubimca
+            Add("m.chat", "Pričaj sa mnom", "Pričaj sa mnom", "Pričaj sa mnom", "Chat with me");
+            Add("m.joke", "Ispričaj foru", "Ispričaj foru", "Ispričaj foru", "Tell a joke");
+            Add("m.roar", "Riči!", "Riči!", "Riči!", "Roar!");
+            Add("m.chick", "Pozovi pile", "Pozovi pile", "Pozovi pile", "Call the chick");
+            Add("m.glasses", "Naočale", "Naočare", "Naočale", "Glasses");
+            Add("m.sleep", "Spavaj", "Spavaj", "Spavaj", "Sleep");
+            Add("m.wake", "Probudi", "Probudi", "Probudi", "Wake up");
+            Add("m.summon", "Dozovi ovamo", "Dozovi ovamo", "Dozovi ovamo", "Come here");
+            Add("m.size", "Veličina", "Veličina", "Veličina", "Size");
+            Add("m.sizes", "Mali|Srednji|Veliki", "Mali|Srednji|Veliki", "Mali|Srednji|Veliki", "Small|Medium|Large");
+            Add("m.talk", "Pričljivost", "Pričljivost", "Pričljivost", "Chattiness");
+            Add("m.talks", "Tih|Normalan|Brbljivac", "Tih|Normalan|Brbljivac", "Tih|Normalan|Brbljavac", "Quiet|Normal|Chatterbox");
+            Add("m.aiset", "Podesi AI...", "Podesi AI...", "Postavi AI...", "AI settings...");
+            Add("m.persona", "Uredi AI ličnost (licnost.txt)", "Uredi AI ličnost (licnost.txt)", "Uredi AI osobnost (licnost.txt)", "Edit AI persona (licnost.txt)");
+            Add("m.clear", "Obriši razgovor", "Obriši razgovor", "Obriši razgovor", "Clear conversation");
+            Add("s.cleared", "Razgovor obrisan. Ne sjećam se ničega. Kao poslije meteora.", "Razgovor obrisan. Ne sećam se ničega. Kao posle meteora.", "Razgovor obrisan. Ne sjećam se ničega. Kao poslije meteora.", "Conversation cleared. I remember nothing. Like after the meteor.");
+            Add("s.forgot", "Šta smo pričali? Ne sjećam se.", "Šta smo pričali? Ne sećam se.", "Što smo pričali? Ne sjećam se.", "What were we talking about? I forgot.");
+            Add("m.jokes", "Fore", "Fore", "Fore", "Jokes");
+            Add("m.jokefolder", "Otvori folder sa mojim forama", "Otvori folder sa mojim forama", "Otvori mapu s mojim forama", "Open my jokes folder");
+            Add("m.reload", "Učitaj fore ponovo", "Učitaj fore ponovo", "Učitaj fore ponovno", "Reload jokes");
+            Add("m.exit", "Izlaz", "Izlaz", "Izlaz", "Exit");
+            Add("s.noauto", "OK, neću se sam paliti.", "OK, neću se sam paliti.", "OK, neću se sam paliti.", "OK, I won't start on my own.");
+            Add("s.auto", "Vidimo se pri svakom logonu!", "Vidimo se pri svakom logonu!", "Vidimo se pri svakoj prijavi!", "See you at every logon!");
+            Add("s.write", "Piši, ja čekam.", "Piši, ja čekam.", "Piši, ja čekam.", "Write away, I'm waiting.");
+            Add("s.njam", "NJAM! Konačno!", "NJAM! Konačno!", "NJAM! Konačno!", "NOM! Finally!");
+            Add("s.full", "Sit sam, ali hvala :)", "Sit sam, ali hvala :)", "Sit sam, ali hvala :)", "I'm full, but thanks :)");
+            Add("s.morning", "Jutro!", "Jutro!", "Jutro!", "Morning!");
+            Add("s.night", "Laku noć...", "Laku noć...", "Laku noć...", "Good night...");
+            Add("s.here", "Evo me!", "Evo me!", "Evo me!", "Here I am!");
+            Add("s.aion", "Povezan na AI ({0}). Enter šalje, Esc zatvara.", "Povezan na AI ({0}). Enter šalje, Esc zatvara.", "Povezan na AI ({0}). Enter šalje, Esc zatvara.", "Connected to AI ({0}). Enter sends, Esc closes.");
+            Add("s.aioff", "Offline režim. Za pravi razgovor: desni klik na mene → AI → Podesi AI.", "Offline režim. Za pravi razgovor: desni klik na mene → AI → Podesi AI.", "Offline način. Za pravi razgovor: desni klik na mene → AI → Postavi AI.", "Offline mode. For real chat: right-click me → AI → AI settings.");
+            Add("s.you", "Ti", "Ti", "Ti", "You");
+            Add("s.badkey", "Ključ ne valja ili je opozvan. Desni klik → AI → Podesi AI.", "Ključ ne valja ili je opozvan. Desni klik → AI → Podesi AI.", "Ključ ne valja ili je opozvan. Desni klik → AI → Postavi AI.", "The key is invalid or revoked. Right-click → AI → AI settings.");
+            Add("s.limit", "Limit dostignut. Odmaram od AI-ja 5 minuta, do tada pričam iz glave.", "Limit dostignut. Odmaram od AI-ja 5 minuta, do tada pričam iz glave.", "Limit dosegnut. Odmaram od AI-ja 5 minuta, do tada pričam iz glave.", "Rate limit reached. Taking a 5 minute AI break, I'll talk from memory.");
+            Add("s.nonet", "Nema veze sa serverom (mreža/proxy/firewall). Pokušaću opet za minut.", "Nema veze sa serverom (mreža/proksi/firewall). Pokušaću opet za minut.", "Nema veze sa serverom (mreža/proxy/firewall). Pokušat ću opet za minutu.", "Can't reach the server (network/proxy/firewall). I'll retry in a minute.");
+            Add("s.aierr", "AI greška.", "AI greška.", "AI pogreška.", "AI error.");
+            Add("s.seechat", "… (vidi chat)", "… (vidi chat)", "… (vidi chat)", "… (see chat)");
+            Add("s.connected", "Povezan sam! Klikni me u tray-u ili desni klik → Pričaj sa mnom.", "Povezan sam! Klikni me u tray-u ili desni klik → Pričaj sa mnom.", "Povezan sam! Klikni me u tray-u ili desni klik → Pričaj sa mnom.", "Connected! Click me in the tray or right-click → Chat with me.");
+            Add("s.aion2", "Povezan na AI ({0}).", "Povezan na AI ({0}).", "Povezan na AI ({0}).", "Connected to AI ({0}).");
+            Add("s.persona", "Mijenjaš mi karakter? Hrabro.", "Menjaš mi karakter? Hrabro.", "Mijenjaš mi karakter? Hrabro.", "Changing my personality? Brave.");
+            Add("s.roarsorry", "ROAR! ...izvini, refleks.", "ROAR! ...izvini, refleks.", "ROAR! ...oprosti, refleks.", "ROAR! ...sorry, reflex.");
+            Add("s.floor", "Opet ja na podu.", "Opet ja na podu.", "Opet ja na podu.", "On the floor again.");
+            Add("s.yawn", "*zijev*", "*zev*", "*zijev*", "*yawn*");
+            Add("s.notsleep", "Hm?! Ne spavam, odmaram oči.", "Hm?! Ne spavam, odmaram oči.", "Hm?! Ne spavam, odmaram oči.", "Hm?! I'm not sleeping, just resting my eyes.");
+            Add("s.noglasses", "Bez naočala sam ljepši. Mislim.", "Bez naočara sam lepši. Mislim.", "Bez naočala sam ljepši. Mislim.", "I look better without glasses. I think.");
+            Add("g.mon", "Ponedjeljak. Izumro bih opet.", "Ponedeljak. Izumro bih opet.", "Ponedjeljak. Izumro bih opet.", "Monday. I'd go extinct again.");
+            Add("g.fri", "Petak je. Ne diraj ništa.", "Petak je. Ne diraj ništa.", "Petak je. Ne diraj ništa.", "It's Friday. Don't touch anything.");
+            Add("g.morning", "Dobro jutro! Prvo kafa, pa sve ostalo.", "Dobro jutro! Prvo kafa, pa sve ostalo.", "Dobro jutro! Prvo kava, pa sve ostalo.", "Good morning! Coffee first, everything else later.");
+            Add("g.day", "Ćao! Ja sam {0}.", "Ćao! Ja sam {0}.", "Bok! Ja sam {0}.", "Hi! I'm {0}.");
+            Add("g.eve", "Dobro veče! Još radiš?", "Dobro veče! Još radiš?", "Dobra večer! Još radiš?", "Good evening! Still working?");
+            Add("g.night", "Što ne spavaš? Ni ja ne spavam. Ja sam fosil.", "Što ne spavaš? Ni ja ne spavam. Ja sam fosil.", "Zašto ne spavaš? Ni ja ne spavam. Ja sam fosil.", "Why aren't you asleep? Me neither. I'm a fossil.");
+            Add("ai.title", "{0} AI - podešavanje", "{0} AI - podešavanje", "{0} AI - postavke", "{0} AI - settings");
+            Add("ai.intro", "1) Klikni \"Otvori Groq\", uloguj se i napravi API ključ (besplatno).\r\n2) Zalijepi ključ ispod i klikni \"Testiraj i sačuvaj\".", "1) Klikni \"Otvori Groq\", uloguj se i napravi API ključ (besplatno).\r\n2) Nalepi ključ ispod i klikni \"Testiraj i sačuvaj\".", "1) Klikni \"Otvori Groq\", prijavi se i napravi API ključ (besplatno).\r\n2) Zalijepi ključ ispod i klikni \"Testiraj i spremi\".", "1) Click \"Open Groq\", sign in and create an API key (free).\r\n2) Paste the key below and click \"Test and save\".");
+            Add("ai.open", "Otvori Groq", "Otvori Groq", "Otvori Groq", "Open Groq");
+            Add("ai.key", "API ključ:", "API ključ:", "API ključ:", "API key:");
+            Add("ai.show", "Prikaži ključ", "Prikaži ključ", "Prikaži ključ", "Show key");
+            Add("ai.enabled", "AI uključen (isključeno = offline fore)", "AI uključen (isključeno = offline fore)", "AI uključen (isključeno = offline fore)", "AI enabled (off = offline jokes)");
+            Add("ai.test", "Testiraj i sačuvaj", "Testiraj i sačuvaj", "Testiraj i spremi", "Test and save");
+            Add("ai.save", "Sačuvaj bez testa", "Sačuvaj bez testa", "Spremi bez testa", "Save without test");
+            Add("ai.enter", "Unesi ključ.", "Unesi ključ.", "Unesi ključ.", "Enter a key.");
+            Add("ai.testing", "Testiram vezu...", "Testiram vezu...", "Testiram vezu...", "Testing connection...");
+            Add("ai.works", "Radi! {0} kaže: {1}", "Radi! {0} kaže: {1}", "Radi! {0} kaže: {1}", "Works! {0} says: {1}");
+            Add("ai.fail", "Ne radi: {0}", "Ne radi: {0}", "Ne radi: {0}", "Doesn't work: {0}");
+            Add("ai.chattitle", "Pričaj sa {0}", "Pričaj sa {0}", "Pričaj s {0}", "Chat with {0}");
+            Add("ai.send", "Pošalji", "Pošalji", "Pošalji", "Send");
+            Add("ai.empty", "Prazan odgovor od servera.", "Prazan odgovor od servera.", "Prazan odgovor poslužitelja.", "Empty response from server.");
+
+            Add("s.error", "Greška: ", "Greška: ", "Pogreška: ", "Error: ");
+            Add("g.noon", "Podne! Pauza? Može sve osim piletine.", "Podne! Pauza? Može sve osim piletine.", "Podne! Pauza? Može sve osim piletine.", "Noon! Lunch break? Anything but chicken.");
+            Add("g.endwork", "15h. Ko je zadnji, gasi svjetlo.", "15h. Ko je zadnji, gasi svetlo.", "15h. Tko je zadnji, gasi svjetlo.", "3 PM. Last one out turns off the lights.");
+            Add("ai.think", "Model je samo razmišljao, bez odgovora (povećaj max_tokens ili promijeni model).", "Model je samo razmišljao, bez odgovora (povećaj max_tokens ili promeni model).", "Model je samo razmišljao, bez odgovora (povećaj max_tokens ili promijeni model).", "The model only thought, no answer (raise max_tokens or change model).");
+            Add("ai.greetme", "Pozdravi me u jednoj kratkoj rečenici.", "Pozdravi me u jednoj kratkoj rečenici.", "Pozdravi me u jednoj kratkoj rečenici.", "Greet me in one short sentence.");
+
             // bosanski izuzeci
             BsOverride["wiz.settings"] = "Dino Joe - postavke";
             BsOverride["menu.settings"] = "Postavke...";
+            BsOverride["m.aiset"] = "AI postavke...";
+            BsOverride["ai.title"] = "{0} AI - postavke";
             BsOverride["s.ai.text"] = "Zdravo! Ja sam {0}. Radim i bez interneta i bez računa: jedem, spavam, pričam fore i pravim ti društvo.\r\n\r\nAko želiš, poveži AI račun i postajem pravi chatbot - odgovaram na pitanja, pomažem oko posla i pamtim naše razgovore.\r\n\r\nOvo nije obavezno. Možeš preskočiti i uključiti kasnije u Postavkama.";
         }
     }

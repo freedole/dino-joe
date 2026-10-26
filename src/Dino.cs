@@ -219,7 +219,7 @@ namespace DinoJoe
         };
 
         public static readonly string[] Feed = {
-            "Njam njam!", "NJAM! Konačno!", "Ovo nije piletina, je l' da?",
+            "Njam njam!", Lang.Get("s.njam"), "Ovo nije piletina, je l' da?",
             "Hvala! Sad mogu još 66 miliona godina.", "Mmm, paprat sa kečapom."
         };
 
@@ -1009,6 +1009,12 @@ namespace DinoJoe
             }
             pose.Female = Settings.Female;
             pose.Glasses = Settings.Glasses;
+            // jezik se možda promijenio: napravi meni ponovo
+            ContextMenuStrip old = menu;
+            BuildMenu();
+            ContextMenuStrip = menu;
+            tray.ContextMenuStrip = menu;
+            if (old != null) old.Dispose();
             Text = Profile.Name;
             tray.Text = Profile.TrayText.Length > 63 ? Profile.TrayText.Substring(0, 63) : Profile.TrayText;
             SaveState();
@@ -1050,28 +1056,28 @@ namespace DinoJoe
         void BuildMenu()
         {
             menu = new ContextMenuStrip();
-            ToolStripMenuItem miChat = new ToolStripMenuItem("Pričaj sa mnom", null, delegate { OpenChat(); });
+            ToolStripMenuItem miChat = new ToolStripMenuItem(Lang.Get("m.chat"), null, delegate { OpenChat(); });
             miChat.Font = new Font(miChat.Font, FontStyle.Bold);
             menu.Items.Add(miChat);
             menu.Items.Add(new ToolStripSeparator());
-            menu.Items.Add("Ispričaj foru", null, delegate { TellJoke(true); });
+            menu.Items.Add(Lang.Get("m.joke"), null, delegate { TellJoke(true); });
             menu.Items.Add(Lang.Get("st.menu"), null, delegate { OpenStatus(); });
             menu.Items.Add(Lang.Get("act.feed"), null, delegate { DoAction("feed"); });
             menu.Items.Add(Lang.Get("act.water"), null, delegate { DoAction("water"); });
             menu.Items.Add(Lang.Get("act.pet"), null, delegate { DoAction("pet"); });
             menu.Items.Add(Lang.Get("act.play"), null, delegate { DoAction("play"); });
             menu.Items.Add(Lang.Get("act.bath"), null, delegate { DoAction("bath"); });
-            menu.Items.Add("Riči!", null, delegate { Roar(); });
-            menu.Items.Add("Pozovi pile", null, delegate { CallChick(); });
-            miGlasses = new ToolStripMenuItem("Naočale", null, delegate { ToggleGlasses(); });
+            menu.Items.Add(Lang.Get("m.roar"), null, delegate { Roar(); });
+            menu.Items.Add(Lang.Get("m.chick"), null, delegate { CallChick(); });
+            miGlasses = new ToolStripMenuItem(Lang.Get("m.glasses"), null, delegate { ToggleGlasses(); });
             menu.Items.Add(miGlasses);
-            miSleep = new ToolStripMenuItem("Spavaj", null, delegate { ToggleSleep(); });
+            miSleep = new ToolStripMenuItem(Lang.Get("m.sleep"), null, delegate { ToggleSleep(); });
             menu.Items.Add(miSleep);
-            menu.Items.Add("Dozovi ovamo", null, delegate { Summon(); });
+            menu.Items.Add(Lang.Get("m.summon"), null, delegate { Summon(); });
             menu.Items.Add(new ToolStripSeparator());
 
-            ToolStripMenuItem size = new ToolStripMenuItem("Veličina");
-            string[] sn = { "Mali", "Srednji", "Veliki" };
+            ToolStripMenuItem size = new ToolStripMenuItem(Lang.Get("m.size"));
+            string[] sn = Lang.Get("m.sizes").Split('|');
             float[] sv = { 0.75f, 1f, 1.4f };
             miSize = new ToolStripMenuItem[3];
             for (int i = 0; i < 3; i++)
@@ -1082,8 +1088,8 @@ namespace DinoJoe
             }
             menu.Items.Add(size);
 
-            ToolStripMenuItem talk = new ToolStripMenuItem("Pričljivost");
-            string[] tn = { "Tih", "Normalan", "Brbljivac" };
+            ToolStripMenuItem talk = new ToolStripMenuItem(Lang.Get("m.talk"));
+            string[] tn = Lang.Get("m.talks").Split('|');
             miTalk = new ToolStripMenuItem[3];
             for (int i = 0; i < 3; i++)
             {
@@ -1094,11 +1100,11 @@ namespace DinoJoe
             menu.Items.Add(talk);
 
             ToolStripMenuItem aiMenu = new ToolStripMenuItem("AI");
-            aiMenu.DropDownItems.Add("Podesi AI...", null, delegate { OpenAiSettings(); });
-            aiMenu.DropDownItems.Add("Uredi ličnost (licnost.txt)", null, delegate { EditPersona(); });
-            aiMenu.DropDownItems.Add("Obriši razgovor", null, delegate { history.Clear(); if (chat != null) chat.AppendNote("Razgovor obrisan. Ne sjećam se ničega. Kao poslije meteora."); Say("Šta smo pričali? Ne sjećam se."); });
+            aiMenu.DropDownItems.Add(Lang.Get("m.aiset"), null, delegate { OpenAiSettings(); });
+            aiMenu.DropDownItems.Add(Lang.Get("m.persona"), null, delegate { EditPersona(); });
+            aiMenu.DropDownItems.Add(Lang.Get("m.clear"), null, delegate { history.Clear(); if (chat != null) chat.AppendNote(Lang.Get("s.cleared")); Say(Lang.Get("s.forgot")); });
             menu.Items.Add(aiMenu);
-            ToolStripMenuItem fun = new ToolStripMenuItem("Fore");
+            ToolStripMenuItem fun = new ToolStripMenuItem(Lang.Get("m.jokes"));
             miLike = new ToolStripMenuItem(Lang.Get("pk.like"), null, delegate { if (lastJoke != null) { Packs.Like(lastJoke); Say(Lang.Get("pk.liked")); Profile.LoadJokes(); } });
             miBlock = new ToolStripMenuItem(Lang.Get("pk.block"), null, delegate { if (lastJoke != null) { Packs.Block(lastJoke); lastJoke = null; recent.Clear(); Profile.LoadJokes(); Say(Lang.Get("pk.blocked")); } });
             fun.DropDownItems.Add(miLike);
@@ -1108,17 +1114,17 @@ namespace DinoJoe
             miProfiles = new ToolStripMenuItem(Lang.Get("pk.profiles"));
             fun.DropDownItems.Add(miProfiles);
             fun.DropDownItems.Add(new ToolStripSeparator());
-            fun.DropDownItems.Add("Otvori folder sa forama", null, delegate { OpenCustom(); });
-            fun.DropDownItems.Add("Učitaj fore ponovo", null, delegate { Profile.LoadJokes(); recent.Clear(); Say(string.Format(Lang.Get("pk.loaded"), Profile.JokeCount)); });
+            fun.DropDownItems.Add(Lang.Get("m.jokefolder"), null, delegate { OpenCustom(); });
+            fun.DropDownItems.Add(Lang.Get("m.reload"), null, delegate { Profile.LoadJokes(); recent.Clear(); Say(string.Format(Lang.Get("pk.loaded"), Profile.JokeCount)); });
             menu.Items.Add(fun);
             menu.Items.Add(Lang.Get("menu.settings"), null, delegate { OpenSettings(); });
-            miAutostart = new ToolStripMenuItem("Pokreni sa Windowsom", null, delegate { ToggleAutostart(); });
+            miAutostart = new ToolStripMenuItem(Lang.Get("s.autostart"), null, delegate { ToggleAutostart(); });
             menu.Items.Add(miAutostart);
             menu.Items.Add(new ToolStripSeparator());
-            menu.Items.Add("Izlaz", null, delegate { Close(); });
+            menu.Items.Add(Lang.Get("m.exit"), null, delegate { Close(); });
             menu.Opening += delegate
             {
-                miSleep.Text = pose.State == State.Sleep ? "Probudi" : "Spavaj";
+                miSleep.Text = pose.State == State.Sleep ? Lang.Get("m.wake") : Lang.Get("m.sleep");
                 miGlasses.Checked = pose.Glasses;
                 miLike.Enabled = miBlock.Enabled = lastJoke != null;
                 BuildProfilesMenu();
@@ -1144,11 +1150,11 @@ namespace DinoJoe
             {
                 using (RegistryKey rk = Registry.CurrentUser.OpenSubKey(RunKey, true))
                 {
-                    if (IsAutostart()) { rk.DeleteValue(AppName, false); Say("OK, neću se sam paliti."); }
-                    else { rk.SetValue(AppName, "\"" + Application.ExecutablePath + "\""); Say("Vidimo se pri svakom logonu!"); }
+                    if (IsAutostart()) { rk.DeleteValue(AppName, false); Say(Lang.Get("s.noauto")); }
+                    else { rk.SetValue(AppName, "\"" + Application.ExecutablePath + "\""); Say(Lang.Get("s.auto")); }
                 }
             }
-            catch (Exception ex) { Say("Greška: " + ex.Message); }
+            catch (Exception ex) { Say(Lang.Get("s.error") + ex.Message); }
         }
 
         string CustomPath() { return Path.Combine(Profile.FunDir, "moje.txt"); }
@@ -1178,9 +1184,9 @@ namespace DinoJoe
                 if (!File.Exists(p))
                     File.WriteAllText(p, "# Tvoje fore, jedna po liniji. Linije sa # se ignorišu.\r\n# Svaki .txt u ovom folderu je jedna kategorija (ime fajla = kategorija).\r\n# Poslije izmjene: desni klik -> Fore -> Učitaj fore ponovo.\r\n", new UTF8Encoding(true));
                 System.Diagnostics.Process.Start("explorer.exe", "\"" + Profile.FunDir + "\"");
-                Say("Piši, ja čekam.");
+                Say(Lang.Get("s.write"));
             }
-            catch (Exception ex) { Say("Greška: " + ex.Message); }
+            catch (Exception ex) { Say(Lang.Get("s.error") + ex.Message); }
         }
 
         // ---------------- stanje ----------------
@@ -1253,12 +1259,12 @@ namespace DinoJoe
         {
             DateTime n = DateTime.Now;
             int h = n.Hour;
-            if (n.DayOfWeek == DayOfWeek.Monday && h < 12) return Profile.GetPick("pozdrav_ponedjeljak", "Ponedjeljak. Izumro bih opet.");
-            if (n.DayOfWeek == DayOfWeek.Friday && h >= 12) return Profile.GetPick("pozdrav_petak", "Petak je. Ne diraj ništa.");
-            if (h < 10) return Profile.GetPick("pozdrav_jutro", "Dobro jutro! Prvo kafa, pa sve ostalo.");
-            if (h < 17) return Profile.GetPick("pozdrav_dan", "Ćao! Ja sam " + Profile.Name + ".");
-            if (h < 22) return Profile.GetPick("pozdrav_vece", "Dobro veče! Još radiš?");
-            return Profile.GetPick("pozdrav_noc", "Što ne spavaš? Ni ja ne spavam. Ja sam fosil.");
+            if (n.DayOfWeek == DayOfWeek.Monday && h < 12) return Profile.GetPick("pozdrav_ponedjeljak", Lang.Get("g.mon"));
+            if (n.DayOfWeek == DayOfWeek.Friday && h >= 12) return Profile.GetPick("pozdrav_petak", Lang.Get("g.fri"));
+            if (h < 10) return Profile.GetPick("pozdrav_jutro", Lang.Get("g.morning"));
+            if (h < 17) return Profile.GetPick("pozdrav_dan", string.Format(Lang.Get("g.day"), Profile.Name));
+            if (h < 22) return Profile.GetPick("pozdrav_vece", Lang.Get("g.eve"));
+            return Profile.GetPick("pozdrav_noc", Lang.Get("g.night"));
         }
 
         void TellJoke(bool manual)
@@ -1276,7 +1282,7 @@ namespace DinoJoe
             lastFed = DateTime.Now; SaveState();
             forcedSleep = false;
             heartsStart = pose.T;
-            Say(h > 60 ? "NJAM! Konačno!" : (h > 15 ? Profile.Special("food", Jokes.Feed) : "Sit sam, ali hvala :)"));
+            Say(h > 60 ? Lang.Get("s.njam") : (h > 15 ? Profile.Special("food", Jokes.Feed) : Lang.Get("s.full")));
             SetState(State.Happy, 2.2);
         }
 
@@ -1308,13 +1314,13 @@ namespace DinoJoe
             Settings.Glasses = pose.Glasses; Settings.Save();
             glassesLeft = 0;
             SaveState();
-            Say(pose.Glasses ? Profile.Special("glasses", Jokes.Glasses) : "Bez naočala sam ljepši. Mislim.");
+            Say(pose.Glasses ? Profile.Special("glasses", Jokes.Glasses) : Lang.Get("s.noglasses"));
         }
 
         void ToggleSleep()
         {
-            if (pose.State == State.Sleep) { forcedSleep = false; Say("Jutro!"); SetState(State.Idle, 2); }
-            else { forcedSleep = true; Say("Laku noć..."); SetState(State.Sleep, 1e9); }
+            if (pose.State == State.Sleep) { forcedSleep = false; Say(Lang.Get("s.morning")); SetState(State.Idle, 2); }
+            else { forcedSleep = true; Say(Lang.Get("s.night")); SetState(State.Sleep, 1e9); }
         }
 
         void Summon()
@@ -1333,7 +1339,7 @@ namespace DinoJoe
                 Say(Lang.Get("say.back"));
                 return;
             }
-            Say("Evo me!");
+            Say(Lang.Get("s.here"));
         }
 
         // ---------------- AI chat ----------------
@@ -1344,8 +1350,8 @@ namespace DinoJoe
             if (chat == null)
             {
                 chat = new ChatForm(Ask);
-                chat.AppendNote(ai.Ready ? "Povezan na AI (" + ai.Model + "). Enter šalje, Esc zatvara."
-                                         : "Offline režim. Za pravi razgovor: desni klik na ODjordja → AI → Podesi AI.");
+                chat.AppendNote(ai.Ready ? string.Format(Lang.Get("s.aion"), ai.Model)
+                                         : Lang.Get("s.aioff"));
             }
             if (pose.State == State.Sleep) { forcedSleep = false; SetState(State.Idle, 3); }
             chat.ShowNear(new Rectangle((int)fx, (int)fy, cw, ch));
@@ -1353,7 +1359,7 @@ namespace DinoJoe
 
         void Ask(string q)
         {
-            chat.Append("Ti", q, false);
+            chat.Append(Lang.Get("s.you"), q, false);
             if (pose.State == State.Sleep) { forcedSleep = false; SetState(State.Idle, 3); }
 
             if (!AiActive())
@@ -1397,10 +1403,10 @@ namespace DinoJoe
 
             if (history.Count > 0 && history[history.Count - 1].Role == "user") history.RemoveAt(history.Count - 1);
             string note;
-            if (r.Status == 401 || r.Status == 403) note = "Ključ ne valja ili je opozvan. Desni klik → AI → Podesi AI.";
-            else if (r.Status == 429) { note = "Limit dostignut. Odmaram od AI-ja 5 minuta, do tada pričam iz glave."; aiPauseUntil = DateTime.Now.AddMinutes(5); }
-            else if (r.Status == 0) { note = "Nema veze sa serverom (mreža/proxy/firewall). Pokušaću opet za minut."; aiPauseUntil = DateTime.Now.AddMinutes(1); }
-            else note = "AI greška.";
+            if (r.Status == 401 || r.Status == 403) note = Lang.Get("s.badkey");
+            else if (r.Status == 429) { note = Lang.Get("s.limit"); aiPauseUntil = DateTime.Now.AddMinutes(5); }
+            else if (r.Status == 0) { note = Lang.Get("s.nonet"); aiPauseUntil = DateTime.Now.AddMinutes(1); }
+            else note = Lang.Get("s.aierr");
             chat.AppendNote(note + "  [" + r.Text + "]");
             string a = OfflineBrain.Reply(q);
             chat.Append(Profile.Name, a, true);
@@ -1413,7 +1419,7 @@ namespace DinoJoe
             if (t.Length > 170)
             {
                 int cut = t.LastIndexOf(' ', 165);
-                t = t.Substring(0, cut > 100 ? cut : 165) + "… (vidi chat)";
+                t = t.Substring(0, cut > 100 ? cut : 165) + Lang.Get("s.seechat");
             }
             Say(t);
         }
@@ -1424,8 +1430,8 @@ namespace DinoJoe
             ai.Prompted = true;
             ai.Save();
             aiPauseUntil = DateTime.MinValue;
-            if (ai.Ready) Say("Povezan sam! Klikni me u tray-u ili desni klik → Pričaj sa mnom.");
-            if (chat != null) chat.AppendNote(ai.Ready ? "Povezan na AI (" + ai.Model + ")." : "Offline režim.");
+            if (ai.Ready) Say(Lang.Get("s.connected"));
+            if (chat != null) chat.AppendNote(ai.Ready ? string.Format(Lang.Get("s.aion2"), ai.Model) : Lang.Get("s.ai.off"));
         }
 
         void EditPersona()
@@ -1434,9 +1440,9 @@ namespace DinoJoe
             {
                 ai.Persona();
                 System.Diagnostics.Process.Start("notepad.exe", "\"" + ai.PersonaPath + "\"");
-                Say("Mijenjaš mi karakter? Hrabro.");
+                Say(Lang.Get("s.persona"));
             }
-            catch (Exception ex) { Say("Greška: " + ex.Message); }
+            catch (Exception ex) { Say(Lang.Get("s.error") + ex.Message); }
         }
 
         void Say(string text)
@@ -1468,7 +1474,7 @@ namespace DinoJoe
             else if (r < 70) SetState(State.Idle, 2 + rnd.Next(4));
             else if (r < 85) SetState(State.Sit, 4 + rnd.Next(10));
             else if (r < 96) SetState(State.Sleep, 15 + rnd.Next(30));
-            else { SetState(State.Roar, 1.4); Say(rnd.Next(2) == 0 ? "ROAAAR!" : "ROAR! ...izvini, refleks."); }
+            else { SetState(State.Roar, 1.4); Say(rnd.Next(2) == 0 ? "ROAAAR!" : Lang.Get("s.roarsorry")); }
         }
 
         // ---------------- petlja ----------------
@@ -1546,7 +1552,7 @@ namespace DinoJoe
                     if (fy >= ground)
                     {
                         fy = ground; vy = 0;
-                        Say(rnd.Next(2) == 0 ? "Uf!" : "Opet ja na podu.");
+                        Say(rnd.Next(2) == 0 ? "Uf!" : Lang.Get("s.floor"));
                         SetState(State.Idle, 1.2);
                     }
                     break;
@@ -1567,7 +1573,7 @@ namespace DinoJoe
 
             if (st != State.Drag && st != State.Fall && stateT >= stateDur && !forcedSleep)
             {
-                if (st == State.Sleep) Say("*zijev*");
+                if (st == State.Sleep) Say(Lang.Get("s.yawn"));
                 NextRandomState();
             }
 
@@ -1578,8 +1584,8 @@ namespace DinoJoe
                 if (n.Hour != lastHourGreeted && n.Minute == 0)
                 {
                     lastHourGreeted = n.Hour;
-                    if (n.Hour == 12) Say(Profile.GetPick("podne", "Podne! Pauza? Može sve osim piletine."));
-                    else if (n.Hour == 15 && n.DayOfWeek != DayOfWeek.Saturday && n.DayOfWeek != DayOfWeek.Sunday) Say(Profile.GetPick("kraj_radnog", "15h. Ko je zadnji, gasi svjetlo."));
+                    if (n.Hour == 12) Say(Profile.GetPick("podne", Lang.Get("g.noon")));
+                    else if (n.Hour == 15 && n.DayOfWeek != DayOfWeek.Saturday && n.DayOfWeek != DayOfWeek.Sunday) Say(Profile.GetPick("kraj_radnog", Lang.Get("g.endwork")));
                 }
                 else if (needs[needs.Lowest] < 30 && !needs.Vacation && sinceTalk > (Needs.Hardcore ? 45 : 100) && rnd.Next(200) == 0) Say(NeedLine(needs.Lowest));
                 else if (sinceTalk > nextTalk) TellJoke(false);
@@ -1646,7 +1652,7 @@ namespace DinoJoe
             bool wasDrag = dragging;
             mouseDown = false; dragging = false;
             if (wasDrag) { vy = 0; SetState(State.Fall, 0); }
-            else if (pose.State == State.Sleep) { forcedSleep = false; Say("Hm?! Ne spavam, odmaram oči."); SetState(State.Idle, 2); }
+            else if (pose.State == State.Sleep) { forcedSleep = false; Say(Lang.Get("s.notsleep")); SetState(State.Idle, 2); }
             else
             {
                 if (rnd.Next(3) == 0) Say(Profile.Special("poke", Jokes.Poke)); else Say(PickJoke());

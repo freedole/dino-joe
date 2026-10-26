@@ -203,9 +203,9 @@ Pravila:
                 {
                     r.Status = (int)resp.StatusCode;
                     string txt = ExtractContent(sr.ReadToEnd());
-                    if (string.IsNullOrEmpty(txt)) { r.Text = "Prazan odgovor od servera."; return r; }
+                    if (string.IsNullOrEmpty(txt)) { r.Text = Lang.Get("ai.empty"); return r; }
                     txt = StripThink(txt);
-                    if (txt.Length == 0) { r.Text = "Model je samo razmišljao, bez odgovora (povećaj max_tokens ili promijeni model)."; return r; }
+                    if (txt.Length == 0) { r.Text = Lang.Get("ai.think"); return r; }
                     r.Ok = true; r.Text = txt;
                 }
             }
@@ -310,7 +310,7 @@ Pravila:
         public AiSettingsForm(AiConfig c)
         {
             cfg = c;
-            Text = Profile.Name + " AI - podešavanje";
+            Text = string.Format(Lang.Get("ai.title"), Profile.Name);
             FormBorderStyle = FormBorderStyle.FixedDialog;
             MaximizeBox = false; MinimizeBox = false;
             StartPosition = FormStartPosition.CenterScreen;
@@ -321,17 +321,17 @@ Pravila:
             BackColor = Color.White;
 
             Label intro = new Label();
-            intro.Text = "1) Klikni \"Otvori Groq\", uloguj se i napravi API ključ (besplatno).\r\n2) Zalijepi ključ ispod i klikni \"Testiraj i sačuvaj\".";
+            intro.Text = Lang.Get("ai.intro");
             intro.SetBounds(16, 12, 490, 40);
             Controls.Add(intro);
 
             Button btOpen = new ModernButton();
-            btOpen.Text = "Otvori Groq";
+            btOpen.Text = Lang.Get("ai.open");
             btOpen.SetBounds(16, 58, 120, 30);
             btOpen.Click += delegate { try { System.Diagnostics.Process.Start(AiConfig.KeysPage); } catch { } };
             Controls.Add(btOpen);
 
-            AddLabel("API ključ:", 100);
+            AddLabel(Lang.Get("ai.key"), 100);
             tbKey = new TextBox();
             tbKey.SetBounds(120, 97, 384, 26);
             tbKey.UseSystemPasswordChar = true;
@@ -339,7 +339,7 @@ Pravila:
             Controls.Add(tbKey);
 
             CheckBox cbShow = new CheckBox();
-            cbShow.Text = "Prikaži ključ";
+            cbShow.Text = Lang.Get("ai.show");
             cbShow.SetBounds(120, 126, 150, 22);
             cbShow.CheckedChanged += delegate { tbKey.UseSystemPasswordChar = !cbShow.Checked; };
             Controls.Add(cbShow);
@@ -364,7 +364,7 @@ Pravila:
             Controls.Add(btDef);
 
             cbEnabled = new CheckBox();
-            cbEnabled.Text = "AI uključen (isključeno = offline fore)";
+            cbEnabled.Text = Lang.Get("ai.enabled");
             cbEnabled.SetBounds(120, 226, 380, 22);
             cbEnabled.Checked = cfg.Enabled;
             Controls.Add(cbEnabled);
@@ -375,19 +375,19 @@ Pravila:
             Controls.Add(lbStatus);
 
             btTest = new ModernButton();
-            btTest.Text = "Testiraj i sačuvaj";
+            btTest.Text = Lang.Get("ai.test");
             btTest.SetBounds(16, 292, 150, 30);
             btTest.Click += delegate { TestAndSave(); };
             Controls.Add(btTest);
 
             btSave = new ModernButton();
-            btSave.Text = "Sačuvaj bez testa";
+            btSave.Text = Lang.Get("ai.save");
             btSave.SetBounds(176, 292, 150, 30);
             btSave.Click += delegate { Apply(); cfg.Save(); DialogResult = DialogResult.OK; Close(); };
             Controls.Add(btSave);
 
             Button btCancel = new ModernButton();
-            btCancel.Text = "Zatvori";
+            btCancel.Text = Lang.Get("pk.close");
             btCancel.SetBounds(404, 292, 100, 30);
             btCancel.Click += delegate { Close(); };
             Controls.Add(btCancel);
@@ -413,15 +413,15 @@ Pravila:
         void TestAndSave()
         {
             Apply();
-            if (!cfg.HasKey) { lbStatus.ForeColor = Color.Firebrick; lbStatus.Text = "Unesi ključ."; return; }
+            if (!cfg.HasKey) { lbStatus.ForeColor = Color.Firebrick; lbStatus.Text = Lang.Get("ai.enter"); return; }
             lbStatus.ForeColor = Color.FromArgb(60, 60, 60);
-            lbStatus.Text = "Testiram vezu...";
+            lbStatus.Text = Lang.Get("ai.testing");
             btTest.Enabled = false; btSave.Enabled = false;
             string key = cfg.Key, persona = cfg.Persona();
             ThreadPool.QueueUserWorkItem(delegate
             {
                 List<ChatMsg> h = new List<ChatMsg>();
-                h.Add(new ChatMsg("user", "Pozdravi me u jednoj kratkoj rečenici."));
+                h.Add(new ChatMsg("user", Lang.Get("ai.greetme")));
                 AiResult r = AiClient.Ask(cfg, key, persona, h, 60);
                 try
                 {
@@ -432,13 +432,13 @@ Pravila:
                         {
                             cfg.Save();
                             lbStatus.ForeColor = Color.SeaGreen;
-                            lbStatus.Text = "Radi! " + Profile.Name + " kaže: " + r.Text;
+                            lbStatus.Text = string.Format(Lang.Get("ai.works"), Profile.Name, r.Text);
                             DialogResult = DialogResult.OK;
                         }
                         else
                         {
                             lbStatus.ForeColor = Color.Firebrick;
-                            lbStatus.Text = "Ne radi: " + r.Text;
+                            lbStatus.Text = string.Format(Lang.Get("ai.fail"), r.Text);
                         }
                     });
                 }
@@ -463,7 +463,7 @@ Pravila:
         public ChatForm(Action<string> sendHandler)
         {
             onSend = sendHandler;
-            Text = "Pričaj sa " + Profile.NameWith;
+            Text = string.Format(Lang.Get("ai.chattitle"), Profile.NameWith);
             FormBorderStyle = FormBorderStyle.SizableToolWindow;
             ShowInTaskbar = false;
             TopMost = true;
@@ -481,7 +481,7 @@ Pravila:
             bottom.BackColor = Color.FromArgb(240, 246, 240);
 
             send = new ModernButton();
-            send.Text = "Pošalji";
+            send.Text = Lang.Get("ai.send");
             send.Dock = DockStyle.Right;
             send.Width = 80;
             send.FlatStyle = FlatStyle.Flat;
@@ -535,7 +535,7 @@ Pravila:
         public void SetBusy(bool busy)
         {
             send.Enabled = !busy;
-            send.Text = busy ? "..." : "Pošalji";
+            send.Text = busy ? "..." : Lang.Get("ai.send");
         }
 
         public void Append(string who, string text, bool isPet)
