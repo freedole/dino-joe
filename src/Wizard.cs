@@ -1,4 +1,4 @@
-// Dino Joe - čarobnjak pri prvom pokretanju (i "Podešavanja..." kasnije).
+﻿// Dino Joe - čarobnjak pri prvom pokretanju (i "Podešavanja..." kasnije).
 // Koraci: jezik, ko si ti (izlijeganje + pol + ime), izgled, ličnost, paketi, AI + autostart.
 // C# 5 kompatibilno.
 
@@ -308,10 +308,11 @@ namespace DinoJoe
         void StepLang()
         {
             Header("s.lang", "s.lang.sub");
-            for (int i = 0; i < Lang.Codes.Length; i++)
+            for (int n = 0; n < Lang.Order.Length; n++)
             {
+                int i = Lang.Order[n];
                 string code = Lang.Codes[i];
-                RadioButton rb = Radio(Lang.Names[i], 10, 10 + i * 44, 400, langCode == code);
+                RadioButton rb = Radio(Lang.Names[i], 10, 10 + n * 44, 400, langCode == code);
                 rb.Font = new Font("Segoe UI", 12f);
                 rb.CheckedChanged += delegate(object o, EventArgs e)
                 {

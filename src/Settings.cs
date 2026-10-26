@@ -1,4 +1,4 @@
-// Dino Joe - korisnička podešavanja (%APPDATA%\DinoJoe\settings.ini), jezici, ličnosti, palete boja.
+﻿// Dino Joe - korisnička podešavanja (%APPDATA%\DinoJoe\settings.ini), jezici, ličnosti, palete boja.
 // C# 5 kompatibilno (csc iz .NET Framework 4.x).
 
 using System;
@@ -17,9 +17,16 @@ namespace DinoJoe
     static class Lang
     {
         // indeksi u nizovima prevoda
-        public const int SrIjek = 0, SrEkav = 1, Hr = 2, En = 3;
-        public static readonly string[] Codes = { "sr-ijek", "sr-ekav", "hr", "en" };
-        public static readonly string[] Names = { "Srpski (ijekavica)", "Srpski (ekavica)", "Hrvatski", "English" };
+        // Bs (bosanski) koristi ijekavske prevode + izuzetke iz BsOverride
+        public const int SrIjek = 0, SrEkav = 1, Hr = 2, En = 3, Bs = 4;
+        public static readonly string[] Codes = { "sr-ijek", "sr-ekav", "hr", "en", "bs" };
+        public static readonly string[] Names = { "Srpski (ijekavica)", "Srpski (ekavica)", "Hrvatski", "English", "Bosanski" };
+        public static readonly int[] Order = { SrIjek, SrEkav, Bs, Hr, En };   // redoslijed u čarobnjaku
+
+        // indeks u nizovima prevoda (bosanski -> ijekavica)
+        public static int Idx { get { return Current == Bs ? SrIjek : Current; } }
+
+        static readonly Dictionary<string, string> BsOverride = new Dictionary<string, string>();
 
         public static int Current = SrIjek;
 
@@ -37,8 +44,9 @@ namespace DinoJoe
         public static string Get(string key)
         {
             string[] v;
+            if (Current == Bs && BsOverride.ContainsKey(key)) return BsOverride[key];
             if (!T.TryGetValue(key, out v)) return key;
-            string s = v[Current];
+            string s = v[Idx];
             return string.IsNullOrEmpty(s) ? v[0] : s;
         }
 
@@ -100,6 +108,11 @@ namespace DinoJoe
             Add("pet.hello", "Eto me! Desni klik na mene za sve. Ne zaboravi me nahraniti.", "Evo me! Desni klik na mene za sve. Ne zaboravi da me nahraniš.", "Evo me! Desni klik na mene za sve. Ne zaboravi me nahraniti.", "Here I am! Right-click me for everything. Don't forget to feed me.");
             Add("pet.updated", "Novi ja! Kako ti se sviđam?", "Novi ja! Kako ti se sviđam?", "Novi ja! Kako ti se sviđam?", "New me! How do I look?");
             Add("menu.settings", "Podešavanja...", "Podešavanja...", "Postavke...", "Settings...");
+
+            // bosanski izuzeci
+            BsOverride["wiz.settings"] = "Dino Joe - postavke";
+            BsOverride["menu.settings"] = "Postavke...";
+            BsOverride["s.ai.text"] = "Zdravo! Ja sam {0}. Radim i bez interneta i bez računa: jedem, spavam, pričam fore i pravim ti društvo.\r\n\r\nAko želiš, poveži AI račun i postajem pravi chatbot - odgovaram na pitanja, pomažem oko posla i pamtim naše razgovore.\r\n\r\nOvo nije obavezno. Možeš preskočiti i uključiti kasnije u Postavkama.";
         }
     }
 
@@ -113,7 +126,7 @@ namespace DinoJoe
         public string SampleSr, SampleEn;
         public string Style;        // dodatak AI ličnosti
 
-        public string Name { get { string n = Names[Lang.Current]; return string.IsNullOrEmpty(n) ? Names[0] : n; } }
+        public string Name { get { string n = Names[Lang.Idx]; return string.IsNullOrEmpty(n) ? Names[0] : n; } }
         public string Sample { get { return Lang.IsEnglish ? SampleEn : SampleSr; } }
 
         public static readonly List<Personality> All = new List<Personality>();
@@ -182,7 +195,7 @@ namespace DinoJoe
         public Color Primary, Secondary;
         public bool Classic;     // originalne ODjordje boje
 
-        public string Name { get { string n = Names[Lang.Current]; return string.IsNullOrEmpty(n) ? Names[0] : n; } }
+        public string Name { get { string n = Names[Lang.Idx]; return string.IsNullOrEmpty(n) ? Names[0] : n; } }
         public override string ToString() { return Name; }
 
         public static readonly List<Palette> All = new List<Palette>();
@@ -339,6 +352,7 @@ namespace DinoJoe
             string lang = Lang.Current == Lang.En ? "Odgovaraj na engleskom." :
                           Lang.Current == Lang.Hr ? "Odgovaraj na hrvatskom." :
                           Lang.Current == Lang.SrEkav ? "Odgovaraj na srpskom, ekavica, latinica." :
+                          Lang.Current == Lang.Bs ? "Odgovaraj na bosanskom, ijekavica, latinica." :
                           "Odgovaraj na srpskom, ijekavica, latinica.";
             return "Tvoje ime je " + DisplayName + ". " + (Female ? "Ženskog si roda (dinosaurka)." : "Muškog si roda.") +
                    "\r\nStil ličnosti: " + p.Style + "\r\n" + lang;
