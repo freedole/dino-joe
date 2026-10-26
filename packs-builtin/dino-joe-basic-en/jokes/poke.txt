@@ -1,0 +1,12 @@
+# SPECIAL: when clicked
+# One joke per line. Lines starting with # are ignored.
+Hey! That tickles!
+Don't poke me, I have scales.
+Rawr!
+What's up? Need something?
+Purrr...
+I'm here, I'm here!
+Hey, I'm not a touchscreen!
+Hehe, stop it!
+Again? I just got comfortable.
+One more poke and I'll lock your screen. Just kidding.
