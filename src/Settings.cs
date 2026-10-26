@@ -277,11 +277,33 @@ namespace DinoJoe
             Add("trg.monday", "Ponedjeljak, 8h. Kafa prvo, pitanja poslije.|Ponedjeljak ujutro. Hrabro, izdržaćemo zajedno.", "Ponedeljak, 8h. Kafa prvo, pitanja posle.|Ponedeljak ujutru. Hrabro, izdržaćemo zajedno.", "Ponedjeljak, 8h. Kava prvo, pitanja poslije.|Ponedjeljak ujutro. Hrabro, izdržat ćemo zajedno.", "Monday, 8 AM. Coffee first, questions later.|Monday morning. Be brave, we'll survive together.");
             Add("trg.back", "Jesi živ? Već sam jednom ostao sam, ne bih opet.|E, vratio si se! Mislio sam da te je meteor odnio.|Dugo te nije bilo. Čuvao sam desktop.", "Jesi živ? Već sam jednom ostao sam, ne bih opet.|E, vratio si se! Mislio sam da te je meteor odneo.|Dugo te nije bilo. Čuvao sam desktop.", "Jesi živ? Već sam jednom ostao sam, ne bih opet.|E, vratio si se! Mislio sam da te je meteor odnio.|Dugo te nije bilo. Čuvao sam radnu površinu.", "Are you alive? I've been left alone once, not again.|Hey, you're back! I thought the meteor got you.|Long time no see. I guarded the desktop.");
 
+            // AI servisi
+            Add("ai.provider", "AI servis:", "AI servis:", "AI servis:", "AI service:");
+            Add("ai.model", "Model:", "Model:", "Model:", "Model:");
+            Add("ai.getkey", "Napravi API ključ ↗", "Napravi API ključ ↗", "Napravi API ključ ↗", "Get an API key ↗");
+            Add("ai.getollama", "Preuzmi Ollama ↗", "Preuzmi Ollama ↗", "Preuzmi Ollama ↗", "Download Ollama ↗");
+            Add("aip.groq", "Groq (besplatno)", "Groq (besplatno)", "Groq (besplatno)", "Groq (free)");
+            Add("aip.groq.info", "Besplatno, vrlo brzo. Napravi ključ, zalijepi ga ispod i to je to.", "Besplatno, vrlo brzo. Napravi ključ, nalepi ga ispod i to je to.", "Besplatno, vrlo brzo. Napravi ključ, zalijepi ga ispod i to je to.", "Free and very fast. Create a key, paste it below, done.");
+            Add("aip.gemini", "Google Gemini (besplatni nivo)", "Google Gemini (besplatni nivo)", "Google Gemini (besplatna razina)", "Google Gemini (free tier)");
+            Add("aip.gemini.info", "Besplatan nivo uz Google nalog (Google AI Studio).", "Besplatan nivo uz Google nalog (Google AI Studio).", "Besplatna razina uz Google račun (Google AI Studio).", "Free tier with a Google account (Google AI Studio).");
+            Add("aip.openai", "OpenAI (ChatGPT)", "OpenAI (ChatGPT)", "OpenAI (ChatGPT)", "OpenAI (ChatGPT)");
+            Add("aip.openai.info", "Plaća se po potrošnji (API nalog nije isto što i ChatGPT pretplata).", "Plaća se po potrošnji (API nalog nije isto što i ChatGPT pretplata).", "Plaća se po potrošnji (API račun nije isto što i ChatGPT pretplata).", "Pay as you go (an API account is not the same as a ChatGPT subscription).");
+            Add("aip.claude", "Anthropic Claude", "Anthropic Claude", "Anthropic Claude", "Anthropic Claude");
+            Add("aip.claude.info", "Plaća se po potrošnji. Ključ se pravi u Anthropic konzoli.", "Plaća se po potrošnji. Ključ se pravi u Anthropic konzoli.", "Plaća se po potrošnji. Ključ se izrađuje u Anthropic konzoli.", "Pay as you go. Create the key in the Anthropic console.");
+            Add("aip.openrouter", "OpenRouter (stotine modela)", "OpenRouter (stotine modela)", "OpenRouter (stotine modela)", "OpenRouter (hundreds of models)");
+            Add("aip.openrouter.info", "Jedan ključ za mnogo modela, neki su besplatni (završavaju na :free).", "Jedan ključ za mnogo modela, neki su besplatni (završavaju na :free).", "Jedan ključ za mnogo modela, neki su besplatni (završavaju na :free).", "One key for many models, some are free (ending in :free).");
+            Add("aip.ollama", "Ollama (lokalno, bez interneta)", "Ollama (lokalno, bez interneta)", "Ollama (lokalno, bez interneta)", "Ollama (local, offline)");
+            Add("aip.ollama.info", "AI radi na tvom računaru, bez ključa i bez slanja podataka. Treba instalirati Ollama i model.", "AI radi na tvom računaru, bez ključa i bez slanja podataka. Treba instalirati Ollama i model.", "AI radi na tvom računalu, bez ključa i bez slanja podataka. Treba instalirati Ollama i model.", "AI runs on your computer, no key and no data leaves it. Install Ollama and a model.");
+            Add("aip.custom", "Drugo (OpenAI-kompatibilno)", "Drugo (OpenAI-kompatibilno)", "Drugo (OpenAI-kompatibilno)", "Other (OpenAI-compatible)");
+            Add("aip.custom.info", "Bilo koji servis sa OpenAI-kompatibilnim /chat/completions endpointom.", "Bilo koji servis sa OpenAI-kompatibilnim /chat/completions endpointom.", "Bilo koji servis s OpenAI-kompatibilnim /chat/completions endpointom.", "Any service with an OpenAI-compatible /chat/completions endpoint.");
+
             // bosanski izuzeci
             BsOverride["wiz.settings"] = "Dino Joe - postavke";
             BsOverride["menu.settings"] = "Postavke...";
             BsOverride["m.aiset"] = "AI postavke...";
             BsOverride["ai.title"] = "{0} AI - postavke";
+            BsOverride["aip.gemini.info"] = "Besplatan nivo uz Google račun (Google AI Studio).";
+            BsOverride["aip.openai.info"] = "Plaća se po potrošnji (API račun nije isto što i ChatGPT pretplata).";
             BsOverride["s.ai.text"] = "Zdravo! Ja sam {0}. Radim i bez interneta i bez računa: jedem, spavam, pričam fore i pravim ti društvo.\r\n\r\nAko želiš, poveži AI račun i postajem pravi chatbot - odgovaram na pitanja, pomažem oko posla i pamtim naše razgovore.\r\n\r\nOvo nije obavezno. Možeš preskočiti i uključiti kasnije u Postavkama.";
         }
     }

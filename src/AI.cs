@@ -18,6 +18,52 @@ namespace DinoJoe
     // ======================================================================
     //  KONFIGURACIJA (ključ šifrovan DPAPI-jem, vezan za Windows korisnika)
     // ======================================================================
+    class AiProvider
+    {
+        public string Id, NameKey, Url, Model, KeysPage, InfoKey;
+        public bool NeedsKey = true, Anthropic;
+
+        public string Name { get { return Lang.Get(NameKey); } }
+        public override string ToString() { return Name; }
+
+        public static readonly List<AiProvider> All = new List<AiProvider>();
+
+        static AiProvider Add(string id, string url, string model, string keys)
+        {
+            AiProvider p = new AiProvider();
+            p.Id = id; p.NameKey = "aip." + id; p.InfoKey = "aip." + id + ".info";
+            p.Url = url; p.Model = model; p.KeysPage = keys;
+            All.Add(p);
+            return p;
+        }
+
+        static AiProvider()
+        {
+            Add("groq", "https://api.groq.com/openai/v1/chat/completions", "openai/gpt-oss-120b", "https://console.groq.com/keys");
+            Add("gemini", "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", "gemini-2.5-flash", "https://aistudio.google.com/apikey");
+            Add("openai", "https://api.openai.com/v1/chat/completions", "gpt-5-mini", "https://platform.openai.com/api-keys");
+            Add("claude", "https://api.anthropic.com/v1/messages", "claude-haiku-5-5", "https://console.anthropic.com/settings/keys").Anthropic = true;
+            Add("openrouter", "https://openrouter.ai/api/v1/chat/completions", "openrouter/auto", "https://openrouter.ai/keys");
+            Add("ollama", "http://localhost:11434/v1/chat/completions", "llama3.2", "https://ollama.com/download").NeedsKey = false;
+            Add("custom", "", "", "");
+        }
+
+        public static AiProvider Find(string id)
+        {
+            foreach (AiProvider p in All) if (p.Id == id) return p;
+            return null;
+        }
+
+        /// Pogodi provajdera po URL-u (za stare ai.cfg bez provider=).
+        public static AiProvider Guess(string url)
+        {
+            string u = (url ?? "").ToLowerInvariant();
+            foreach (AiProvider p in All)
+                if (p.Url.Length > 0 && u.StartsWith(p.Url.Substring(0, p.Url.IndexOf('/', 8)).ToLowerInvariant())) return p;
+            return Find("custom");
+        }
+    }
+
     class AiConfig
     {
         public const string DefaultUrl = "https://api.groq.com/openai/v1/chat/completions";
@@ -27,6 +73,7 @@ namespace DinoJoe
 
         public string Url = DefaultUrl;
         public string Model = DefaultModel;
+        public string ProviderId = "";
         public bool Enabled = true;
         public bool Prompted;          // već smo jednom ponudili podešavanje
         string keyEnc = "";
@@ -51,7 +98,9 @@ namespace DinoJoe
         }
 
         public bool HasKey { get { return !string.IsNullOrEmpty(keyEnc); } }
-        public bool Ready { get { return Enabled && HasKey && !string.IsNullOrEmpty(Url); } }
+        public AiProvider Provider { get { AiProvider p = AiProvider.Find(ProviderId); return p ?? AiProvider.Guess(Url); } }
+        public bool IsAnthropic { get { return Provider.Anthropic || (Url ?? "").ToLowerInvariant().Contains("api.anthropic.com"); } }
+        public bool Ready { get { return Enabled && (HasKey || !Provider.NeedsKey) && !string.IsNullOrEmpty(Url); } }
 
         public string Key
         {
@@ -86,6 +135,7 @@ namespace DinoJoe
                     if (k == "url" && v.Length > 0) Url = v;
                     else if (k == "model" && v.Length > 0) Model = Array.IndexOf(DeadModels, v) >= 0 ? DefaultModel : v;
                     else if (k == "enabled") Enabled = v == "1";
+                    else if (k == "provider") ProviderId = v;
                     else if (k == "prompted") Prompted = v == "1";
                     else if (k == "key") keyEnc = v;
                 }
@@ -98,6 +148,7 @@ namespace DinoJoe
             try
             {
                 File.WriteAllText(path,
+                    "provider=" + ProviderId + "\r\n" +
                     "url=" + Url + "\r\n" +
                     "model=" + Model + "\r\n" +
                     "enabled=" + (Enabled ? "1" : "0") + "\r\n" +
@@ -165,6 +216,7 @@ Pravila:
 
         public static AiResult Ask(AiConfig cfg, string key, string persona, List<ChatMsg> history, int maxTokens)
         {
+            if (cfg.IsAnthropic) return AskAnthropic(cfg, key, persona, history, maxTokens);
             AiResult r = new AiResult();
             try
             {
@@ -182,10 +234,12 @@ Pravila:
                 Dictionary<string, object> body = new Dictionary<string, object>();
                 body["model"] = cfg.Model;
                 body["messages"] = msgs;
-                body["temperature"] = 0.9;
-                // reasoning modeli (gpt-oss, qwen3...) troše tokene na razmišljanje -> veći budžet + niski napor
+                // reasoning modeli (gpt-oss, qwen3, gpt-5, o-serija) troše tokene na razmišljanje -> veći budžet + niski napor
                 string ml = (cfg.Model ?? "").ToLowerInvariant();
-                if (ml.Contains("gpt-oss")) { body["reasoning_effort"] = "low"; body["max_tokens"] = Math.Max(maxTokens, 1024); }
+                bool oaiReasoning = ml.StartsWith("gpt-5") || (ml.Length > 1 && ml[0] == 'o' && char.IsDigit(ml[1]));
+                if (!oaiReasoning) body["temperature"] = 0.9;
+                if (oaiReasoning) { body["reasoning_effort"] = "low"; body["max_completion_tokens"] = Math.Max(maxTokens, 1024); }
+                else if (ml.Contains("gpt-oss")) { body["reasoning_effort"] = "low"; body["max_tokens"] = Math.Max(maxTokens, 1024); }
                 else if (ml.Contains("qwen3")) { body["max_tokens"] = Math.Max(maxTokens, 1024); }
                 else body["max_tokens"] = maxTokens;
 
@@ -225,6 +279,80 @@ Pravila:
                     string msg = "";
                     try { using (StreamReader sr = new StreamReader(er.GetResponseStream(), Encoding.UTF8)) msg = ExtractError(sr.ReadToEnd()); }
                     catch { }
+                    r.Text = "HTTP " + r.Status + (msg.Length > 0 ? ": " + msg : "");
+                }
+                else { r.Status = 0; r.Text = we.Message; }
+            }
+            catch (Exception ex) { r.Status = -1; r.Text = ex.Message; }
+            return r;
+        }
+
+        // Anthropic Messages API (Claude): x-api-key, anthropic-version, system odvojeno, odgovor u content[].text
+        static AiResult AskAnthropic(AiConfig cfg, string key, string persona, List<ChatMsg> history, int maxTokens)
+        {
+            AiResult r = new AiResult();
+            try
+            {
+                List<object> msgs = new List<object>();
+                string lastRole = null;
+                foreach (ChatMsg m in history)
+                {
+                    string role = m.Role == "assistant" ? "assistant" : "user";
+                    if (msgs.Count == 0 && role == "assistant") continue;          // mora početi sa user
+                    if (role == lastRole)                                          // spoji uzastopne iste uloge
+                    {
+                        Dictionary<string, object> prev = (Dictionary<string, object>)msgs[msgs.Count - 1];
+                        prev["content"] = prev["content"] + "\n" + m.Content;
+                        continue;
+                    }
+                    Dictionary<string, object> d = new Dictionary<string, object>();
+                    d["role"] = role; d["content"] = m.Content;
+                    msgs.Add(d); lastRole = role;
+                }
+                Dictionary<string, object> body = new Dictionary<string, object>();
+                body["model"] = cfg.Model;
+                body["max_tokens"] = Math.Max(maxTokens, 300);
+                body["system"] = persona + "\n\nTrenutno vrijeme: " + Now() + ".";
+                body["messages"] = msgs;
+                byte[] payload = Encoding.UTF8.GetBytes(new JavaScriptSerializer().Serialize(body));
+
+                HttpWebRequest req = (HttpWebRequest)WebRequest.Create(cfg.Url);
+                req.Method = "POST";
+                req.ContentType = "application/json";
+                req.UserAgent = "DinoJoe/0.1";
+                req.Timeout = 45000; req.ReadWriteTimeout = 45000;
+                req.Headers["x-api-key"] = key;
+                req.Headers["anthropic-version"] = "2023-06-01";
+                IWebProxy px = WebRequest.DefaultWebProxy;
+                if (px != null) { px.Credentials = CredentialCache.DefaultCredentials; req.Proxy = px; }
+                req.ContentLength = payload.Length;
+                using (Stream st = req.GetRequestStream()) st.Write(payload, 0, payload.Length);
+                using (HttpWebResponse resp = (HttpWebResponse)req.GetResponse())
+                using (StreamReader sr = new StreamReader(resp.GetResponseStream(), Encoding.UTF8))
+                {
+                    r.Status = (int)resp.StatusCode;
+                    Dictionary<string, object> root = new JavaScriptSerializer().DeserializeObject(sr.ReadToEnd()) as Dictionary<string, object>;
+                    StringBuilder sb = new StringBuilder();
+                    IList content = root != null && root.ContainsKey("content") ? root["content"] as IList : null;
+                    if (content != null)
+                        foreach (object o in content)
+                        {
+                            Dictionary<string, object> c = o as Dictionary<string, object>;
+                            if (c != null && c.ContainsKey("type") && (string)c["type"] == "text" && c.ContainsKey("text")) sb.Append(c["text"]);
+                        }
+                    string txt = sb.ToString().Trim();
+                    if (txt.Length == 0) { r.Text = Lang.Get("ai.empty"); return r; }
+                    r.Ok = true; r.Text = txt;
+                }
+            }
+            catch (WebException we)
+            {
+                HttpWebResponse er = we.Response as HttpWebResponse;
+                if (er != null)
+                {
+                    r.Status = (int)er.StatusCode;
+                    string msg = "";
+                    try { using (StreamReader sr = new StreamReader(er.GetResponseStream(), Encoding.UTF8)) msg = ExtractError(sr.ReadToEnd()); } catch { }
                     r.Text = "HTTP " + r.Status + (msg.Length > 0 ? ": " + msg : "");
                 }
                 else { r.Status = 0; r.Text = we.Message; }
@@ -314,6 +442,10 @@ Pravila:
         Label lbStatus;
         Button btTest, btSave;
 
+        ComboBox cbProvider;
+        Label lbInfo;
+        ModernButton btKeys;
+
         public AiSettingsForm(AiConfig c)
         {
             cfg = c;
@@ -322,84 +454,105 @@ Pravila:
             MaximizeBox = false; MinimizeBox = false;
             StartPosition = FormStartPosition.CenterScreen;
             TopMost = true;
-            Font = new Font("Segoe UI", 9.5f);
-            AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(520, 330);
-            BackColor = Color.White;
+            AutoScaleMode = AutoScaleMode.Dpi;
+            ClientSize = new Size(540, 392);
 
-            Label intro = new Label();
-            intro.Text = Lang.Get("ai.intro");
-            intro.SetBounds(16, 12, 490, 40);
-            Controls.Add(intro);
+            AddLabel(Lang.Get("ai.provider"), 19);
+            cbProvider = new ComboBox();
+            cbProvider.DropDownStyle = ComboBoxStyle.DropDownList;
+            cbProvider.SetBounds(130, 15, 394, 28);
+            foreach (AiProvider p in AiProvider.All) cbProvider.Items.Add(p);
+            Controls.Add(cbProvider);
 
-            Button btOpen = new ModernButton();
-            btOpen.Text = Lang.Get("ai.open");
-            btOpen.SetBounds(16, 58, 120, 30);
-            btOpen.Click += delegate { try { System.Diagnostics.Process.Start(AiConfig.KeysPage); } catch { } };
-            Controls.Add(btOpen);
+            lbInfo = new Label();
+            lbInfo.SetBounds(130, 48, 394, 40);
+            lbInfo.ForeColor = Theme.TextMuted;
+            Controls.Add(lbInfo);
 
-            AddLabel(Lang.Get("ai.key"), 100);
+            btKeys = new ModernButton();
+            btKeys.SetBounds(130, 90, 200, 30);
+            btKeys.Click += delegate
+            {
+                AiProvider p = cbProvider.SelectedItem as AiProvider;
+                if (p != null && p.KeysPage.Length > 0) try { System.Diagnostics.Process.Start(p.KeysPage); } catch { }
+            };
+            Controls.Add(btKeys);
+
+            AddLabel(Lang.Get("ai.key"), 136);
             tbKey = new TextBox();
-            tbKey.SetBounds(120, 97, 384, 26);
+            tbKey.SetBounds(130, 133, 394, 26);
             tbKey.UseSystemPasswordChar = true;
             if (cfg.HasKey) tbKey.Text = cfg.Key;
             Controls.Add(tbKey);
 
             CheckBox cbShow = new CheckBox();
             cbShow.Text = Lang.Get("ai.show");
-            cbShow.SetBounds(120, 126, 150, 22);
+            cbShow.SetBounds(130, 162, 200, 22);
             cbShow.CheckedChanged += delegate { tbKey.UseSystemPasswordChar = !cbShow.Checked; };
             Controls.Add(cbShow);
 
-            AddLabel("Endpoint URL:", 160);
+            AddLabel("Endpoint URL:", 196);
             tbUrl = new TextBox();
-            tbUrl.SetBounds(120, 157, 384, 26);
+            tbUrl.SetBounds(130, 193, 394, 26);
             tbUrl.Text = cfg.Url;
             Controls.Add(tbUrl);
 
-            AddLabel("Model:", 194);
+            AddLabel(Lang.Get("ai.model"), 230);
             tbModel = new TextBox();
-            tbModel.SetBounds(120, 191, 260, 26);
+            tbModel.SetBounds(130, 227, 394, 26);
             tbModel.Text = cfg.Model;
             Controls.Add(tbModel);
 
-            Button btDef = new ModernButton();
-            btDef.Text = "Groq default";
-            new ToolTip().SetToolTip(btDef, "Alternative: qwen/qwen3.6-27b, llama-3.1-8b-instant");
-            btDef.SetBounds(388, 190, 116, 28);
-            btDef.Click += delegate { tbUrl.Text = AiConfig.DefaultUrl; tbModel.Text = AiConfig.DefaultModel; };
-            Controls.Add(btDef);
-
             cbEnabled = new CheckBox();
             cbEnabled.Text = Lang.Get("ai.enabled");
-            cbEnabled.SetBounds(120, 226, 380, 22);
+            cbEnabled.SetBounds(130, 260, 394, 22);
             cbEnabled.Checked = cfg.Enabled;
             Controls.Add(cbEnabled);
 
             lbStatus = new Label();
-            lbStatus.SetBounds(16, 254, 490, 36);
+            lbStatus.SetBounds(16, 290, 508, 52);
             lbStatus.ForeColor = Color.FromArgb(60, 60, 60);
             Controls.Add(lbStatus);
 
             btTest = new ModernButton();
             btTest.Text = Lang.Get("ai.test");
-            btTest.SetBounds(16, 292, 150, 30);
+            btTest.SetBounds(16, 350, 160, 32);
             btTest.Click += delegate { TestAndSave(); };
             Controls.Add(btTest);
 
             btSave = new ModernButton();
             btSave.Text = Lang.Get("ai.save");
-            btSave.SetBounds(176, 292, 150, 30);
+            btSave.SetBounds(184, 350, 160, 32);
             btSave.Click += delegate { Apply(); cfg.Save(); DialogResult = DialogResult.OK; Close(); };
             Controls.Add(btSave);
 
             Button btCancel = new ModernButton();
             btCancel.Text = Lang.Get("pk.close");
-            btCancel.SetBounds(404, 292, 100, 30);
+            btCancel.SetBounds(424, 350, 100, 32);
             btCancel.Click += delegate { Close(); };
             Controls.Add(btCancel);
             CancelButton = btCancel;
             AcceptButton = btTest;
+
+            AiProvider cur = cfg.Provider;
+            cbProvider.SelectedItem = cur;
+            ShowProviderInfo(cur);
+            cbProvider.SelectedIndexChanged += delegate
+            {
+                AiProvider p = cbProvider.SelectedItem as AiProvider;
+                if (p == null) return;
+                if (p.Url.Length > 0) { tbUrl.Text = p.Url; tbModel.Text = p.Model; }
+                ShowProviderInfo(p);
+            };
+        }
+
+        void ShowProviderInfo(AiProvider p)
+        {
+            if (p == null) return;
+            lbInfo.Text = Lang.Get(p.InfoKey);
+            btKeys.Text = p.NeedsKey ? Lang.Get("ai.getkey") : Lang.Get("ai.getollama");
+            btKeys.Visible = p.KeysPage.Length > 0;
+            tbKey.Enabled = p.NeedsKey;
         }
 
         void AddLabel(string t, int y)
@@ -412,6 +565,8 @@ Pravila:
         void Apply()
         {
             cfg.Key = tbKey.Text.Trim();
+            AiProvider sel = cbProvider.SelectedItem as AiProvider;
+            cfg.ProviderId = sel != null ? sel.Id : "";
             cfg.Url = tbUrl.Text.Trim().Length > 0 ? tbUrl.Text.Trim() : AiConfig.DefaultUrl;
             cfg.Model = tbModel.Text.Trim().Length > 0 ? tbModel.Text.Trim() : AiConfig.DefaultModel;
             cfg.Enabled = cbEnabled.Checked;
@@ -420,7 +575,7 @@ Pravila:
         void TestAndSave()
         {
             Apply();
-            if (!cfg.HasKey) { lbStatus.ForeColor = Color.Firebrick; lbStatus.Text = Lang.Get("ai.enter"); return; }
+            if (!cfg.HasKey && cfg.Provider.NeedsKey) { lbStatus.ForeColor = Color.Firebrick; lbStatus.Text = Lang.Get("ai.enter"); return; }
             lbStatus.ForeColor = Color.FromArgb(60, 60, 60);
             lbStatus.Text = Lang.Get("ai.testing");
             btTest.Enabled = false; btSave.Enabled = false;
