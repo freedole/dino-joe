@@ -550,6 +550,8 @@ namespace DinoJoe
             {
                 if (CustomName.Length > 0) return CustomName;
                 if (Profile.HasIniName) return Profile.Name;
+                string pn = DinoJoe.Packs.ActiveValue("pet_name");
+                if (pn != null) return pn;
                 return DefaultName(Female, Lang.Current);
             }
         }
@@ -561,6 +563,7 @@ namespace DinoJoe
             {
                 if (CustomName.Length > 0 || Lang.IsEnglish) return DisplayName;
                 if (Profile.HasIniName) return Profile.NameWith;
+                if (DinoJoe.Packs.ActiveValue("pet_name") != null) return DinoJoe.Packs.ActiveValue("pet_name_with") ?? DisplayName;
                 return Female ? "ODjordjinom" : "ODjordjem";
             }
         }

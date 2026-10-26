@@ -1292,16 +1292,25 @@ namespace DinoJoe
             return Profile.RandomJoke();
         }
 
+        /// Pozdrav: aktivni paket (greeting.<key>), pa dino.ini pored exe-a, pa podrazumijevani. Varijante sa |.
+        string G(string packKey, string iniKey, string def)
+        {
+            string v = Packs.ActiveValue("greeting." + packKey);
+            if (v == null) return Profile.GetPick(iniKey, def);
+            string[] parts = v.Split('|');
+            return parts[rnd.Next(parts.Length)].Trim();
+        }
+
         string Greeting()
         {
             DateTime n = DateTime.Now;
             int h = n.Hour;
-            if (n.DayOfWeek == DayOfWeek.Monday && h < 12) return Profile.GetPick("pozdrav_ponedjeljak", Lang.Get("g.mon"));
-            if (n.DayOfWeek == DayOfWeek.Friday && h >= 12) return Profile.GetPick("pozdrav_petak", Lang.Get("g.fri"));
-            if (h < 10) return Profile.GetPick("pozdrav_jutro", Lang.Get("g.morning"));
-            if (h < 17) return Profile.GetPick("pozdrav_dan", string.Format(Lang.Get("g.day"), Profile.Name));
-            if (h < 22) return Profile.GetPick("pozdrav_vece", Lang.Get("g.eve"));
-            return Profile.GetPick("pozdrav_noc", Lang.Get("g.night"));
+            if (n.DayOfWeek == DayOfWeek.Monday && h < 12) return G("monday", "pozdrav_ponedjeljak", Lang.Get("g.mon"));
+            if (n.DayOfWeek == DayOfWeek.Friday && h >= 12) return G("friday", "pozdrav_petak", Lang.Get("g.fri"));
+            if (h < 10) return G("morning", "pozdrav_jutro", Lang.Get("g.morning"));
+            if (h < 17) return G("day", "pozdrav_dan", string.Format(Lang.Get("g.day"), Profile.Name));
+            if (h < 22) return G("evening", "pozdrav_vece", Lang.Get("g.eve"));
+            return G("night", "pozdrav_noc", Lang.Get("g.night"));
         }
 
         void TellJoke(bool manual)
@@ -1622,8 +1631,8 @@ namespace DinoJoe
                 if (n.Hour != lastHourGreeted && n.Minute == 0)
                 {
                     lastHourGreeted = n.Hour;
-                    if (n.Hour == 12) Say(Profile.GetPick("podne", Lang.Get("g.noon")));
-                    else if (n.Hour == 15 && n.DayOfWeek != DayOfWeek.Saturday && n.DayOfWeek != DayOfWeek.Sunday) Say(Profile.GetPick("kraj_radnog", Lang.Get("g.endwork")));
+                    if (n.Hour == 12) Say(G("noon", "podne", Lang.Get("g.noon")));
+                    else if (n.Hour == 15 && n.DayOfWeek != DayOfWeek.Saturday && n.DayOfWeek != DayOfWeek.Sunday) Say(G("endwork", "kraj_radnog", Lang.Get("g.endwork")));
                 }
                 else if ((trig = triggers.Step(Dt)) != null) { Say(trig); SetState(State.Happy, 1.5); }
                 else if (needs[needs.Lowest] < 30 && !needs.Vacation && sinceTalk > (Needs.Hardcore ? 45 : 100) && rnd.Next(200) == 0) Say(NeedLine(needs.Lowest));

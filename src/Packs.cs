@@ -175,6 +175,32 @@ namespace DinoJoe
             return r.Length > 0 ? r : "paket";
         }
 
+        /// Vrijednost iz pack.ini prvog aktivnog paketa koji je ima (dodati paketi imaju prednost).
+        /// Koristi se za personalizovane dinose: pet_name, pet_name_with, greeting.*.
+        public static string ActiveValue(string key)
+        {
+            foreach (Pack p in All())
+            {
+                if (!p.Active) continue;
+                string v = p.Get(key, null, "");
+                if (v.Length > 0) return v;
+            }
+            return null;
+        }
+
+        /// persona.txt iz aktivnih paketa (dodatak AI ličnosti).
+        public static string ActivePersona()
+        {
+            StringBuilder b = new StringBuilder();
+            foreach (Pack p in All())
+            {
+                if (!p.Active) continue;
+                string f = Path.Combine(p.Dir, "persona.txt");
+                try { if (File.Exists(f)) b.Append("\r\n\r\n").Append(File.ReadAllText(f, Encoding.UTF8).Trim()); } catch { }
+            }
+            return b.ToString();
+        }
+
         /// en paketi idu uz engleski, ostali (sr/bs/hr) uz naše jezike; prazno = svi
         public static bool LangCompatible(string lang)
         {
