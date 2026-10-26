@@ -11,5 +11,6 @@ if errorlevel 1 (
   if not defined CI pause
   exit /b 1
 )
+xcopy /e /i /y /q packs-builtin build\packs-builtin >nul
 echo OK  build\DinoJoe.exe
 if not defined CI pause
