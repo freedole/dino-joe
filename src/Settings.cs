@@ -318,6 +318,23 @@ namespace DinoJoe
             Add("acc.mustache", "Brkovi", "Brkovi", "Brkovi", "Mustache");
             Add("acc.bowtie", "Leptir-mašna", "Leptir-mašna", "Leptir-mašna", "Bow tie");
 
+            // katalog
+            Add("cat.menu", "Preuzmi pakete sa interneta...", "Preuzmi pakete sa interneta...", "Preuzmi pakete s interneta...", "Download packs...");
+            Add("cat.title", "Katalog paketa", "Katalog paketa", "Katalog paketa", "Pack catalog");
+            Add("cat.sub", "Paketi zajednice sa GitHub-a (freedole/dino-joe-packs). Dupli klik ili Preuzmi.", "Paketi zajednice sa GitHub-a (freedole/dino-joe-packs). Dupli klik ili Preuzmi.", "Paketi zajednice s GitHuba (freedole/dino-joe-packs). Dvostruki klik ili Preuzmi.", "Community packs from GitHub (freedole/dino-joe-packs). Double-click or Download.");
+            Add("cat.col.state", "Stanje", "Stanje", "Stanje", "Status");
+            Add("cat.alllangs", "Prikaži pakete na svim jezicima", "Prikaži pakete na svim jezicima", "Prikaži pakete na svim jezicima", "Show packs in all languages");
+            Add("cat.install", "Preuzmi", "Preuzmi", "Preuzmi", "Download");
+            Add("cat.loading", "Učitavam katalog...", "Učitavam katalog...", "Učitavam katalog...", "Loading catalog...");
+            Add("cat.count", "Paketa u katalogu: {0}", "Paketa u katalogu: {0}", "Paketa u katalogu: {0}", "Packs in catalog: {0}");
+            Add("cat.state.new", "nije preuzet", "nije preuzet", "nije preuzet", "not installed");
+            Add("cat.state.update", "nova verzija (imaš {0})", "nova verzija (imaš {0})", "nova verzija (imaš {0})", "update available (you have {0})");
+            Add("cat.state.installed", "✓ instaliran", "✓ instaliran", "✓ instaliran", "✓ installed");
+            Add("cat.installing", "Preuzimam: {0}...", "Preuzimam: {0}...", "Preuzimam: {0}...", "Downloading: {0}...");
+            Add("cat.installed", "✓ Preuzeto: {0}", "✓ Preuzeto: {0}", "✓ Preuzeto: {0}", "✓ Downloaded: {0}");
+            Add("cat.err.net", "Katalog nije dostupan (internet/proxy/firewall).", "Katalog nije dostupan (internet/proksi/firewall).", "Katalog nije dostupan (internet/proxy/firewall).", "Catalog unavailable (internet/proxy/firewall).");
+            Add("cat.err.hash", "Provjera fajla nije prošla (SHA256):", "Provera fajla nije prošla (SHA256):", "Provjera datoteke nije prošla (SHA256):", "File check failed (SHA256):");
+
             // bosanski izuzeci
             BsOverride["wiz.settings"] = "Dino Joe - postavke";
             BsOverride["menu.settings"] = "Postavke...";

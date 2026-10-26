@@ -995,6 +995,18 @@ namespace DinoJoe
             Say(string.Format(Lang.Get("pk.loaded"), Profile.JokeCount));
         }
 
+        void OpenCatalog()
+        {
+            using (CatalogForm f = new CatalogForm())
+            {
+                f.ShowDialog();
+                if (!f.Changed) return;
+            }
+            Profile.LoadJokes();
+            recent.Clear();
+            Say(string.Format(Lang.Get("pk.loaded"), Profile.JokeCount));
+        }
+
         void BuildProfilesMenu()
         {
             miProfiles.DropDownItems.Clear();
@@ -1128,6 +1140,7 @@ namespace DinoJoe
             fun.DropDownItems.Add(miBlock);
             fun.DropDownItems.Add(new ToolStripSeparator());
             fun.DropDownItems.Add(Lang.Get("pk.menu"), null, delegate { OpenPacks(); });
+            fun.DropDownItems.Add(Lang.Get("cat.menu"), null, delegate { OpenCatalog(); });
             miProfiles = new ToolStripMenuItem(Lang.Get("pk.profiles"));
             fun.DropDownItems.Add(miProfiles);
             fun.DropDownItems.Add(new ToolStripSeparator());

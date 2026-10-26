@@ -91,6 +91,11 @@ namespace DinoJoe
             Button bImport = Btn(Lang.Get("pk.import"), 12, 428, 170);
             ((ModernButton)bImport).Primary = true;
             bImport.Click += delegate { ImportPack(); };
+            Button bCat = Btn(Lang.Get("cat.menu"), 470, 389, 238);
+            bCat.Click += delegate
+            {
+                using (CatalogForm cf = new CatalogForm()) { cf.ShowDialog(this); if (cf.Changed) { Changed = true; ReloadList(); } }
+            };
             Button bFolder = Btn(Lang.Get("pk.folder"), 190, 428, 130);
             bFolder.Click += delegate
             {
