@@ -43,6 +43,21 @@ namespace DinoJoe
                 Console.WriteLine("pile: " + Profile.Special("pile", Jokes.Chick));
                 return;
             }
+            if (args.Length >= 1 && args[0] == "--packs")
+            {
+                Profile.Load(); Settings.Load(); Settings.Apply();
+                Application.EnableVisualStyles();
+                using (PackManagerForm f = new PackManagerForm()) f.ShowDialog();
+                return;
+            }
+            if (args.Length >= 2 && args[0] == "--import")
+            {
+                // uvoz paketa iz komandne linije (kasnije: dupli klik na .dinopack)
+                Profile.Load(); Settings.Load();
+                try { Pack p = Packs.Import(args[1]); Console.WriteLine("OK " + p.Id + " " + p.JokeCount); }
+                catch (Exception ex) { Console.WriteLine("GRESKA " + ex.Message); }
+                return;
+            }
             if (args.Length >= 2 && args[0] == "--aitest")
             {
                 AiConfig c = new AiConfig(Path.GetTempPath());
@@ -807,7 +822,8 @@ namespace DinoJoe
         readonly System.Windows.Forms.Timer timer = new System.Windows.Forms.Timer();
         NotifyIcon tray;
         ContextMenuStrip menu;
-        ToolStripMenuItem miSleep, miAutostart, miGlasses;
+        ToolStripMenuItem miSleep, miAutostart, miGlasses, miLike, miBlock, miProfiles;
+        string lastJoke;   // zadnja ispričana fora (za 👍 / 👎)
         ToolStripMenuItem[] miSize, miTalk;
 
         float dpiK, sizeMul = 1f, k;
@@ -887,6 +903,38 @@ namespace DinoJoe
 
             SetState(State.Happy, 2.5);
             Say(Program.JustSetUp ? Lang.Get("pet.hello") : Greeting());
+        }
+
+        void OpenPacks()
+        {
+            using (PackManagerForm f = new PackManagerForm())
+            {
+                f.ShowDialog();
+                if (!f.Changed) return;
+            }
+            Profile.LoadJokes();
+            recent.Clear();
+            Say(string.Format(Lang.Get("pk.loaded"), Profile.JokeCount));
+        }
+
+        void BuildProfilesMenu()
+        {
+            miProfiles.DropDownItems.Clear();
+            List<Packs.SavedProfile> list = Packs.LoadProfiles();
+            miProfiles.Enabled = list.Count > 0;
+            foreach (Packs.SavedProfile sp in list)
+            {
+                Packs.SavedProfile p = sp;
+                ToolStripMenuItem it = new ToolStripMenuItem(p.Name, null, delegate
+                {
+                    Packs.Activate(p);
+                    Profile.LoadJokes();
+                    recent.Clear();
+                    Say(string.Format(Lang.Get("pk.switched"), p.Name));
+                });
+                it.Checked = p.Name.Equals(Settings.ActiveProfile, StringComparison.OrdinalIgnoreCase);
+                miProfiles.DropDownItems.Add(it);
+            }
         }
 
         void OpenSettings()
@@ -982,8 +1030,17 @@ namespace DinoJoe
             aiMenu.DropDownItems.Add("Obriši razgovor", null, delegate { history.Clear(); if (chat != null) chat.AppendNote("Razgovor obrisan. Ne sjećam se ničega. Kao poslije meteora."); Say("Šta smo pričali? Ne sjećam se."); });
             menu.Items.Add(aiMenu);
             ToolStripMenuItem fun = new ToolStripMenuItem("Fore");
+            miLike = new ToolStripMenuItem(Lang.Get("pk.like"), null, delegate { if (lastJoke != null) { Packs.Like(lastJoke); Say(Lang.Get("pk.liked")); Profile.LoadJokes(); } });
+            miBlock = new ToolStripMenuItem(Lang.Get("pk.block"), null, delegate { if (lastJoke != null) { Packs.Block(lastJoke); lastJoke = null; recent.Clear(); Profile.LoadJokes(); Say(Lang.Get("pk.blocked")); } });
+            fun.DropDownItems.Add(miLike);
+            fun.DropDownItems.Add(miBlock);
+            fun.DropDownItems.Add(new ToolStripSeparator());
+            fun.DropDownItems.Add(Lang.Get("pk.menu"), null, delegate { OpenPacks(); });
+            miProfiles = new ToolStripMenuItem(Lang.Get("pk.profiles"));
+            fun.DropDownItems.Add(miProfiles);
+            fun.DropDownItems.Add(new ToolStripSeparator());
             fun.DropDownItems.Add("Otvori folder sa forama", null, delegate { OpenCustom(); });
-            fun.DropDownItems.Add("Učitaj fore ponovo", null, delegate { Profile.LoadJokes(); recent.Clear(); Say("Učitao sam " + Profile.JokeCount + " fora. Spreman!"); });
+            fun.DropDownItems.Add("Učitaj fore ponovo", null, delegate { Profile.LoadJokes(); recent.Clear(); Say(string.Format(Lang.Get("pk.loaded"), Profile.JokeCount)); });
             menu.Items.Add(fun);
             menu.Items.Add(Lang.Get("menu.settings"), null, delegate { OpenSettings(); });
             miAutostart = new ToolStripMenuItem("Pokreni sa Windowsom", null, delegate { ToggleAutostart(); });
@@ -994,6 +1051,8 @@ namespace DinoJoe
             {
                 miSleep.Text = pose.State == State.Sleep ? "Probudi" : "Spavaj";
                 miGlasses.Checked = pose.Glasses;
+                miLike.Enabled = miBlock.Enabled = lastJoke != null;
+                BuildProfilesMenu();
                 miAutostart.Checked = IsAutostart();
                 for (int i = 0; i < 3; i++) miTalk[i].Checked = talkLevel == i;
                 miSize[0].Checked = sizeMul < 0.9f; miSize[1].Checked = sizeMul >= 0.9f && sizeMul < 1.2f; miSize[2].Checked = sizeMul >= 1.2f;
@@ -1112,6 +1171,7 @@ namespace DinoJoe
                 else s = Profile.RandomJoke();
                 if (!recent.Contains(s) || attempt == 7)
                 {
+                    lastJoke = s;
                     recent.Enqueue(s);
                     while (recent.Count > 25) recent.Dequeue();
                     return s;

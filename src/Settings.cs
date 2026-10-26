@@ -109,6 +109,46 @@ namespace DinoJoe
             Add("pet.updated", "Novi ja! Kako ti se sviđam?", "Novi ja! Kako ti se sviđam?", "Novi ja! Kako ti se sviđam?", "New me! How do I look?");
             Add("menu.settings", "Podešavanja...", "Podešavanja...", "Postavke...", "Settings...");
 
+            // paketi
+            Add("pk.title", "Paketi fora", "Paketi fora", "Paketi fora", "Joke packs");
+            Add("pk.menu", "Paketi fora...", "Paketi fora...", "Paketi fora...", "Joke packs...");
+            Add("pk.col.name", "Paket", "Paket", "Paket", "Pack");
+            Add("pk.col.jokes", "Fora", "Fora", "Fora", "Jokes");
+            Add("pk.col.lang", "Jezik", "Jezik", "Jezik", "Language");
+            Add("pk.col.ver", "Verzija", "Verzija", "Verzija", "Version");
+            Add("pk.col.src", "Izvor", "Izvor", "Izvor", "Source");
+            Add("pk.col.weight", "Težina", "Težina", "Težina", "Weight");
+            Add("pk.builtin", "ugrađen", "ugrađen", "ugrađen", "built-in");
+            Add("pk.user", "dodat", "dodat", "dodan", "added");
+            Add("pk.w.low", "Malo", "Malo", "Malo", "Low");
+            Add("pk.w.normal", "Normalno", "Normalno", "Normalno", "Normal");
+            Add("pk.w.high", "Puno", "Puno", "Puno", "High");
+            Add("pk.weight", "Težina izabranog:", "Težina izabranog:", "Težina odabranog:", "Selected weight:");
+            Add("pk.import", "Uvezi .dinopack...", "Uvezi .dinopack...", "Uvezi .dinopack...", "Import .dinopack...");
+            Add("pk.remove", "Ukloni", "Ukloni", "Ukloni", "Remove");
+            Add("pk.folder", "Otvori folder", "Otvori folder", "Otvori mapu", "Open folder");
+            Add("pk.unblock", "Vrati blokirane ({0})", "Vrati blokirane ({0})", "Vrati blokirane ({0})", "Restore blocked ({0})");
+            Add("pk.close", "Zatvori", "Zatvori", "Zatvori", "Close");
+            Add("pk.profile", "Profil:", "Profil:", "Profil:", "Profile:");
+            Add("pk.profile.none", "(bez profila)", "(bez profila)", "(bez profila)", "(no profile)");
+            Add("pk.profile.save", "Sačuvaj kao...", "Sačuvaj kao...", "Spremi kao...", "Save as...");
+            Add("pk.profile.del", "Obriši profil", "Obriši profil", "Obriši profil", "Delete profile");
+            Add("pk.profile.name", "Ime profila (npr. Posao, Vikend):", "Ime profila (npr. Posao, Vikend):", "Ime profila (npr. Posao, Vikend):", "Profile name (e.g. Work, Weekend):");
+            Add("pk.remove.q", "Ukloniti paket \"{0}\"?", "Ukloniti paket \"{0}\"?", "Ukloniti paket \"{0}\"?", "Remove pack \"{0}\"?");
+            Add("pk.builtin.noremove", "Ugrađeni paket se ne može ukloniti, samo isključiti.", "Ugrađeni paket se ne može ukloniti, samo isključiti.", "Ugrađeni paket se ne može ukloniti, samo isključiti.", "Built-in packs can't be removed, only disabled.");
+            Add("pk.imported", "Uvezen paket: {0} ({1} fora)", "Uvezen paket: {0} ({1} fora)", "Uvezen paket: {0} ({1} fora)", "Imported pack: {0} ({1} jokes)");
+            Add("pk.err.size", "Paket je prevelik (najviše 1 MB).", "Paket je prevelik (najviše 1 MB).", "Paket je prevelik (najviše 1 MB).", "Pack is too big (max 1 MB).");
+            Add("pk.err.bad", "Neispravan paket (sumnjive putanje u zip-u).", "Neispravan paket (sumnjive putanje u zip-u).", "Neispravan paket (sumnjive putanje u zip-u).", "Invalid pack (suspicious paths in zip).");
+            Add("pk.err.noini", "U paketu nema pack.ini.", "U paketu nema pack.ini.", "U paketu nema pack.ini.", "pack.ini not found in pack.");
+            Add("pk.err.empty", "Paket nema nijednu foru.", "Paket nema nijednu foru.", "Paket nema nijednu foru.", "Pack has no jokes.");
+            Add("pk.loaded", "Učitao sam {0} fora. Spreman!", "Učitao sam {0} fora. Spreman!", "Učitao sam {0} fora. Spreman!", "Loaded {0} jokes. Ready!");
+            Add("pk.like", "👍 Dobra fora!", "👍 Dobra fora!", "👍 Dobra fora!", "👍 Good one!");
+            Add("pk.block", "👎 Ne prikazuj više ovu foru", "👎 Ne prikazuj više ovu foru", "👎 Ne prikazuj više ovu foru", "👎 Never show this joke again");
+            Add("pk.liked", "Hvala! Pričaću je češće.", "Hvala! Pričaću je češće.", "Hvala! Pričat ću je češće.", "Thanks! I'll tell it more often.");
+            Add("pk.blocked", "Dobro, ta fora je izumrla.", "Dobro, ta fora je izumrla.", "Dobro, ta fora je izumrla.", "Okay, that joke is now extinct.");
+            Add("pk.profiles", "Profil", "Profil", "Profil", "Profile");
+            Add("pk.switched", "Profil: {0}", "Profil: {0}", "Profil: {0}", "Profile: {0}");
+
             // bosanski izuzeci
             BsOverride["wiz.settings"] = "Dino Joe - postavke";
             BsOverride["menu.settings"] = "Postavke...";
@@ -243,6 +283,8 @@ namespace DinoJoe
         public static int Color2 = -1;     // -1 = automatski (od palete)
         public static bool Glasses;
         public static string Packs = "odjordje-classic";   // id-ovi uključenih paketa, zarezom
+        public static string PackWeights = "";              // id:2,id2:0.5 (1 = normalno)
+        public static string ActiveProfile = "";
 
         static string Dir { get { return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), Profile.Id); } }
         static string PathIni { get { return Path.Combine(Dir, "settings.ini"); } }
@@ -267,6 +309,8 @@ namespace DinoJoe
                         else if (k == "color2" && int.TryParse(v, out n)) Color2 = n;
                         else if (k == "glasses") Glasses = v == "1";
                         else if (k == "packs") Packs = v;
+                        else if (k == "pack_weights") PackWeights = v;
+                        else if (k == "profile") ActiveProfile = v;
                     }
             }
             catch { }
@@ -288,7 +332,9 @@ namespace DinoJoe
                     "color=" + Color1 + "\r\n" +
                     "color2=" + Color2 + "\r\n" +
                     "glasses=" + (Glasses ? "1" : "0") + "\r\n" +
-                    "packs=" + Packs + "\r\n", new UTF8Encoding(true));
+                    "packs=" + Packs + "\r\n" +
+                    "pack_weights=" + PackWeights + "\r\n" +
+                    "profile=" + ActiveProfile.Replace("\r", "").Replace("\n", "") + "\r\n", new UTF8Encoding(true));
             }
             catch { }
         }
@@ -325,6 +371,7 @@ namespace DinoJoe
         {
             Lang.Current = Lang.FromCode(LangCode);
             ApplyColors(Color1, Color2);
+            Profile.LoadJokes();
             if (!Profile.HasIniName)
             {
                 Profile.Name = DisplayName;
@@ -378,36 +425,6 @@ namespace DinoJoe
                 }
             }
             catch { }
-        }
-
-        // ---------------- ugrađeni paketi ----------------
-        public class PackInfo { public string Id, Name, Desc; }
-
-        public static List<PackInfo> BuiltinPacks()
-        {
-            List<PackInfo> list = new List<PackInfo>();
-            try
-            {
-                string root = Path.Combine(Profile.Dir ?? "", "packs-builtin");
-                if (!Directory.Exists(root)) return list;
-                foreach (string d in Directory.GetDirectories(root))
-                {
-                    string ini = Path.Combine(d, "pack.ini");
-                    PackInfo pi = new PackInfo();
-                    pi.Id = Path.GetFileName(d); pi.Name = pi.Id; pi.Desc = "";
-                    if (File.Exists(ini))
-                        foreach (string raw in File.ReadAllLines(ini, Encoding.UTF8))
-                        {
-                            int i = raw.IndexOf('=');
-                            if (i <= 0 || raw.TrimStart().StartsWith("#")) continue;
-                            string k = raw.Substring(0, i).Trim(), v = raw.Substring(i + 1).Trim();
-                            if (k == "id") pi.Id = v; else if (k == "naziv") pi.Name = v; else if (k == "opis") pi.Desc = v;
-                        }
-                    list.Add(pi);
-                }
-            }
-            catch { }
-            return list;
         }
 
         public static bool PackEnabled(string id)

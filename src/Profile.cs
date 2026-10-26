@@ -92,12 +92,12 @@ namespace DinoJoe
             special.Clear();
             Dictionary<string, List<string>> files = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
 
+            // 1) profil pored exe-a (personalizovani dino): fore\*.txt + fore*.txt
             try
             {
                 if (Directory.Exists(FunDir))
                     foreach (string f in Directory.GetFiles(FunDir, "*.txt"))
                         AddFile(files, Path.GetFileNameWithoutExtension(f), f);
-                // kompatibilnost: fore.txt i fore-*.txt pored exe-a
                 foreach (string f in Directory.GetFiles(Dir, "fore*.txt"))
                 {
                     string n = Path.GetFileNameWithoutExtension(f);
@@ -107,41 +107,69 @@ namespace DinoJoe
                 }
             }
             catch { }
+            foreach (KeyValuePair<string, List<string>> kv in files)
+                AddCat(kv.Key, kv.Value, Get("tezina." + kv.Key, "10"), Get("kljucne." + kv.Key, ""), 1.0);
 
-            List<string> empty = new List<string>();
-            foreach (KeyValuePair<string, List<string>> kv in files) if (kv.Value.Count == 0) empty.Add(kv.Key);
-            foreach (string e in empty) files.Remove(e);
-
-            if (files.Count == 0) // nema profila -> ugrađene fore (ODjordje)
+            // 2) uključeni paketi
+            try
             {
-                files["komasacija"] = new List<string>(Jokes.Koma);
-                files["poljoprivreda"] = new List<string>(Jokes.Farm);
-                files["dino"] = new List<string>(Jokes.Dino);
-                files["it"] = new List<string>(Jokes.IT);
-                if (!ini.ContainsKey("tezina.komasacija")) { ini["tezina.komasacija"] = "32"; ini["tezina.poljoprivreda"] = "25"; ini["tezina.dino"] = "22"; ini["tezina.it"] = "21"; }
-                if (!ini.ContainsKey("kljucne.komasacija"))
+                foreach (Pack p in Packs.All())
                 {
-                    ini["kljucne.komasacija"] = "koma,parcel,međa,meda,geodet,katast,posjed,zemlji";
-                    ini["kljucne.poljoprivreda"] = "pil,kok,jaj,pijet,farm,kukuruz,traktor,njiv,brojler,nosilj";
-                    ini["kljucne.it"] = "server,backup,dns,mrež,mrez,windows,sql,vpn,hyper,docker,linux,lozink,admin";
+                    if (!p.Enabled || !Directory.Exists(p.FunDir)) continue;
+                    double mul = p.Weight;
+                    foreach (string f in Directory.GetFiles(p.FunDir, "*.txt"))
+                    {
+                        string cat = Path.GetFileNameWithoutExtension(f);
+                        Dictionary<string, List<string>> one = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
+                        AddFile(one, cat, f);
+                        string w, k;
+                        if (!p.Ini.TryGetValue("tezina." + cat, out w)) w = "10";
+                        if (!p.Ini.TryGetValue("kljucne." + cat, out k)) k = "";
+                        AddCat(p.Id + "/" + cat, one[cat], w, k, mul);
+                    }
                 }
             }
+            catch { }
 
-            foreach (KeyValuePair<string, List<string>> kv in files)
+            // 3) ništa -> ugrađene ODjordje fore
+            if (Cats.Count == 0)
             {
-                if (kv.Value.Count == 0) continue;
-                if (Array.IndexOf(SpecialNames, kv.Key.ToLowerInvariant()) >= 0) { special[kv.Key] = kv.Value; continue; }
-                JokeCat c = new JokeCat();
-                c.Name = kv.Key;
-                c.Lines = kv.Value;
-                int w;
-                c.Weight = int.TryParse(Get("tezina." + kv.Key, "10"), out w) ? Math.Max(0, w) : 10;
-                string keys = Get("kljucne." + kv.Key, "");
-                List<string> kl = new List<string>();
-                foreach (string k in keys.Split(',')) if (k.Trim().Length > 0) kl.Add(k.Trim().ToLowerInvariant());
-                c.Keys = kl.ToArray();
-                Cats.Add(c);
+                AddCat("dino", new List<string>(Jokes.Dino), "22", "meteor,izumr,rex,dinosaur", 1.0);
+                AddCat("it", new List<string>(Jokes.IT), "21", "server,backup,dns,mrež,mrez,windows,sql,vpn,hyper,docker,linux,lozink,admin", 1.0);
+                AddCat("poljoprivreda", new List<string>(Jokes.Farm), "15", "pil,kok,jaj,pijet,farm,kukuruz,traktor,njiv", 1.0);
+                AddCat("komasacija", new List<string>(Jokes.Koma), "8", "koma,parcel,međa,meda,geodet,katast", 1.0);
             }
+        }
+
+        /// Dodaje kategoriju (ili specijalnu). Blokirane fore se izbacuju, omiljene se dupliraju.
+        static void AddCat(string name, List<string> raw, string weight, string keys, double mul)
+        {
+            List<string> lines = new List<string>();
+            foreach (string l in raw)
+            {
+                if (Packs.IsBlocked(l)) continue;
+                lines.Add(l);
+                if (Packs.IsLiked(l)) { lines.Add(l); lines.Add(l); }
+            }
+            if (lines.Count == 0) return;
+
+            string baseName = name.Contains("/") ? name.Substring(name.LastIndexOf('/') + 1) : name;
+            if (Array.IndexOf(SpecialNames, baseName.ToLowerInvariant()) >= 0)
+            {
+                List<string> sp;
+                if (!special.TryGetValue(baseName, out sp)) { sp = new List<string>(); special[baseName] = sp; }
+                sp.AddRange(lines);
+                return;
+            }
+            JokeCat c = new JokeCat();
+            c.Name = name;
+            c.Lines = lines;
+            int w;
+            c.Weight = int.TryParse(weight, out w) ? Math.Max(0, (int)Math.Round(w * mul)) : 10;
+            List<string> kl = new List<string>();
+            foreach (string k in keys.Split(',')) if (k.Trim().Length > 0) kl.Add(k.Trim().ToLowerInvariant());
+            c.Keys = kl.ToArray();
+            Cats.Add(c);
         }
 
         static void AddFile(Dictionary<string, List<string>> files, string cat, string path)

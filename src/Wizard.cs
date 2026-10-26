@@ -464,16 +464,16 @@ namespace DinoJoe
         void StepPacks()
         {
             Header("s.packs", "s.packs.sub");
-            List<Settings.PackInfo> list = Settings.BuiltinPacks();
+            List<Pack> list = Packs.All();
             if (list.Count == 0) { Lbl(Lang.Get("s.packs.none"), 12, 12, 400, 24).ForeColor = Color.Gray; return; }
             CheckedListBox cl = new CheckedListBox();
             cl.CheckOnClick = true;
             cl.BorderStyle = BorderStyle.None;
             cl.SetBounds(10, 8, 425, 300);
-            foreach (Settings.PackInfo pi in list)
+            foreach (Pack pi in list)
             {
                 bool on = ("," + packs + ",").Contains("," + pi.Id + ",");
-                cl.Items.Add(pi.Name + (pi.Desc.Length > 0 ? "  -  " + pi.Desc : ""), on);
+                cl.Items.Add(pi.Name + "  (" + pi.JokeCount + ")" + (pi.Desc.Length > 0 ? "  -  " + pi.Desc : ""), on);
             }
             cl.ItemCheck += delegate(object o, ItemCheckEventArgs e)
             {
