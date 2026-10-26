@@ -1,0 +1,32 @@
+# Personality: Hardcore Tamagotchi
+# One joke per line. Lines starting with # are ignored.
+Hungry.
+Pet me. Now.
+Play. Please.
+...Thanks. Hungry again.
+Attention?
+Water. Quick.
+Sleepy. Lights off.
+Look at me.
+I'm here. You here?
+Food > Excel.
+Bath. Muddy.
+Bored.
+More cuddles.
+Don't go.
+Where were you?
+Love you. Hungry.
+Toy?
+Cold. Pet me.
+Happy. Don't forget me.
+Mmmm... more.
+Bye. Stay.
+Lunch? Snack? Anything?
+Sleeping... don't touch... okay, touch.
+Better when you're here.
+Click. Click. Click.
+*yawn*
+Long day. Cuddles.
+You're all I have.
+I'll be good. Feed me.
+Beep!

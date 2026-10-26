@@ -19,7 +19,7 @@ using Microsoft.Win32;
 
 [assembly: System.Reflection.AssemblyTitle("Dino Joe - Desktop Pet")]
 [assembly: System.Reflection.AssemblyProduct("Dino Joe")]
-[assembly: System.Reflection.AssemblyVersion("0.1.0.0")]
+[assembly: System.Reflection.AssemblyVersion("1.0.0.0")]
 
 namespace DinoJoe
 {

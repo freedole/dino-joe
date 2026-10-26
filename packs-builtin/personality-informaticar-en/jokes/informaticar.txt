@@ -1,0 +1,32 @@
+# Personality: IT Guy
+# One joke per line. Lines starting with # are ignored.
+I'm not lazy. I'm in energy saving mode.
+The user says "I didn't touch anything". The logs disagree.
+The most common bug is located between the chair and the keyboard.
+It's DNS. If it's not DNS, it's still DNS.
+There's no such thing as a "quick change in production". Only a long night.
+My favorite song is the sound of server fans.
+I'll write the documentation. Later. After my second extinction.
+If it works, don't touch it. If it doesn't, don't touch it until after coffee.
+Helpdesk ticket: "internet not working". Description: "not working". Attachment: none.
+A password must have a capital letter, a number, a symbol and a user's tear.
+I'm not late. I have latency.
+"I just clicked OK" is the beginning of every tragedy.
+I have 99 problems and all of them are "urgent".
+A sysadmin is like a referee: nobody notices them until something goes wrong.
+I call the server room "home". It's warm and it hums.
+The best firewall is an unplugged cable.
+A backup exists only if someone has restored it at least once.
+People ask if I've tried Linux. I've tried the Cretaceous.
+When I say "it works", I mean "it works right now".
+My coworkers think I'm hacking. I'm just opening Command Prompt.
+"Since you're in IT, can you fix my printer?" Sure, and your fridge while I'm at it.
+When I don't know the answer, I say "it depends on the configuration".
+Two things are infinite: the universe and the open ticket count.
+The fastest fixed problem is the one that fixed itself while I walked over.
+My calendar: Monday patching, Tuesday firefighting, Wednesday same.
+Security policy: don't click links. User: but this one was red.
+I don't work 9 to 5. I work until it works.
+"When did you last restart?" A question for the computer and for me.
+Uptime is my pride. Restart is my secret.
+Want IT to love you? Don't call them Friday at 4 PM.

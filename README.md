@@ -10,7 +10,7 @@ A tiny dinosaur that lives on your Windows desktop. It walks around, sleeps, tel
 - **Tiny.** ~100 KB exe, no runtime to install (uses .NET Framework 4.x that ships with Windows 10/11).
 - **Balkan humor** built in. English packs too.
 
-> Status: early development (v0.x). See the roadmap below.
+> **v1.0** - 4 species, 12 colors, 5 patterns, 10 accessories, 9 personalities, care status, ~1000 jokes (SR + EN), joke packs with an online catalog, optional AI.
 
 ![preview](assets/preview.png)
 
@@ -34,7 +34,7 @@ Output: `build\DinoJoe.exe`. Every push is also built by GitHub Actions; tags `v
 
 ## Roadmap
 
-- **v1.0** - first-run wizard (language, gender, look, personality, packs, AI), care status (hunger, petting, happiness/worry), modular skins (4 species, colors, patterns, accessories), 9 personalities incl. *Hardcore Tamagotchi mode*, pack manager & profiles, AI presets
+- **v1.0** ✓ - first-run wizard, 5 languages, ODjordje / ODjordjina, 4 species, colors, patterns, accessories, 9 personalities incl. *Hardcore Tamagotchi mode*, care status, joke packs & profiles & catalog, AI services (Groq, Gemini, OpenAI, Claude, OpenRouter, Ollama)
 - **v1.1** - Microsoft Store, achievements, evolution (egg → baby → adult)
 - **v1.2+** - mini games, seasonal skins, physics
 
