@@ -1,7 +1,7 @@
 ﻿// Profil dinosaurusa: sve što razlikuje jednog dinu od drugog čita se iz foldera pored exe-a.
 //   dino.ini        - ime, id, pozdravi, težine kategorija, ključne riječi za offline chat
 //   fore\*.txt      - fore; ime fajla = kategorija. Specijalni: pile, hrana, bockanje, naocale (nisu u random izboru)
-//   licnost.txt     - AI ličnost (ako ne postoji, koristi se %APPDATA%\<id>\licnost.txt)
+//   personality.txt - AI ličnost (ako ne postoji, koristi se %APPDATA%\<id>\personality.txt; stari naziv licnost.txt)
 // Bez profila radi kao ODjordje (ugrađene fore). Podaci: %APPDATA%\DinoJoe
 
 using System;
@@ -44,7 +44,17 @@ namespace DinoJoe
         static readonly Dictionary<string, List<string>> special = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
         static readonly Random rnd = new Random();
 
-        public static string FunDir { get { return Path.Combine(Dir, "fore"); } }
+        // jokes\ pored exe-a (stari naziv: fore\)
+        public static string FunDir
+        {
+            get
+            {
+                string j = Path.Combine(Dir, "jokes");
+                if (Directory.Exists(j)) return j;
+                string f = Path.Combine(Dir, "fore");
+                return Directory.Exists(f) ? f : j;
+            }
+        }
         public static string IniPath { get { return Path.Combine(Dir, "dino.ini"); } }
 
         public static void Load()

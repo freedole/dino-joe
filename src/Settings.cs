@@ -206,7 +206,10 @@ namespace DinoJoe
             Add("m.talk", "Pričljivost", "Pričljivost", "Pričljivost", "Chattiness");
             Add("m.talks", "Tih|Normalan|Brbljivac", "Tih|Normalan|Brbljivac", "Tih|Normalan|Brbljavac", "Quiet|Normal|Chatterbox");
             Add("m.aiset", "Podesi AI...", "Podesi AI...", "Postavi AI...", "AI settings...");
-            Add("m.persona", "Uredi AI ličnost (licnost.txt)", "Uredi AI ličnost (licnost.txt)", "Uredi AI osobnost (licnost.txt)", "Edit AI persona (licnost.txt)");
+            Add("m.persona", "Uredi AI ličnost (personality.txt)", "Uredi AI ličnost (personality.txt)", "Uredi AI osobnost (personality.txt)", "Edit AI persona (personality.txt)");
+            Add("my.name", "Moje fore", "Moje fore", "Moje fore", "My jokes");
+            Add("my.desc", "Fore koje sam sam napisao.", "Fore koje sam sam napisao.", "Fore koje sam sam napisao.", "Jokes I wrote myself.");
+            Add("my.header", "# Tvoje fore, jedna po liniji. Linije sa # se ignorišu.\r\n# Svaki .txt u ovom folderu je jedna kategorija (ime fajla = kategorija).\r\n# Poslije izmjene: desni klik -> Fore -> Učitaj fore ponovo.\r\n", "# Tvoje fore, jedna po liniji. Linije sa # se ignorišu.\r\n# Svaki .txt u ovom folderu je jedna kategorija (ime fajla = kategorija).\r\n# Posle izmene: desni klik -> Fore -> Učitaj fore ponovo.\r\n", "# Tvoje fore, jedna po retku. Retci s # se ignoriraju.\r\n# Svaki .txt u ovoj mapi je jedna kategorija (ime datoteke = kategorija).\r\n# Nakon izmjene: desni klik -> Fore -> Učitaj fore ponovno.\r\n", "# Your jokes, one per line. Lines starting with # are ignored.\r\n# Each .txt in this folder is one category (file name = category).\r\n# After editing: right-click -> Jokes -> Reload jokes.\r\n");
             Add("m.clear", "Obriši razgovor", "Obriši razgovor", "Obriši razgovor", "Clear conversation");
             Add("s.cleared", "Razgovor obrisan. Ne sjećam se ničega. Kao poslije meteora.", "Razgovor obrisan. Ne sećam se ničega. Kao posle meteora.", "Razgovor obrisan. Ne sjećam se ničega. Kao poslije meteora.", "Conversation cleared. I remember nothing. Like after the meteor.");
             Add("s.forgot", "Šta smo pričali? Ne sjećam se.", "Šta smo pričali? Ne sećam se.", "Što smo pričali? Ne sjećam se.", "What were we talking about? I forgot.");

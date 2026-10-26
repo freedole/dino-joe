@@ -3,4 +3,5 @@ dist/
 *.exe
 *.pdb
 licnost.txt
+personality.txt
 ai.ini

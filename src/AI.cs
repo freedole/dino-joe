@@ -38,8 +38,15 @@ namespace DinoJoe
         public AiConfig(string dir)
         {
             path = Path.Combine(dir, "ai.cfg");
-            string local = Path.Combine(Profile.Dir ?? "", "licnost.txt");
-            PersonaPath = File.Exists(local) ? local : Path.Combine(dir, "licnost.txt");
+            // personality.txt (stari naziv licnost.txt se i dalje čita / preimenuje)
+            string local = Path.Combine(Profile.Dir ?? "", "personality.txt");
+            string localOld = Path.Combine(Profile.Dir ?? "", "licnost.txt");
+            string user = Path.Combine(dir, "personality.txt");
+            string userOld = Path.Combine(dir, "licnost.txt");
+            try { if (!File.Exists(user) && File.Exists(userOld)) File.Move(userOld, user); } catch { }
+            if (File.Exists(local)) PersonaPath = local;
+            else if (File.Exists(localOld)) PersonaPath = localOld;
+            else PersonaPath = File.Exists(user) || !File.Exists(userOld) ? user : userOld;
             Load();
         }
 

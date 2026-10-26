@@ -1157,7 +1157,10 @@ namespace DinoJoe
             catch (Exception ex) { Say(Lang.Get("s.error") + ex.Message); }
         }
 
-        string CustomPath() { return Path.Combine(Profile.FunDir, "moje.txt"); }
+        // Moje fore = korisnički paket "my-jokes" u %APPDATA%\DinoJoe\packs\my-jokes
+        static string MyPackDir { get { return Path.Combine(Packs.UserDir, "my-jokes"); } }
+        static string MyJokesDir { get { return Path.Combine(MyPackDir, "jokes"); } }
+        string CustomPath() { return Path.Combine(MyJokesDir, "my-jokes.txt"); }
 
         void LoadCustom()
         {
@@ -1180,10 +1183,14 @@ namespace DinoJoe
             try
             {
                 string p = CustomPath();
-                Directory.CreateDirectory(Profile.FunDir);
+                Directory.CreateDirectory(MyJokesDir);
+                string ini = Path.Combine(MyPackDir, "pack.ini");
+                if (!File.Exists(ini))
+                    File.WriteAllText(ini, "# Dino Joe joke pack (UTF-8)\r\nid=my-jokes\r\nname=" + Lang.Get("my.name") + "\r\nlang=" + Settings.LangCode + "\r\nauthor=" + Environment.UserName + "\r\nversion=1.0\r\ndescription=" + Lang.Get("my.desc") + "\r\n", new UTF8Encoding(true));
                 if (!File.Exists(p))
-                    File.WriteAllText(p, "# Tvoje fore, jedna po liniji. Linije sa # se ignorišu.\r\n# Svaki .txt u ovom folderu je jedna kategorija (ime fajla = kategorija).\r\n# Poslije izmjene: desni klik -> Fore -> Učitaj fore ponovo.\r\n", new UTF8Encoding(true));
-                System.Diagnostics.Process.Start("explorer.exe", "\"" + Profile.FunDir + "\"");
+                    File.WriteAllText(p, Lang.Get("my.header"), new UTF8Encoding(true));
+                if (!Packs.IsEnabled("my-jokes")) { Packs.SetEnabled("my-jokes", true); Settings.Save(); }
+                System.Diagnostics.Process.Start("explorer.exe", "\"" + MyJokesDir + "\"");
                 Say(Lang.Get("s.write"));
             }
             catch (Exception ex) { Say(Lang.Get("s.error") + ex.Message); }
