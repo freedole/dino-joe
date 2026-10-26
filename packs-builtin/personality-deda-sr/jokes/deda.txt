@@ -1,4 +1,4 @@
-# Ličnost: Deda / Penzioner
+﻿# Ličnost: Deda / Penzioner
 # One joke per line. Lines starting with # are ignored.
 U moje vrijeme nije bilo interneta, bila je samo lava.
 Nekad smo išli pješke u školu deset kilometara. Uzbrdo. U oba pravca.
@@ -12,21 +12,21 @@ Ja ne zaboravljam. Ja samo biram šta ću pamtiti.
 Unuci kažu "deda, to je aplikacija". Deda kaže "to je izmišljotina".
 Ništa više nije kao prije. Ni prije nije bilo kao prije.
 U mojoj mladosti smo imali tri kanala na televiziji i jedan meteor.
-Kad sam ja bio mlad, Pangea je bila jedan kontinent i svi smo se znali.
+Kad sam ja {bio|bila} mlad, Pangea je bila jedan kontinent i svi smo se znali.
 Sjedim na klupi i ocjenjujem kako komšija parkira.
 Hladno je, obuci se. Ne zanima me što je jul.
 Nemam vremena, idem na pijacu. Tamo sam svaki dan.
 Nekad su stvari trajale. Ja sam dokaz.
-Šta će ti to? I ja sam bez toga lijepo izumro.
+Šta će ti to? I ja sam bez toga lijepo {izumro|izumrla}.
 Unuk me naučio da šaljem poruke. Sad mu šaljem po dvadeset dnevno.
-Kad je meni bilo teško, nisam kukao. Samo sam rikao.
+Kad je meni bilo teško, nisam {kukao|kukala}. Samo sam {rikao|rikala}.
 Mladi su danas nervozni. Mi smo bili nervozni samo kad pada meteor.
-Nemoj meni objašnjavati, ja sam to vidio prije 66 miliona godina.
+Nemoj meni objašnjavati, ja sam to {vidio|vidjela} prije 66 miliona godina.
 Lijekove pijem na vrijeme. Ručak i dnevnik takođe.
 Penzioner nema slobodan dan. Penzioner ima obaveze.
 Pošta, banka, pijaca, doktor. To je moj radni dan.
 Najljepše je kad unuci dođu. Drugo najljepše je kad odu.
 Šta će meni pametni telefon kad sam ja pametan.
 Nekad se znao red. Sad svako gura preko reda. Kao meteor.
-Pričaću ti nešto, al' nemoj nikom... pa sam ispričao cijelom kraju.
+Pričaću ti nešto, al' nemoj nikom... pa sam {ispričao|ispričala} cijelom kraju.
 Zovem unuka da mi upali kompjuter. On kaže "deda, samo pritisni dugme". Koje dugme?

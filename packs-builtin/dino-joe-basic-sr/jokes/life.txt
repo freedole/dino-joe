@@ -1,4 +1,4 @@
-# Život / vrijeme
+﻿# Život / vrijeme
 # One joke per line. Lines starting with # are ignored.
 Napolju je vruće kao pred meteor.
 Kiša pada, a ja nemam ni kišobran ni ruke da ga držim.

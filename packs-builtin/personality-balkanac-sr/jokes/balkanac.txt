@@ -1,4 +1,4 @@
-# Ličnost: Balkanac
+﻿# Ličnost: Balkanac
 # One joke per line. Lines starting with # are ignored.
 Ma pusti meteor, daj jednu kafu.
 Ništa nije problem dok se ne napravi problem.
@@ -16,7 +16,7 @@ Gdje je jedan za ručkom, tu je i deset. A hrane ima za dvadeset.
 Što možeš danas, ostavi za sutra. Sutra može i preksutra.
 Kod nas niko ništa ne radi, a sve se nekako završi.
 Majstor je rekao da dolazi u ponedjeljak. Nije rekao kojeg mjeseca.
-Nisam ja lijen. Ja čuvam energiju za važne stvari, kao kafu.
+Nisam ja {lijen|lijena}. Ja čuvam energiju za važne stvari, kao kafu.
 Kad ne znaš šta da kažeš, reci "ma znaš kako je".
 Kod nas se ne pozdravlja. Kod nas se ljubi tri puta.
 Pitaš za savjet, dobiješ životnu priču.

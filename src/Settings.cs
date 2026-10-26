@@ -38,6 +38,18 @@ namespace DinoJoe
 
         public static bool IsEnglish { get { return Current == En; } }
 
+        static readonly System.Text.RegularExpressions.Regex GenderRx =
+            new System.Text.RegularExpressions.Regex(@"\{([^{}|]*)\|([^{}|]*)\}");
+
+        /// "{muški|ženski}" u tekstu -> oblik po polu ljubimca (ODjordje / ODjordjina).
+        public static string Gender(string s) { return GenderFor(s, Settings.Female); }
+
+        public static string GenderFor(string s, bool f)
+        {
+            if (string.IsNullOrEmpty(s) || s.IndexOf('{') < 0) return s;
+            return GenderRx.Replace(s, delegate(System.Text.RegularExpressions.Match m) { return f ? m.Groups[2].Value : m.Groups[1].Value; });
+        }
+
         static readonly Dictionary<string, string[]> T = new Dictionary<string, string[]>();
         static void Add(string key, string ijek, string ekav, string hr, string en) { T[key] = new string[] { ijek, ekav, hr, en }; }
 
@@ -100,7 +112,7 @@ namespace DinoJoe
                 "Hi! I'm {0}. I work offline and without an account: I eat, sleep, tell jokes and keep you company.\r\n\r\nIf you want, connect an AI account and I become a real chatbot - I answer questions, help with work and remember our chats.\r\n\r\nThis is optional. You can skip it and turn it on later in Settings.");
             Add("s.ai.connect", "Poveži AI", "Poveži AI", "Poveži AI", "Connect AI");
             Add("s.ai.later", "Možda kasnije", "Možda kasnije", "Možda kasnije", "Maybe later");
-            Add("s.ai.ok", "✓ AI je povezan.", "✓ AI je povezan.", "✓ AI je povezan.", "✓ AI connected.");
+            Add("s.ai.ok", "✓ AI je {povezan|povezana}.", "✓ AI je {povezan|povezana}.", "✓ AI je {povezan|povezana}.", "✓ AI connected.");
             Add("s.ai.off", "Offline režim (samo fore).", "Offline režim (samo fore).", "Offline način (samo fore).", "Offline mode (jokes only).");
             Add("s.autostart", "Pokreni sa Windowsom", "Pokreni sa Windowsom", "Pokreni s Windowsima", "Start with Windows");
 
@@ -142,7 +154,7 @@ namespace DinoJoe
             Add("pk.err.bad", "Neispravan paket (sumnjive putanje u zip-u).", "Neispravan paket (sumnjive putanje u zip-u).", "Neispravan paket (sumnjive putanje u zip-u).", "Invalid pack (suspicious paths in zip).");
             Add("pk.err.noini", "U paketu nema pack.ini.", "U paketu nema pack.ini.", "U paketu nema pack.ini.", "pack.ini not found in pack.");
             Add("pk.err.empty", "Paket nema nijednu foru.", "Paket nema nijednu foru.", "Paket nema nijednu foru.", "Pack has no jokes.");
-            Add("pk.loaded", "Učitao sam {0} fora. Spreman!", "Učitao sam {0} fora. Spreman!", "Učitao sam {0} fora. Spreman!", "Loaded {0} jokes. Ready!");
+            Add("pk.loaded", "{Učitao|Učitala} sam {0} fora. {Spreman|Spremna}!", "{Učitao|Učitala} sam {0} fora. {Spreman|Spremna}!", "{Učitao|Učitala} sam {0} fora. {Spreman|Spremna}!", "Loaded {0} jokes. Ready!");
             Add("pk.like", "👍 Dobra fora!", "👍 Dobra fora!", "👍 Dobra fora!", "👍 Good one!");
             Add("pk.block", "👎 Ne prikazuj više ovu foru", "👎 Ne prikazuj više ovu foru", "👎 Ne prikazuj više ovu foru", "👎 Never show this joke again");
             Add("pk.liked", "Hvala! Pričaću je češće.", "Hvala! Pričaću je češće.", "Hvala! Pričat ću je češće.", "Thanks! I'll tell it more often.");
@@ -182,16 +194,16 @@ namespace DinoJoe
             Add("say.water", "Glup glup glup... Aaah!", "Glup glup glup... Aaah!", "Glup glup glup... Aaah!", "Glug glug glug... Aaah!");
             Add("say.play", "Hajmo! Ti juri meteor, ja bježim!", "Hajmo! Ti juri meteor, ja bežim!", "Idemo! Ti juri meteor, ja bježim!", "Let's go! You chase the meteor, I run!");
             Add("say.bath", "Blub blub! Sad mirišem kao fosil iz parfimerije.", "Blub blub! Sad mirišem kao fosil iz parfimerije.", "Blub blub! Sad mirišem kao fosil iz parfumerije.", "Splish splash! Now I smell like a fossil from a perfume shop.");
-            Add("say.tired", "Pretvaram se da nisam umoran. Ne ide mi.", "Pretvaram se da nisam umoran. Ne ide mi.", "Pretvaram se da nisam umoran. Ne ide mi.", "I'm pretending I'm not tired. It's not working.");
-            Add("need.say.food", "Ne kažem da sam gladan, ali onaj kursor liči na kobasicu.|Gladan sam! (dupli klik)|Stomak mi krči kao stari hard disk.", "Ne kažem da sam gladan, ali onaj kursor liči na kobasicu.|Gladan sam! (dupli klik)|Stomak mi krči kao stari hard disk.", "Ne kažem da sam gladan, ali onaj kursor sliči na kobasicu.|Gladan sam! (dupli klik)|Trbuh mi krči kao stari hard disk.", "Not saying I'm hungry, but that cursor looks like a sausage.|I'm hungry! (double-click)|My stomach growls like an old hard drive.");
-            Add("need.say.water", "Žedan sam kao pustinja u Kredi.|Daj malo vode, suho mi je ko na serveru bez ventilatora.", "Žedan sam kao pustinja u Kredi.|Daj malo vode, suvo mi je ko na serveru bez ventilatora.", "Žedan sam kao pustinja u Kredi.|Daj malo vode, suho mi je ko na serveru bez ventilatora.", "I'm as thirsty as a Cretaceous desert.|Water please, I'm drier than a server without fans.");
+            Add("say.tired", "Pretvaram se da nisam {umoran|umorna}. Ne ide mi.", "Pretvaram se da nisam {umoran|umorna}. Ne ide mi.", "Pretvaram se da nisam {umoran|umorna}. Ne ide mi.", "I'm pretending I'm not tired. It's not working.");
+            Add("need.say.food", "Ne kažem da sam {gladan|gladna}, ali onaj kursor liči na kobasicu.|{Gladan|Gladna} sam! (dupli klik)|Stomak mi krči kao stari hard disk.", "Ne kažem da sam {gladan|gladna}, ali onaj kursor liči na kobasicu.|{Gladan|Gladna} sam! (dupli klik)|Stomak mi krči kao stari hard disk.", "Ne kažem da sam {gladan|gladna}, ali onaj kursor sliči na kobasicu.|{Gladan|Gladna} sam! (dupli klik)|Trbuh mi krči kao stari hard disk.", "Not saying I'm hungry, but that cursor looks like a sausage.|I'm hungry! (double-click)|My stomach growls like an old hard drive.");
+            Add("need.say.water", "{Žedan|Žedna} sam kao pustinja u Kredi.|Daj malo vode, suho mi je ko na serveru bez ventilatora.", "{Žedan|Žedna} sam kao pustinja u Kredi.|Daj malo vode, suvo mi je ko na serveru bez ventilatora.", "{Žedan|Žedna} sam kao pustinja u Kredi.|Daj malo vode, suho mi je ko na serveru bez ventilatora.", "I'm as thirsty as a Cretaceous desert.|Water please, I'm drier than a server without fans.");
             Add("need.say.energy", "Oči mi se zatvaraju brže nego tebi tabovi.|*zijev* Može li jedna dremka?", "Oči mi se zatvaraju brže nego tebi tabovi.|*zev* Može li jedna dremka?", "Oči mi se zatvaraju brže nego tebi tabovi.|*zijev* Može li jedno drijemanje?", "My eyes close faster than your tabs.|*yawn* Nap time?");
             Add("need.say.love", "Dobro. Niko me ne mazi. Idem da se mazim sa Recycle Binom.|Jesi zaboravio da postojim? Ja jesam fosil, ali ipak.", "Dobro. Niko me ne mazi. Idem da se mazim sa Recycle Binom.|Jesi zaboravio da postojim? Ja jesam fosil, ali ipak.", "Dobro. Nitko me ne mazi. Idem se maziti s Recycle Binom.|Jesi zaboravio da postojim? Ja jesam fosil, ali ipak.", "Fine. Nobody pets me. I'll cuddle the Recycle Bin.|Forgot I exist? I am a fossil, but still.");
             Add("need.say.fun", "Dosadno mi je. Hoćemo se igrati?|Ajde nešto zanimljivo, ovaj Excel me ubija.", "Dosadno mi je. Hoćemo da se igramo?|Ajde nešto zanimljivo, ovaj Excel me ubija.", "Dosadno mi je. Hoćemo se igrati?|Ajde nešto zanimljivo, ovaj Excel me ubija.", "I'm bored. Wanna play?|Something fun please, this Excel is killing me.");
-            Add("need.say.hygiene", "Mirišem kao muzej poslije ponoći. Okupaj me.|Malo sam blatnjav. Od Krede.", "Mirišem kao muzej posle ponoći. Okupaj me.|Malo sam blatnjav. Od Krede.", "Mirišem kao muzej poslije ponoći. Okupaj me.|Malo sam blatnjav. Od Krede.", "I smell like a museum after midnight. Bath please.|I'm a bit muddy. Cretaceous mud.");
+            Add("need.say.hygiene", "Mirišem kao muzej poslije ponoći. Okupaj me.|Malo sam {blatnjav|blatnjava}. Od Krede.", "Mirišem kao muzej posle ponoći. Okupaj me.|Malo sam {blatnjav|blatnjava}. Od Krede.", "Mirišem kao muzej poslije ponoći. Okupaj me.|Malo sam {blatnjav|blatnjava}. Od Krede.", "I smell like a museum after midnight. Bath please.|I'm a bit muddy. Cretaceous mud.");
             Add("need.say.health", "Nije mi dobro... Trebam hranu, vodu i kupku.|Kašljem kao stari laptop.", "Nije mi dobro... Treba mi hrana, voda i kupka.|Kašljem kao stari laptop.", "Nije mi dobro... Trebam hranu, vodu i kupku.|Kašljem kao stari laptop.", "Not feeling well... I need food, water and a bath.|Coughing like an old laptop.");
-            Add("say.ranaway", "Otišao sam. Niko me ne pazi. (tray -> Dozovi ovamo)", "Otišao sam. Niko me ne pazi. (tray -> Dozovi ovamo)", "Otišao sam. Nitko me ne pazi. (tray -> Dozovi ovamo)", "I left. Nobody takes care of me. (tray -> Summon)");
-            Add("say.back", "Vratio sam se... Ali sad me pazi, važi?", "Vratio sam se... Ali sad me pazi, važi?", "Vratio sam se... Ali sad me pazi, može?", "I'm back... but take care of me now, okay?");
+            Add("say.ranaway", "{Otišao|Otišla} sam. Niko me ne pazi. (tray -> Dozovi ovamo)", "{Otišao|Otišla} sam. Niko me ne pazi. (tray -> Dozovi ovamo)", "{Otišao|Otišla} sam. Nitko me ne pazi. (tray -> Dozovi ovamo)", "I left. Nobody takes care of me. (tray -> Summon)");
+            Add("say.back", "{Vratio|Vratila} sam se... Ali sad me pazi, važi?", "{Vratio|Vratila} sam se... Ali sad me pazi, važi?", "{Vratio|Vratila} sam se... Ali sad me pazi, može?", "I'm back... but take care of me now, okay?");
 
             // meni i govor ljubimca
             Add("m.chat", "Pričaj sa mnom", "Pričaj sa mnom", "Pričaj sa mnom", "Chat with me");
@@ -222,11 +234,11 @@ namespace DinoJoe
             Add("s.auto", "Vidimo se pri svakom logonu!", "Vidimo se pri svakom logonu!", "Vidimo se pri svakoj prijavi!", "See you at every logon!");
             Add("s.write", "Piši, ja čekam.", "Piši, ja čekam.", "Piši, ja čekam.", "Write away, I'm waiting.");
             Add("s.njam", "NJAM! Konačno!", "NJAM! Konačno!", "NJAM! Konačno!", "NOM! Finally!");
-            Add("s.full", "Sit sam, ali hvala :)", "Sit sam, ali hvala :)", "Sit sam, ali hvala :)", "I'm full, but thanks :)");
+            Add("s.full", "{Sit|Sita} sam, ali hvala :)", "{Sit|Sita} sam, ali hvala :)", "{Sit|Sita} sam, ali hvala :)", "I'm full, but thanks :)");
             Add("s.morning", "Jutro!", "Jutro!", "Jutro!", "Morning!");
             Add("s.night", "Laku noć...", "Laku noć...", "Laku noć...", "Good night...");
             Add("s.here", "Evo me!", "Evo me!", "Evo me!", "Here I am!");
-            Add("s.aion", "Povezan na AI ({0}). Enter šalje, Esc zatvara.", "Povezan na AI ({0}). Enter šalje, Esc zatvara.", "Povezan na AI ({0}). Enter šalje, Esc zatvara.", "Connected to AI ({0}). Enter sends, Esc closes.");
+            Add("s.aion", "{Povezan|Povezana} na AI ({0}). Enter šalje, Esc zatvara.", "{Povezan|Povezana} na AI ({0}). Enter šalje, Esc zatvara.", "{Povezan|Povezana} na AI ({0}). Enter šalje, Esc zatvara.", "Connected to AI ({0}). Enter sends, Esc closes.");
             Add("s.aioff", "Offline režim. Za pravi razgovor: desni klik na mene → AI → Podesi AI.", "Offline režim. Za pravi razgovor: desni klik na mene → AI → Podesi AI.", "Offline način. Za pravi razgovor: desni klik na mene → AI → Postavi AI.", "Offline mode. For real chat: right-click me → AI → AI settings.");
             Add("s.you", "Ti", "Ti", "Ti", "You");
             Add("s.badkey", "Ključ ne valja ili je opozvan. Desni klik → AI → Podesi AI.", "Ključ ne valja ili je opozvan. Desni klik → AI → Podesi AI.", "Ključ ne valja ili je opozvan. Desni klik → AI → Postavi AI.", "The key is invalid or revoked. Right-click → AI → AI settings.");
@@ -234,15 +246,15 @@ namespace DinoJoe
             Add("s.nonet", "Nema veze sa serverom (mreža/proxy/firewall). Pokušaću opet za minut.", "Nema veze sa serverom (mreža/proksi/firewall). Pokušaću opet za minut.", "Nema veze sa serverom (mreža/proxy/firewall). Pokušat ću opet za minutu.", "Can't reach the server (network/proxy/firewall). I'll retry in a minute.");
             Add("s.aierr", "AI greška.", "AI greška.", "AI pogreška.", "AI error.");
             Add("s.seechat", "… (vidi chat)", "… (vidi chat)", "… (vidi chat)", "… (see chat)");
-            Add("s.connected", "Povezan sam! Klikni me u tray-u ili desni klik → Pričaj sa mnom.", "Povezan sam! Klikni me u tray-u ili desni klik → Pričaj sa mnom.", "Povezan sam! Klikni me u tray-u ili desni klik → Pričaj sa mnom.", "Connected! Click me in the tray or right-click → Chat with me.");
-            Add("s.aion2", "Povezan na AI ({0}).", "Povezan na AI ({0}).", "Povezan na AI ({0}).", "Connected to AI ({0}).");
+            Add("s.connected", "{Povezan|Povezana} sam! Klikni me u tray-u ili desni klik → Pričaj sa mnom.", "{Povezan|Povezana} sam! Klikni me u tray-u ili desni klik → Pričaj sa mnom.", "{Povezan|Povezana} sam! Klikni me u tray-u ili desni klik → Pričaj sa mnom.", "Connected! Click me in the tray or right-click → Chat with me.");
+            Add("s.aion2", "{Povezan|Povezana} na AI ({0}).", "{Povezan|Povezana} na AI ({0}).", "{Povezan|Povezana} na AI ({0}).", "Connected to AI ({0}).");
             Add("s.persona", "Mijenjaš mi karakter? Hrabro.", "Menjaš mi karakter? Hrabro.", "Mijenjaš mi karakter? Hrabro.", "Changing my personality? Brave.");
             Add("s.roarsorry", "ROAR! ...izvini, refleks.", "ROAR! ...izvini, refleks.", "ROAR! ...oprosti, refleks.", "ROAR! ...sorry, reflex.");
             Add("s.floor", "Opet ja na podu.", "Opet ja na podu.", "Opet ja na podu.", "On the floor again.");
             Add("s.yawn", "*zijev*", "*zev*", "*zijev*", "*yawn*");
             Add("s.notsleep", "Hm?! Ne spavam, odmaram oči.", "Hm?! Ne spavam, odmaram oči.", "Hm?! Ne spavam, odmaram oči.", "Hm?! I'm not sleeping, just resting my eyes.");
             Add("s.noglasses", "Bez naočala sam ljepši. Mislim.", "Bez naočara sam lepši. Mislim.", "Bez naočala sam ljepši. Mislim.", "I look better without glasses. I think.");
-            Add("g.mon", "Ponedjeljak. Izumro bih opet.", "Ponedeljak. Izumro bih opet.", "Ponedjeljak. Izumro bih opet.", "Monday. I'd go extinct again.");
+            Add("g.mon", "Ponedjeljak. {Izumro|Izumrla} bih opet.", "Ponedeljak. {Izumro|Izumrla} bih opet.", "Ponedjeljak. {Izumro|Izumrla} bih opet.", "Monday. I'd go extinct again.");
             Add("g.fri", "Petak je. Ne diraj ništa.", "Petak je. Ne diraj ništa.", "Petak je. Ne diraj ništa.", "It's Friday. Don't touch anything.");
             Add("g.morning", "Dobro jutro! Prvo kafa, pa sve ostalo.", "Dobro jutro! Prvo kafa, pa sve ostalo.", "Dobro jutro! Prvo kava, pa sve ostalo.", "Good morning! Coffee first, everything else later.");
             Add("g.day", "Ćao! Ja sam {0}.", "Ćao! Ja sam {0}.", "Bok! Ja sam {0}.", "Hi! I'm {0}.");
@@ -271,11 +283,11 @@ namespace DinoJoe
             Add("ai.greetme", "Pozdravi me u jednoj kratkoj rečenici.", "Pozdravi me u jednoj kratkoj rečenici.", "Pozdravi me u jednoj kratkoj rečenici.", "Greet me in one short sentence.");
 
             // trigger fore (više varijanti odvojeno sa |)
-            Add("trg.cpu", "Šta to pokrećeš? Vruće je kao pred meteor.|Procesor ti radi kao da bježi od meteora.|CPU na maksimumu. Da imam znojne žlijezde, sad bih se oznojio.", "Šta to pokrećeš? Vruće je kao pred meteor.|Procesor ti radi kao da beži od meteora.|CPU na maksimumu. Da imam znojne žlezde, sad bih se oznojio.", "Što to pokrećeš? Vruće je kao pred meteor.|Procesor ti radi kao da bježi od meteora.|CPU na maksimumu. Da imam znojne žlijezde, sad bih se oznojio.", "What are you running? It's hot like before the meteor.|Your CPU is running like it's escaping a meteor.|CPU maxed out. If I had sweat glands, I'd be sweating.");
-            Add("trg.battery", "Baterija pri kraju. I ja sam tako izumro: polako, pa odjednom.|Punjač! Brzo! Ovo nije vježba.", "Baterija pri kraju. I ja sam tako izumro: polako, pa odjednom.|Punjač! Brzo! Ovo nije vežba.", "Baterija pri kraju. I ja sam tako izumro: polako, pa odjednom.|Punjač! Brzo! Ovo nije vježba.", "Battery almost empty. That's how I went extinct: slowly, then all at once.|Charger! Quick! This is not a drill.");
+            Add("trg.cpu", "Šta to pokrećeš? Vruće je kao pred meteor.|Procesor ti radi kao da bježi od meteora.|CPU na maksimumu. Da imam znojne žlijezde, sad bih se {oznojio|oznojila}.", "Šta to pokrećeš? Vruće je kao pred meteor.|Procesor ti radi kao da beži od meteora.|CPU na maksimumu. Da imam znojne žlezde, sad bih se {oznojio|oznojila}.", "Što to pokrećeš? Vruće je kao pred meteor.|Procesor ti radi kao da bježi od meteora.|CPU na maksimumu. Da imam znojne žlijezde, sad bih se {oznojio|oznojila}.", "What are you running? It's hot like before the meteor.|Your CPU is running like it's escaping a meteor.|CPU maxed out. If I had sweat glands, I'd be sweating.");
+            Add("trg.battery", "Baterija pri kraju. I ja sam tako {izumro|izumrla}: polako, pa odjednom.|Punjač! Brzo! Ovo nije vježba.", "Baterija pri kraju. I ja sam tako {izumro|izumrla}: polako, pa odjednom.|Punjač! Brzo! Ovo nije vežba.", "Baterija pri kraju. I ja sam tako {izumro|izumrla}: polako, pa odjednom.|Punjač! Brzo! Ovo nije vježba.", "Battery almost empty. That's how I went extinct: slowly, then all at once.|Charger! Quick! This is not a drill.");
             Add("trg.midnight", "Ponoć je. Ništa pametno nije napisano poslije ponoći. Osim ove fore.|Ponoć. Vrijeme za spavanje, a ne za još jedan tab.", "Ponoć je. Ništa pametno nije napisano posle ponoći. Osim ove fore.|Ponoć. Vreme za spavanje, a ne za još jedan tab.", "Ponoć je. Ništa pametno nije napisano poslije ponoći. Osim ove fore.|Ponoć. Vrijeme za spavanje, a ne za još jedan tab.", "Midnight. Nothing smart was ever written after midnight. Except this joke.|Midnight. Time to sleep, not for one more tab.");
             Add("trg.monday", "Ponedjeljak, 8h. Kafa prvo, pitanja poslije.|Ponedjeljak ujutro. Hrabro, izdržaćemo zajedno.", "Ponedeljak, 8h. Kafa prvo, pitanja posle.|Ponedeljak ujutru. Hrabro, izdržaćemo zajedno.", "Ponedjeljak, 8h. Kava prvo, pitanja poslije.|Ponedjeljak ujutro. Hrabro, izdržat ćemo zajedno.", "Monday, 8 AM. Coffee first, questions later.|Monday morning. Be brave, we'll survive together.");
-            Add("trg.back", "Jesi živ? Već sam jednom ostao sam, ne bih opet.|E, vratio si se! Mislio sam da te je meteor odnio.|Dugo te nije bilo. Čuvao sam desktop.", "Jesi živ? Već sam jednom ostao sam, ne bih opet.|E, vratio si se! Mislio sam da te je meteor odneo.|Dugo te nije bilo. Čuvao sam desktop.", "Jesi živ? Već sam jednom ostao sam, ne bih opet.|E, vratio si se! Mislio sam da te je meteor odnio.|Dugo te nije bilo. Čuvao sam radnu površinu.", "Are you alive? I've been left alone once, not again.|Hey, you're back! I thought the meteor got you.|Long time no see. I guarded the desktop.");
+            Add("trg.back", "Jesi živ? Već sam jednom {ostao|ostala} sam, ne bih opet.|E, {vratio|vratila} si se! {Mislio|Mislila} sam da te je meteor odnio.|Dugo te nije bilo. {Čuvao|Čuvala} sam desktop.", "Jesi živ? Već sam jednom {ostao|ostala} sam, ne bih opet.|E, {vratio|vratila} si se! {Mislio|Mislila} sam da te je meteor odneo.|Dugo te nije bilo. {Čuvao|Čuvala} sam desktop.", "Jesi živ? Već sam jednom {ostao|ostala} sam, ne bih opet.|E, {vratio|vratila} si se! {Mislio|Mislila} sam da te je meteor odnio.|Dugo te nije bilo. {Čuvao|Čuvala} sam radnu površinu.", "Are you alive? I've been left alone once, not again.|Hey, you're back! I thought the meteor got you.|Long time no see. I guarded the desktop.");
 
             // AI servisi
             Add("ai.provider", "AI servis:", "AI servis:", "AI servis:", "AI service:");
@@ -334,6 +346,13 @@ namespace DinoJoe
             Add("cat.installed", "✓ Preuzeto: {0}", "✓ Preuzeto: {0}", "✓ Preuzeto: {0}", "✓ Downloaded: {0}");
             Add("cat.err.net", "Katalog nije dostupan (internet/proxy/firewall).", "Katalog nije dostupan (internet/proksi/firewall).", "Katalog nije dostupan (internet/proxy/firewall).", "Catalog unavailable (internet/proxy/firewall).");
             Add("cat.err.hash", "Provjera fajla nije prošla (SHA256):", "Provera fajla nije prošla (SHA256):", "Provjera datoteke nije prošla (SHA256):", "File check failed (SHA256):");
+
+            // profili i ličnosti
+            Add("prof.default", "Osnovni", "Osnovni", "Osnovni", "Default");
+            Add("pers.hide", "Sakrij ovu ličnost", "Sakrij ovu ličnost", "Sakrij ovu osobnost", "Hide this personality");
+            Add("pers.show", "Prikaži ovu ličnost", "Prikaži ovu ličnost", "Prikaži ovu osobnost", "Show this personality");
+            Add("pers.showhidden", "Prikaži sakrivene ličnosti (desni klik na ličnost = sakrij)", "Prikaži sakrivene ličnosti (desni klik na ličnost = sakrij)", "Prikaži skrivene osobnosti (desni klik na osobnost = sakrij)", "Show hidden personalities (right-click a personality to hide it)");
+            Add("pers.hiddenmark", "(sakrivena)", "(sakrivena)", "(skrivena)", "(hidden)");
 
             // bosanski izuzeci
             BsOverride["wiz.settings"] = "Dino Joe - postavke";
@@ -410,7 +429,7 @@ namespace DinoJoe
                 "Nobody pets me. I'll go extinct again, this time from sadness.",
                 "Dramatična diva: preuveličava sve, traži pažnju i komplimente, teatralna.");
             Add("tamagotchi", "Hardcore Tamagotchi mod", "Hardcore Tamagotchi mod", "Hardcore Tamagotchi mod", "Hardcore Tamagotchi mode",
-                "Gladan. Mazi. Sad. ...Hvala. Opet gladan.",
+                "{Gladan|Gladna}. Mazi. Sad. ...Hvala. Opet {gladan|gladna}.",
                 "Hungry. Pet me. Now. ...Thanks. Hungry again.",
                 "Hardcore Tamagotchi: malo priča, kratke rečenice, stalno traži hranu i pažnju kao pravi ljubimac.");
         }
@@ -478,6 +497,18 @@ namespace DinoJoe
         public static string Packs = "odjordje-classic,dino-joe-basic-sr";   // id-ovi uključenih paketa, zarezom
         public static string PackWeights = "";              // id:2,id2:0.5 (1 = normalno)
         public static string ActiveProfile = "";
+        public static string HiddenPersonalities = "";      // id-ovi sakrivenih ugrađenih ličnosti
+
+        public static bool IsHidden(string id) { return ("," + HiddenPersonalities + ",").Contains("," + id + ","); }
+
+        public static void SetHidden(string id, bool hide)
+        {
+            List<string> l = new List<string>();
+            foreach (string s in HiddenPersonalities.Split(',')) if (s.Length > 0 && s != id) l.Add(s);
+            if (hide) l.Add(id);
+            HiddenPersonalities = string.Join(",", l.ToArray());
+            Save();
+        }
 
         static string Dir { get { return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), Profile.Id); } }
         static string PathIni { get { return Path.Combine(Dir, "settings.ini"); } }
@@ -507,6 +538,7 @@ namespace DinoJoe
                         else if (k == "packs") Packs = v;
                         else if (k == "pack_weights") PackWeights = v;
                         else if (k == "profile") ActiveProfile = v;
+                        else if (k == "hidden_personalities") HiddenPersonalities = v;
                     }
             }
             catch { }
@@ -533,6 +565,7 @@ namespace DinoJoe
                     "accessory=" + Accessory + "\r\n" +
                     "packs=" + Packs + "\r\n" +
                     "pack_weights=" + PackWeights + "\r\n" +
+                    "hidden_personalities=" + HiddenPersonalities + "\r\n" +
                     "profile=" + ActiveProfile.Replace("\r", "").Replace("\n", "") + "\r\n", new UTF8Encoding(true));
             }
             catch { }

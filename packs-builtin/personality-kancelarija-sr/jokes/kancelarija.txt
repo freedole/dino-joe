@@ -1,9 +1,9 @@
-# Ličnost: Kancelarijski
+﻿# Ličnost: Kancelarijski
 # One joke per line. Lines starting with # are ignored.
-"Odgovori svima" je ozbiljna stvar. Jednom sam tako pokrenuo meteor.
-Kalendar je pun. Ja sam prazan.
+"Odgovori svima" je ozbiljna stvar. Jednom sam tako {pokrenuo|pokrenula} meteor.
+Kalendar je pun. Ja sam {prazan|prazna}.
 "Brzi sastanak" od 15 minuta traje do ručka.
-U prilogu šaljem prilog koji sam zaboravio priložiti.
+U prilogu šaljem prilog koji sam {zaboravio|zaboravila} priložiti.
 "Kao u mom prethodnom mejlu" je kancelarijski način da se kaže "čitaj".
 Moja stolica ima više radnog staža od mene. Skoro.
 Pečat, potpis, kopija, original. I još jedna kopija, za svaki slučaj.
@@ -24,7 +24,7 @@ Novi kolega pita gdje je šta. Mi godinama pitamo isto.
 Fotokopir aparat je zaglavljen. Kao i ja ovdje.
 Sastanak je završen. Ostale su samo tri nove tačke za sljedeći.
 Najljepša riječ u kancelariji: "otkazano".
-Out of office: izumro. Vraćam se za 66 miliona godina.
+Out of office: {izumro|izumrla}. Vraćam se za 66 miliona godina.
 Kad ti kažu "nije ništa hitno", uradi to odmah.
 Prioritet broj jedan, dva i tri: sve je prioritet broj jedan.
 Planiram da danas budem produktivan. Plan je odličan.

@@ -174,6 +174,7 @@ namespace DinoJoe
         int species, pattern, accessory;
         string packs;
         bool packsTouched;
+        bool showHidden;
         bool autostart;
 
         int step;
@@ -471,22 +472,43 @@ namespace DinoJoe
             Label sample = Lbl("", 12, 250, 420, 70);
             sample.Font = new Font("Segoe UI", 10f, FontStyle.Italic);
             sample.ForeColor = Color.FromArgb(40, 90, 50);
-            for (int i = 0; i < Personality.All.Count; i++)
+            List<Personality> vis = new List<Personality>();
+            foreach (Personality x in Personality.All)
+                if (showHidden || x.Id == personality || !Settings.IsHidden(x.Id)) vis.Add(x);
+            for (int i = 0; i < vis.Count; i++)
             {
-                Personality p = Personality.All[i];
+                Personality p = vis[i];
                 int col = i < 5 ? 0 : 1, row = i < 5 ? i : i - 5;
-                RadioButton rb = Radio(p.Name, 10 + col * 215, 4 + row * 40, 210, personality == p.Id);
+                bool hid = Settings.IsHidden(p.Id);
+                RadioButton rb = Radio(p.Name + (hid ? "  " + Lang.Get("pers.hiddenmark") : ""), 10 + col * 215, 4 + row * 40, 210, personality == p.Id);
+                if (hid) rb.ForeColor = Theme.TextMuted;
+                ContextMenuStrip cm = new ContextMenuStrip();
+                cm.Items.Add(Lang.Get(hid ? "pers.show" : "pers.hide"), null, delegate
+                {
+                    if (!hid && p.Id == personality) return;     // aktivna se ne sakriva
+                    Settings.SetHidden(p.Id, !hid);
+                    BeginInvoke((MethodInvoker)delegate { Go(step); });
+                });
+                rb.ContextMenuStrip = cm;
                 if (p.Id == "tamagotchi") rb.Font = new Font("Segoe UI Semibold", 10f);
                 rb.CheckedChanged += delegate(object o, EventArgs e)
                 {
                     if (!((RadioButton)o).Checked) return;
                     personality = p.Id;
-                    sample.Text = "„" + p.Sample + "“";
-                    preview.Say(p.Sample, 4);
+                    sample.Text = "„" + Lang.GenderFor(p.Sample, female) + "“";
+                    preview.Say(Lang.GenderFor(p.Sample, female), 4);
                 };
-                if (personality == p.Id) sample.Text = "„" + p.Sample + "“";
+                if (personality == p.Id) sample.Text = "„" + Lang.GenderFor(p.Sample, female) + "“";
             }
-            preview.Say(Personality.Find(personality).Sample, 4);
+            preview.Say(Lang.GenderFor(Personality.Find(personality).Sample, female), 4);
+
+            CheckBox sh = new CheckBox();
+            sh.Text = Lang.Get("pers.showhidden");
+            sh.Checked = showHidden;
+            sh.SetBounds(12, 216, 420, 24);
+            sh.ForeColor = Theme.TextMuted;
+            sh.CheckedChanged += delegate { showHidden = sh.Checked; BeginInvoke((MethodInvoker)delegate { Go(step); }); };
+            content.Controls.Add(sh);
         }
 
         // ---------------- 5. paketi ----------------
@@ -581,6 +603,8 @@ namespace DinoJoe
             Settings.Accessory = accessory;
             Settings.Packs = packs;
             Settings.Save();
+            // prvo pokretanje: izbor paketa i ličnosti postaje prvi profil
+            if (firstRun && Packs.LoadProfiles().Count == 0) Packs.SaveCurrentAs(Lang.Get("prof.default"));
             Settings.SetAutostart(autostart);
             Settings.Apply();
         }

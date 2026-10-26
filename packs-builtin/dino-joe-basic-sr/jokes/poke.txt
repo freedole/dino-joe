@@ -1,4 +1,4 @@
-# SPECIAL: when clicked
+﻿# SPECIAL: when clicked
 # One joke per line. Lines starting with # are ignored.
 Hej! Golica!
 Ne bockaj, imam ljuske.
@@ -6,7 +6,7 @@ Rawr!
 Šta je bilo? Treba nešto?
 Prrr...
 Ovdje sam, ovdje sam!
-Opet ti? Pa ja sam se tek namjestio.
+Opet ti? Pa ja sam se tek {namjestio|namjestila}.
 Ej, nisam ja touchscreen!
 Hihi, prestani!
 Još jednom pa ti zaključam ekran. Šalim se.

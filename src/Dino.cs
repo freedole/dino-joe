@@ -924,7 +924,7 @@ namespace DinoJoe
         }
 
         // ---------------- potrebe / status ----------------
-        string NeedLine(Need n) { return Pick(Lang.Get("need.say." + Needs.Keys[(int)n]).Split('|')); }
+        string NeedLine(Need n) { return Pick(Lang.Gender(Lang.Get("need.say." + Needs.Keys[(int)n])).Split('|')); }
 
         void OpenStatus()
         {
@@ -1297,7 +1297,7 @@ namespace DinoJoe
         {
             string v = Packs.ActiveValue("greeting." + packKey);
             if (v == null) return Profile.GetPick(iniKey, def);
-            string[] parts = v.Split('|');
+            string[] parts = Lang.Gender(v).Split('|');
             return parts[rnd.Next(parts.Length)].Trim();
         }
 
@@ -1493,6 +1493,7 @@ namespace DinoJoe
 
         void Say(string text)
         {
+            text = Lang.Gender(text ?? "");
             pose.Bubble = text;
             bubbleTotal = bubbleLeft = 2.2 + text.Length * 0.065;
             sinceTalk = 0;

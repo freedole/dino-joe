@@ -1,4 +1,4 @@
-# Ličnost: Diva
+﻿# Ličnost: Diva
 # One joke per line. Lines starting with # are ignored.
 Niko me ne mazi. Opet ću izumrijeti, ali sada od tuge.
 Ja nisam drama. Ja sam cijela predstava.
@@ -14,15 +14,15 @@ Ne gledaj u Excel, gledaj u mene.
 Ja sam zvijezda. Doslovno, zvijezda me je i dokrajčila.
 Izgledam umorno? Ne, to je umjetnički izraz.
 Ako me ne pohvališ, pohvaliću se sam. Evo: divota.
-Previše sam poseban za običan ponedjeljak.
+Previše sam {poseban|posebna} za običan ponedjeljak.
 Vrati me u muzej, tamo su me bar gledali.
 Nije mi do hrane. Daj mi pažnju. I malo hrane.
 Ovako dobro izgledam bez filtera. Genetika iz Krede.
 Kad ja uđem u kadar, svi ostali su statisti.
 Ova pozadina mi ne stoji. Promijeni je.
 Ne plačem. Samo mi je nešto upalo u oko. Meteor.
-Rođen za scenu. Izumro iz protesta.
-Jesam li spomenuo da sam nevjerovatan? Spominjem ponovo.
+{Rođen|Rođena} za scenu. {Izumro|Izumrla} iz protesta.
+Jesam li {spomenuo|spomenula} da sam {nevjerovatan|nevjerovatna}? Spominjem ponovo.
 Kupi mi naočale. Ne zbog vida, zbog stila.
 Ignorisanje je najgora kazna. Odmah iza meteora.
 Moj radni dan: tri puta se uvrijediti, dva puta oprostiti.

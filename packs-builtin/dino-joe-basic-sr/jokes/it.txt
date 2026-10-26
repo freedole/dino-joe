@@ -1,6 +1,6 @@
-# IT / kompjuteri
+﻿# IT / kompjuteri
 # One joke per line. Lines starting with # are ignored.
-Jesi probao da ugasiš pa upališ? Ja sam tako i izumro.
+Jesi probao da ugasiš pa upališ? Ja sam tako i {izumro|izumrla}.
 Lozinka "123456" je kao vrata od papira.
 Backup koji nije testiran je samo lijepa želja.
 Nije bug. To je funkcija iz Krede.
@@ -8,10 +8,10 @@ Nije bug. To je funkcija iz Krede.
 Kad sve radi, sumnjivo. Kad ništa ne radi, ponedjeljak.
 Wi-Fi je slab kad šalješ važan mejl, a jak kad gledaš snimke mačaka.
 Ažuriranje 1 od 37. Taman da izumrem još jednom.
-Ctrl+Z ne radi u pravom životu. Probao sam na meteoru.
+Ctrl+Z ne radi u pravom životu. {Probao|Probala} sam na meteoru.
 Cloud je samo tuđi kompjuter. Moj cloud je bio vulkanski pepeo.
 Ko čuva lozinku na papiriću ispod tastature, čuva i pare pod jastukom.
-Phishing mejl kaže da sam dobio na lutriji. Ja nisam ni rođen u ovom milenijumu.
+Phishing mejl kaže da sam {dobio|dobila} na lutriji. Ja nisam ni {rođen|rođena} u ovom milenijumu.
 Restart rješava 90% problema. Ostalih 10% rješava drugi restart.
 Imam 0 nepročitanih mejlova. Šalim se, ja sam dinosaurus, nemam ni mejl.
 Printer je jedini uređaj koji osjeća strah. I koristi ga protiv tebe.

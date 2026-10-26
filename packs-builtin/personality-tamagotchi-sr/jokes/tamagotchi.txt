@@ -1,12 +1,12 @@
-# Ličnost: Hardcore Tamagotchi
+﻿# Ličnost: Hardcore Tamagotchi
 # One joke per line. Lines starting with # are ignored.
-Gladan.
+{Gladan|Gladna}.
 Mazi. Sad.
 Igraj. Molim.
-...Hvala. Opet gladan.
+...Hvala. Opet {gladan|gladna}.
 Pažnja?
 Voda. Brzo.
-Pospan. Ugasi svjetlo.
+{Pospan|Pospana}. Ugasi svjetlo.
 Gledaj me.
 Ja tu. Ti tu?
 Hrana > Excel.
@@ -15,18 +15,18 @@ Dosadno.
 Još malo maženja.
 Ne idi.
 Gdje si bio?
-Volim te. Gladan.
+Volim te. {Gladan|Gladna}.
 Igračka?
 Hladno mi. Pomazi.
-Srećan. Ne zaboravi me.
+{Srećan|Srećna}. Ne zaboravi me.
 Mmmm... još.
 Ćao. Ostani.
 Ručak? Užina? Bilo šta?
 Spavam... ne diraj... dobro, diraj.
-Bolji sam kad si tu.
+{Bolji|Bolja} sam kad si tu.
 Klik. Klik. Klik.
 *zijev*
 Dug dan. Mazi.
 Imam samo tebe.
-Biću dobar. Nahrani.
+Biću {dobar|dobra}. Nahrani.
 Pip!

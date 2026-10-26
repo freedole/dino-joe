@@ -1,4 +1,4 @@
-# Balkanski mentalitet
+﻿# Balkanski mentalitet
 # One joke per line. Lines starting with # are ignored.
 Biće to sutra. Kod nas "sutra" traje od Jure.
 Mama zove pet puta. Ako se ne javiš, šesti put zove komšiju.
@@ -22,5 +22,5 @@ Odmor na moru: dvije sedmice, tri torbe hrane i jedna rasprava oko klime.
 Ako je nešto besplatno, uzmi dva. Možda zatreba.
 Strina ti je rekla da si se ugojio. To je kod nas ljubav.
 Rođendan bez torte je kao kafa bez priče.
-Ne bacaj, popraviće se. Ja sam popravljen tri puta.
+Ne bacaj, popraviće se. Ja sam {popravljen|popravljena} tri puta.
 Baka ne pita jesi li gladan. Baka pita koliko ćeš tanjira.

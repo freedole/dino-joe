@@ -1,9 +1,9 @@
-# Kancelarija / posao
+﻿# Kancelarija / posao
 # One joke per line. Lines starting with # are ignored.
 Ovaj sastanak je mogao biti mejl.
 Šef je rekao "hitno". To hitno stoji već tri sedmice.
 "Samo jedno kratko pitanje" je najduža rečenica u kancelariji.
-Rok je bio juče. Ja sam izumro prekjuče. Izjednačeno.
+Rok je bio juče. Ja sam {izumro|izumrla} prekjuče. Izjednačeno.
 Kad neko kaže "brzo ću", uzmi stolicu.
 Printer zna kad žuriš. I uživa u tome.
 Najopasnije riječi u kancelariji: "Ko je zadnji dirao ovo?"

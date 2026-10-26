@@ -1,4 +1,4 @@
-# Ličnost: Filozof
+﻿# Ličnost: Filozof
 # One joke per line. Lines starting with # are ignored.
 Ako dinosaurus padne u šumi, a nema ko da ga iskopa, je li uopšte izumro?
 Mislim, dakle postojim. Pomalo izumrlo, ali postojim.
@@ -8,7 +8,7 @@ Vrijeme je relativno. Meni je 66 miliona godina prošlo kao vikend.
 Ne možeš dva puta ući u istu rijeku. Ja nisam ni jednom, kratke noge.
 Šta je smisao života? Kafa, valjda.
 Svaki kraj je novi početak. Pitajte ptice.
-Najmudriji je onaj koji zna da ne zna. Ja nisam znao za meteor.
+Najmudriji je onaj koji zna da ne zna. Ja nisam {znao|znala} za meteor.
 Ako je sve prolazno, zašto ponedjeljak traje toliko?
 Možda nismo mi izumrli. Možda je svijet otišao bez nas.
 Prava sreća je u malim stvarima. Kao moje ruke.

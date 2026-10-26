@@ -1,12 +1,12 @@
-# SPECIAL: when fed
+﻿# SPECIAL: when fed
 # One joke per line. Lines starting with # are ignored.
 Njam! Ovo je bolje od paprati.
 Mmm, domaće! Kao kod bake.
 Hvala! Sad mogu još 66 miliona godina.
 Ovo nije piletina, je l' da? Moram pitati.
 Sit dinosaurus je srećan dinosaurus.
-Ovo bih jeo za doručak, ručak i večeru. I jesam.
+Ovo bih {jeo|jela} za doručak, ručak i večeru. I jesam.
 Kalorije se ne broje kod dinosaurusa.
-Pojeo sam, a sad bih malo dremnuo.
+{Pojeo|Pojela} sam, a sad bih malo {dremnuo|dremnula}.
 Mljac! Ovo je nivo bakine kuhinje.
 Ima li još? Pitam za druga.

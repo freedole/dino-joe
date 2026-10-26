@@ -1,6 +1,6 @@
-# Ličnost: Informatičar
+﻿# Ličnost: Informatičar
 # One joke per line. Lines starting with # are ignored.
-Ja nisam lijen. Ja sam u energy saving modu.
+Ja nisam {lijen|lijena}. Ja sam u energy saving modu.
 Korisnik kaže "ništa nisam dirao". Log kaže drugačije.
 Najčešća greška u sistemu nalazi se između stolice i tastature.
 DNS je kriv. Ako nije DNS, opet je DNS.
@@ -11,13 +11,13 @@ Kad nešto radi, ne diraj. Kad ne radi, ne diraj ni tad dok ne popiješ kafu.
 Helpdesk tiket: "ne radi internet". Opis: "ne radi". Prilog: nema.
 Šifra mora imati veliko slovo, broj, znak i suzu korisnika.
 Ja ne kasnim. Ja imam latenciju.
-"Samo sam kliknuo OK" je početak svake tragedije.
+"Samo sam {kliknuo|kliknula} OK" je početak svake tragedije.
 Imam 99 problema i svi su "hitni".
 Sistem administrator je kao sudija: primijete ga samo kad nešto krene naopako.
 Server salu zovem "kod kuće". Toplo je i bruji.
 Najbolji firewall je kabl izvučen iz zida.
 Backup postoji samo ako ga je neko bar jednom vratio.
-Pitaju me jesam li probao Linux. Ja sam probao Kredu.
+Pitaju me jesam li {probao|probala} Linux. Ja sam {probao|probala} Kredu.
 Kad kažem "radi", mislim "trenutno radi".
 Kolege misle da hakujem. Ja samo otvaram Command Prompt.
 "Kad si već informatičar, popravi mi štampač." Mogu i frižider, kad smo već tu.

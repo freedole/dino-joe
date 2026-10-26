@@ -65,7 +65,7 @@ namespace DinoJoe
 
         string Pick(string key)
         {
-            string[] v = Lang.Get(key).Split('|');
+            string[] v = Lang.Gender(Lang.Get(key)).Split('|');
             return v[rnd.Next(v.Length)];
         }
 
