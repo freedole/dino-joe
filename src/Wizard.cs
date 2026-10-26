@@ -456,6 +456,7 @@ namespace DinoJoe
                 };
                 if (personality == p.Id) sample.Text = "„" + p.Sample + "“";
             }
+            preview.Say(Personality.Find(personality).Sample, 4);
         }
 
         // ---------------- 5. paketi ----------------
