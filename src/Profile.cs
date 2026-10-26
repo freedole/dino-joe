@@ -22,7 +22,15 @@ namespace DinoJoe
 
     static class Profile
     {
-        public static readonly string[] SpecialNames = { "pile", "hrana", "bockanje", "naocale" };
+        // specijalne kategorije (nisu u nasumičnom izboru): chick (pile), food (hrana), poke (bockanje), glasses (naočale)
+        public static readonly string[] SpecialNames = { "chick", "food", "poke", "glasses" };
+        static readonly string[] SpecialOld = { "pile", "hrana", "bockanje", "naocale" };   // stari nazivi fajlova
+
+        static string Canonical(string name)
+        {
+            int i = Array.IndexOf(SpecialOld, name.ToLowerInvariant());
+            return i >= 0 ? SpecialNames[i] : name;
+        }
 
         public static string Dir;
         public static string Id = "DinoJoe";
@@ -108,7 +116,7 @@ namespace DinoJoe
             }
             catch { }
             foreach (KeyValuePair<string, List<string>> kv in files)
-                AddCat(kv.Key, kv.Value, Get("tezina." + kv.Key, "10"), Get("kljucne." + kv.Key, ""), 1.0);
+                AddCat(kv.Key, kv.Value, Get("weight." + kv.Key, Get("tezina." + kv.Key, "10")), Get("keywords." + kv.Key, Get("kljucne." + kv.Key, "")), 1.0);
 
             // 2) uključeni paketi
             try
@@ -150,7 +158,7 @@ namespace DinoJoe
             }
             if (lines.Count == 0) return;
 
-            string baseName = name.Contains("/") ? name.Substring(name.LastIndexOf('/') + 1) : name;
+            string baseName = Canonical(name.Contains("/") ? name.Substring(name.LastIndexOf('/') + 1) : name);
             if (Array.IndexOf(SpecialNames, baseName.ToLowerInvariant()) >= 0)
             {
                 List<string> sp;

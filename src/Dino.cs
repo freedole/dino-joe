@@ -40,7 +40,7 @@ namespace DinoJoe
                 foreach (JokeCat c in Profile.Cats) Console.WriteLine("  " + c.Name + " w=" + c.Weight + " n=" + c.Lines.Count + " keys=" + c.Keys.Length);
                 Console.WriteLine("random: " + Profile.RandomJoke());
                 Console.WriteLine("printer: " + OfflineBrain.Reply("printer mi ne radi"));
-                Console.WriteLine("pile: " + Profile.Special("pile", Jokes.Chick));
+                Console.WriteLine("pile: " + Profile.Special("chick", Jokes.Chick));
                 return;
             }
             if (args.Length >= 1 && args[0] == "--packs")
@@ -1236,7 +1236,7 @@ namespace DinoJoe
             {
                 int r = rnd.Next(100);
                 string s;
-                if (pose.Glasses && r < 20) s = Profile.Special("naocale", Jokes.Glasses);
+                if (pose.Glasses && r < 20) s = Profile.Special("glasses", Jokes.Glasses);
                 else s = Profile.RandomJoke();
                 if (!recent.Contains(s) || attempt == 7)
                 {
@@ -1276,7 +1276,7 @@ namespace DinoJoe
             lastFed = DateTime.Now; SaveState();
             forcedSleep = false;
             heartsStart = pose.T;
-            Say(h > 60 ? "NJAM! Konačno!" : (h > 15 ? Profile.Special("hrana", Jokes.Feed) : "Sit sam, ali hvala :)"));
+            Say(h > 60 ? "NJAM! Konačno!" : (h > 15 ? Profile.Special("food", Jokes.Feed) : "Sit sam, ali hvala :)"));
             SetState(State.Happy, 2.2);
         }
 
@@ -1299,7 +1299,7 @@ namespace DinoJoe
         void CallChick()
         {
             chickLeft = 50 + rnd.Next(40);
-            Say(Profile.Special("pile", Jokes.Chick));
+            Say(Profile.Special("chick", Jokes.Chick));
         }
 
         void ToggleGlasses()
@@ -1308,7 +1308,7 @@ namespace DinoJoe
             Settings.Glasses = pose.Glasses; Settings.Save();
             glassesLeft = 0;
             SaveState();
-            Say(pose.Glasses ? Profile.Special("naocale", Jokes.Glasses) : "Bez naočala sam ljepši. Mislim.");
+            Say(pose.Glasses ? Profile.Special("glasses", Jokes.Glasses) : "Bez naočala sam ljepši. Mislim.");
         }
 
         void ToggleSleep()
@@ -1527,7 +1527,7 @@ namespace DinoJoe
             else if (!pose.Glasses && st != State.Sleep && rnd.Next(30 * 60 * 20) == 0)
             {
                 pose.Glasses = true; glassesLeft = 90 + rnd.Next(120);
-                Say(Profile.Special("naocale", Jokes.Glasses));
+                Say(Profile.Special("glasses", Jokes.Glasses));
             }
 
             // fizika i kretanje
@@ -1649,7 +1649,7 @@ namespace DinoJoe
             else if (pose.State == State.Sleep) { forcedSleep = false; Say("Hm?! Ne spavam, odmaram oči."); SetState(State.Idle, 2); }
             else
             {
-                if (rnd.Next(3) == 0) Say(Profile.Special("bockanje", Jokes.Poke)); else Say(PickJoke());
+                if (rnd.Next(3) == 0) Say(Profile.Special("poke", Jokes.Poke)); else Say(PickJoke());
                 SetState(State.Happy, 1.2);
             }
         }

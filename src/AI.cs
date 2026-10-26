@@ -282,7 +282,7 @@ Pravila:
             string s = q.ToLowerInvariant();
             string hit = Profile.JokeForText(q);
             if (hit != null) return hit;
-            if (Has(s, "naoč", "naoc", "četvoro", "cetvoro", "4eyes", "four eyes")) return Profile.Special("naocale", Jokes.Glasses);
+            if (Has(s, "naoč", "naoc", "četvoro", "cetvoro", "4eyes", "four eyes")) return Profile.Special("glasses", Jokes.Glasses);
             if (Has(s, "ćao", "cao", "zdravo", "hej", "pozdrav", "dobro jutro")) return "Ćao! Bez interneta sam, pa pričam iz glave. A glava mi je mala.";
             if (Has(s, "kako si", "šta radiš", "sta radis")) return "Šetam po taskbaru i čekam meteor. Uobičajeno.";
             if (Has(s, "glad", "jest", "hran")) return "Uvijek. Dupli klik i nahrani me.";
