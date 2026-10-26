@@ -242,6 +242,8 @@ namespace DinoJoe
         public bool Glasses;
         public bool Female;       // ODjordjina: trepavice + mašna
         public int Species;       // 0 T-Rex, 1 Triceratops, 2 Brontosaurus, 3 Raptor
+        public int Pattern;       // šara (Skins.PatternKeys)
+        public int Accessory;     // dodatak (Skins.AccessoryKeys)
         public double JumpY;      // jedinice, pozitivno = gore
         public double HeartsT = -1; // 0..1 dok traju srca
         public bool Chick;
@@ -402,6 +404,7 @@ namespace DinoJoe
 
         static void DrawDino(Graphics g, Pose p)
         {
+            curPattern = p.Pattern;
             if (p.Species == DinoJoe.Species.Trike) { DrawTrike(g, p); return; }
             if (p.Species == DinoJoe.Species.Bronto) { DrawBronto(g, p); return; }
             if (p.Species == DinoJoe.Species.Raptor) { DrawRaptor(g, p); return; }
@@ -506,6 +509,7 @@ namespace DinoJoe
             foreach (GraphicsPath gp in parts) Outline(g, gp, 5f);
             using (LinearGradientBrush main = new LinearGradientBrush(new PointF(0, -104), new PointF(0, 2), CTop, CBot))
                 foreach (GraphicsPath gp in parts) g.FillPath(main, gp);
+            DrawPattern(g, parts, -104);
 
             // stomak + šare (clip na tijelo)
             using (LinearGradientBrush bb = new LinearGradientBrush(new PointF(0, -52 + bY), new PointF(0, -16 + bY), CBellyTop, CBellyBot))
@@ -523,7 +527,7 @@ namespace DinoJoe
                 g.FillEllipse(hl, hx + 14, hy + 4, 26, 10);
 
             // mašna (ženski dino)
-            if (p.Female) DrawBow(g, hx + 20, hy + 1);
+            if (p.Female && !Skins.CoversHead(p.Accessory)) DrawBow(g, hx + 20, hy + 1);
 
             // ---------- ruka ----------
             using (GraphicsPath arm = Capsule(20, -45 + bY, 10, 7.5f, armAng))
@@ -535,6 +539,7 @@ namespace DinoJoe
 
             // ---------- lice ----------
             DrawFace(g, p, hx, hy);
+            DrawAccessory(g, p.Accessory, hx, hy, 1f);
 
             foreach (GraphicsPath gp in parts) gp.Dispose();
         }
@@ -885,6 +890,8 @@ namespace DinoJoe
             pose.Female = Settings.Female;
             pose.Glasses = Settings.Glasses;
             pose.Species = Settings.Species;
+            pose.Pattern = Settings.Pattern;
+            pose.Accessory = Settings.Accessory;
             ai = new AiConfig(dir0);
             ai.Persona();
             ApplySize();
@@ -1017,6 +1024,8 @@ namespace DinoJoe
             pose.Female = Settings.Female;
             pose.Glasses = Settings.Glasses;
             pose.Species = Settings.Species;
+            pose.Pattern = Settings.Pattern;
+            pose.Accessory = Settings.Accessory;
             // jezik se možda promijenio: napravi meni ponovo
             ContextMenuStrip old = menu;
             BuildMenu();

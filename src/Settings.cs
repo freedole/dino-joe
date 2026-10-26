@@ -297,6 +297,27 @@ namespace DinoJoe
             Add("aip.custom", "Drugo (OpenAI-kompatibilno)", "Drugo (OpenAI-kompatibilno)", "Drugo (OpenAI-kompatibilno)", "Other (OpenAI-compatible)");
             Add("aip.custom.info", "Bilo koji servis sa OpenAI-kompatibilnim /chat/completions endpointom.", "Bilo koji servis sa OpenAI-kompatibilnim /chat/completions endpointom.", "Bilo koji servis s OpenAI-kompatibilnim /chat/completions endpointom.", "Any service with an OpenAI-compatible /chat/completions endpoint.");
 
+            // šare i dodaci
+            Add("s.look.pattern", "Šara:", "Šara:", "Uzorak:", "Pattern:");
+            Add("s.look.accessory", "Dodatak:", "Dodatak:", "Dodatak:", "Accessory:");
+            Add("pat.none", "Bez šare", "Bez šare", "Bez uzorka", "None");
+            Add("pat.stripes", "Pruge", "Pruge", "Pruge", "Stripes");
+            Add("pat.dots", "Tačkice", "Tačkice", "Točkice", "Dots");
+            Add("pat.gradient", "Prelaz boja", "Prelaz boja", "Prijelaz boja", "Gradient");
+            Add("pat.camo", "Kamuflaža", "Kamuflaža", "Kamuflaža", "Camo");
+            Add("pat.galaxy", "Galaksija", "Galaksija", "Galaksija", "Galaxy");
+            Add("acc.none", "Bez dodatka", "Bez dodatka", "Bez dodatka", "None");
+            Add("acc.beanie", "Zimska kapa", "Zimska kapa", "Zimska kapa", "Beanie");
+            Add("acc.tophat", "Cilindar", "Cilindar", "Cilindar", "Top hat");
+            Add("acc.tie", "Kravata", "Kravata", "Kravata", "Tie");
+            Add("acc.headphones", "Slušalice", "Slušalice", "Slušalice", "Headphones");
+            Add("acc.crown", "Krunica", "Krunica", "Krunica", "Crown");
+            Add("acc.helmet", "Motoristička kaciga", "Motoristička kaciga", "Motoristička kaciga", "Motorcycle helmet");
+            Add("acc.scarf", "Šal", "Šal", "Šal", "Scarf");
+            Add("acc.flower", "Cvijet", "Cvet", "Cvijet", "Flower");
+            Add("acc.mustache", "Brkovi", "Brkovi", "Brkovi", "Mustache");
+            Add("acc.bowtie", "Leptir-mašna", "Leptir-mašna", "Leptir-mašna", "Bow tie");
+
             // bosanski izuzeci
             BsOverride["wiz.settings"] = "Dino Joe - postavke";
             BsOverride["menu.settings"] = "Postavke...";
@@ -435,6 +456,8 @@ namespace DinoJoe
         public static int Color2 = -1;     // -1 = automatski (od palete)
         public static bool Glasses;
         public static int Species;          // 0 T-Rex, 1 Triceratops, 2 Brontosaurus, 3 Raptor
+        public static int Pattern;          // Skins.PatternKeys
+        public static int Accessory;        // Skins.AccessoryKeys
         public static string Packs = "odjordje-classic,dino-joe-basic-sr";   // id-ovi uključenih paketa, zarezom
         public static string PackWeights = "";              // id:2,id2:0.5 (1 = normalno)
         public static string ActiveProfile = "";
@@ -462,6 +485,8 @@ namespace DinoJoe
                         else if (k == "color2" && int.TryParse(v, out n)) Color2 = n;
                         else if (k == "glasses") Glasses = v == "1";
                         else if (k == "species" && int.TryParse(v, out n)) Species = Math.Max(0, Math.Min(DinoJoe.Species.Count - 1, n));
+                        else if (k == "pattern" && int.TryParse(v, out n)) Pattern = Math.Max(0, Math.Min(Skins.PatternCount - 1, n));
+                        else if (k == "accessory" && int.TryParse(v, out n)) Accessory = Math.Max(0, Math.Min(Skins.AccessoryCount - 1, n));
                         else if (k == "packs") Packs = v;
                         else if (k == "pack_weights") PackWeights = v;
                         else if (k == "profile") ActiveProfile = v;
@@ -487,6 +512,8 @@ namespace DinoJoe
                     "color2=" + Color2 + "\r\n" +
                     "glasses=" + (Glasses ? "1" : "0") + "\r\n" +
                     "species=" + Species + "\r\n" +
+                    "pattern=" + Pattern + "\r\n" +
+                    "accessory=" + Accessory + "\r\n" +
                     "packs=" + Packs + "\r\n" +
                     "pack_weights=" + PackWeights + "\r\n" +
                     "profile=" + ActiveProfile.Replace("\r", "").Replace("\n", "") + "\r\n", new UTF8Encoding(true));

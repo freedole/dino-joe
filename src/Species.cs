@@ -82,11 +82,12 @@ namespace DinoJoe
             using (SolidBrush hl = new SolidBrush(Color.FromArgb(60, 255, 255, 255))) g.FillEllipse(hl, 14, 4, 26, 10);
             DrawFace(g, p, 0, 0);
             g.Restore(gs);
+            DrawAccessory(g, p.Accessory, hx, hy, s);
         }
 
         static void BowOnHead(Graphics g, Pose p, float hx, float hy, float s)
         {
-            if (!p.Female) return;
+            if (!p.Female || Skins.CoversHead(p.Accessory)) return;
             GraphicsState gs = g.Save();
             g.TranslateTransform(hx, hy);
             g.ScaleTransform(s, s);
@@ -99,6 +100,7 @@ namespace DinoJoe
             foreach (GraphicsPath gp in parts) Outline(g, gp, outline);
             using (LinearGradientBrush main = new LinearGradientBrush(new PointF(0, top), new PointF(0, 2), CTop, CBot))
                 foreach (GraphicsPath gp in parts) g.FillPath(main, gp);
+            DrawPattern(g, parts, top);
         }
 
         static void FarLeg(Graphics g, GraphicsPath leg)

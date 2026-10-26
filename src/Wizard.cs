@@ -171,7 +171,7 @@ namespace DinoJoe
         string personality;
         int color1, color2;
         bool glasses;
-        int species;
+        int species, pattern, accessory;
         string packs;
         bool packsTouched;
         bool autostart;
@@ -198,6 +198,8 @@ namespace DinoJoe
             color2 = Settings.Color2;
             glasses = Settings.Glasses;
             species = Settings.Species;
+            pattern = Settings.Pattern;
+            accessory = Settings.Accessory;
             packs = Settings.Packs;
             autostart = firstRun ? true : Settings.IsAutostart();
 
@@ -353,7 +355,7 @@ namespace DinoJoe
         }
 
         // ---------------- 3. izgled ----------------
-        ComboBox cbColor1, cbColor2, cbSpecies;
+        ComboBox cbColor1, cbColor2, cbSpecies, cbPattern, cbAccessory;
         CheckBox chGlasses;
 
         void StepLook()
@@ -370,34 +372,54 @@ namespace DinoJoe
             content.Controls.Add(sp);
             cbSpecies = sp;
 
-            Lbl(Lang.Get("s.look.color"), 12, 78, 120, 24);
+            Lbl(Lang.Get("s.look.color"), 12, 52, 120, 24);
             cbColor1 = ColorCombo(false);
-            cbColor1.SetBounds(140, 75, 240, 28);
+            cbColor1.SetBounds(140, 49, 240, 28);
             cbColor1.SelectedIndex = Math.Max(0, Math.Min(Palette.All.Count - 1, color1));
             cbColor1.SelectedIndexChanged += delegate { color1 = cbColor1.SelectedIndex; ApplyLookLive(); };
 
-            Lbl(Lang.Get("s.look.color2"), 12, 120, 120, 24);
+            Lbl(Lang.Get("s.look.color2"), 12, 92, 120, 24);
             cbColor2 = ColorCombo(true);
-            cbColor2.SetBounds(140, 117, 240, 28);
+            cbColor2.SetBounds(140, 89, 240, 28);
             cbColor2.SelectedIndex = color2 < 0 ? 0 : Math.Min(Palette.All.Count, color2 + 1);
             cbColor2.SelectedIndexChanged += delegate { color2 = cbColor2.SelectedIndex - 1; ApplyLookLive(); };
+
+            Lbl(Lang.Get("s.look.pattern"), 12, 132, 120, 24);
+            cbPattern = new ComboBox();
+            cbPattern.DropDownStyle = ComboBoxStyle.DropDownList;
+            for (int i = 0; i < Skins.PatternCount; i++) cbPattern.Items.Add(Skins.PatternName(i));
+            cbPattern.SelectedIndex = Math.Max(0, Math.Min(Skins.PatternCount - 1, pattern));
+            cbPattern.SetBounds(140, 129, 240, 28);
+            cbPattern.SelectedIndexChanged += delegate { pattern = cbPattern.SelectedIndex; ApplyLookLive(); };
+            content.Controls.Add(cbPattern);
+
+            Lbl(Lang.Get("s.look.accessory"), 12, 172, 120, 24);
+            cbAccessory = new ComboBox();
+            cbAccessory.DropDownStyle = ComboBoxStyle.DropDownList;
+            for (int i = 0; i < Skins.AccessoryCount; i++) cbAccessory.Items.Add(Skins.AccessoryName(i));
+            cbAccessory.SelectedIndex = Math.Max(0, Math.Min(Skins.AccessoryCount - 1, accessory));
+            cbAccessory.SetBounds(140, 169, 240, 28);
+            cbAccessory.SelectedIndexChanged += delegate { accessory = cbAccessory.SelectedIndex; ApplyLookLive(); preview.Happy(1); };
+            content.Controls.Add(cbAccessory);
 
             chGlasses = new CheckBox();
             chGlasses.Text = Lang.Get("s.look.glasses");
             chGlasses.Checked = glasses;
-            chGlasses.SetBounds(140, 158, 200, 28);
+            chGlasses.SetBounds(140, 206, 200, 28);
             chGlasses.CheckedChanged += delegate { glasses = chGlasses.Checked; ApplyLookLive(); };
             content.Controls.Add(chGlasses);
 
             Button egg = new ModernButton();
             egg.Text = Lang.Get("s.look.egg");
-            egg.SetBounds(140, 206, 240, 38);
+            egg.SetBounds(140, 244, 240, 38);
             egg.Click += delegate
             {
                 cbSpecies.SelectedIndex = rnd.Next(DinoJoe.Species.Count);
                 cbColor1.SelectedIndex = rnd.Next(Palette.All.Count);
                 cbColor2.SelectedIndex = rnd.Next(3) == 0 ? 1 + rnd.Next(Palette.All.Count) : 0;
                 chGlasses.Checked = rnd.Next(4) == 0;
+                cbPattern.SelectedIndex = rnd.Next(10) < 4 ? 0 : rnd.Next(Skins.PatternCount);
+                cbAccessory.SelectedIndex = rnd.Next(10) < 4 ? 0 : rnd.Next(Skins.AccessoryCount);
                 preview.Happy(1.5);
             };
             content.Controls.Add(egg);
@@ -438,6 +460,8 @@ namespace DinoJoe
             preview.Pose.Glasses = glasses;
             preview.Pose.Female = female;
             preview.Pose.Species = species;
+            preview.Pose.Pattern = pattern;
+            preview.Pose.Accessory = accessory;
         }
 
         // ---------------- 4. ličnost ----------------
@@ -553,6 +577,8 @@ namespace DinoJoe
             Settings.Color2 = color2;
             Settings.Glasses = glasses;
             Settings.Species = species;
+            Settings.Pattern = pattern;
+            Settings.Accessory = accessory;
             Settings.Packs = packs;
             Settings.Save();
             Settings.SetAutostart(autostart);
