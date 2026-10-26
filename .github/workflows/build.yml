@@ -1,0 +1,55 @@
+name: build
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build (csc, .NET Framework 4.x)
+        shell: cmd
+        run: build.bat
+
+      - name: Smoke test (--profile)
+        shell: pwsh
+        run: |
+          $p = Start-Process -FilePath build\DinoJoe.exe -ArgumentList '--profile' -PassThru -Wait -NoNewWindow
+          if ($p.ExitCode -ne 0) { throw "DinoJoe.exe --profile exit $($p.ExitCode)" }
+
+      - name: Package zip
+        shell: pwsh
+        run: |
+          $ver = if ($env:GITHUB_REF -like 'refs/tags/v*') { $env:GITHUB_REF_NAME } else { "dev-$($env:GITHUB_SHA.Substring(0,7))" }
+          New-Item -ItemType Directory -Force dist\DinoJoe | Out-Null
+          Copy-Item build\DinoJoe.exe dist\DinoJoe\
+          Copy-Item LICENSE, README.md dist\DinoJoe\
+          Copy-Item packs-builtin dist\DinoJoe\packs-builtin -Recurse
+          Compress-Archive -Path dist\DinoJoe\* -DestinationPath "dist\DinoJoe-$ver.zip"
+          (Get-FileHash "dist\DinoJoe-$ver.zip" -Algorithm SHA256).Hash | Out-File -Encoding ascii "dist\DinoJoe-$ver.zip.sha256"
+          "VER=$ver" | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: DinoJoe-${{ env.VER }}
+          path: |
+            dist/*.zip
+            dist/*.sha256
+
+      - name: GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/*.zip
+            dist/*.sha256
+          generate_release_notes: true

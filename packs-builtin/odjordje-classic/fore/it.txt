@@ -1,0 +1,24 @@
+﻿# IT
+# Jedna fora po liniji. Linije sa # se ignorišu.
+ping... pong!
+sudo nahrani me
+Jesi li uradio backup?
+Backup koji nije testiran je samo nada.
+Radi na mojoj mašini.
+Ne diraj produkciju u petak.
+DNS je kriv. Uvijek.
+Kad sve radi - sumnjivo.
+Restartuj pa javi.
+Nije bug, to je feature iz Jure.
+Docker? Ja sam bio kontejnerizovan u ćilibaru.
+Ja nisam legacy sistem. Ja sam baština.
+Group Policy mi zabranjuje da jedem kokoške.
+Ko je dao Domain Admin praktikantu?
+Lozinka123 nije lozinka.
+SQL upit traje duže od moje evolucije.
+Uptime mi je 66 miliona godina. Bez patcha.
+VPN pao? Nisam ja, ja sam samo šetao.
+Ko je ugasio server?
+RAID nije backup. Ni ja nisam kokoška. Iako...
+Ticket zatvoren: 'Korisnik izumro'.
+Hyper-V? Ja sam Hyper-Rex.
