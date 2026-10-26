@@ -107,9 +107,9 @@ namespace DinoJoe
             {
                 if (!File.Exists(PersonaPath)) File.WriteAllText(PersonaPath, DefaultPersona.Replace("{ime}", Profile.Name), new UTF8Encoding(true));
                 string s = File.ReadAllText(PersonaPath, Encoding.UTF8).Trim();
-                return s.Length > 0 ? s : DefaultPersona.Replace("{ime}", Profile.Name);
+                return (s.Length > 0 ? s : DefaultPersona.Replace("{ime}", Profile.Name)) + "\r\n\r\n" + Settings.PersonaExtra();
             }
-            catch { return DefaultPersona.Replace("{ime}", Profile.Name); }
+            catch { return DefaultPersona.Replace("{ime}", Profile.Name) + "\r\n\r\n" + Settings.PersonaExtra(); }
         }
 
         public const string DefaultPersona =

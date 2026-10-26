@@ -27,6 +27,8 @@ namespace DinoJoe
     {
         [DllImport("user32.dll")] static extern bool SetProcessDPIAware();
 
+        public static bool JustSetUp;   // upravo završen čarobnjak -> pozdravna poruka
+
         [STAThread]
         static void Main(string[] args)
         {
@@ -61,6 +63,16 @@ namespace DinoJoe
                 try { SetProcessDPIAware(); } catch { }
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
+                Settings.Load();
+                Settings.Apply();
+                if (!Settings.SetupDone || (args.Length >= 1 && args[0] == "--setup"))
+                {
+                    string dir0 = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), Profile.Id);
+                    try { Directory.CreateDirectory(dir0); } catch { }
+                    using (SetupWizard w = new SetupWizard(true, new AiConfig(dir0))) w.ShowDialog();
+                    JustSetUp = true;
+                }
+                Settings.Apply();
                 Application.Run(new PetForm());
             }
         }
@@ -213,6 +225,7 @@ namespace DinoJoe
         public int Dir = 1;       // 1 desno, -1 lijevo
         public bool Blink;
         public bool Glasses;
+        public bool Female;       // ODjordjina: trepavice + mašna
         public double JumpY;      // jedinice, pozitivno = gore
         public double HeartsT = -1; // 0..1 dok traju srca
         public bool Chick;
@@ -225,14 +238,55 @@ namespace DinoJoe
     {
         public const float CanvasW = 250, CanvasH = 265, GroundPad = 6;
 
-        static readonly Color CTop = Color.FromArgb(150, 220, 120);
-        static readonly Color CBot = Color.FromArgb(56, 150, 70);
-        static readonly Color CFarTop = Color.FromArgb(70, 150, 70);
-        static readonly Color CFarBot = Color.FromArgb(40, 110, 50);
-        static readonly Color COut = Color.FromArgb(24, 70, 36);
-        static readonly Color CBelly = Color.FromArgb(225, 242, 190);
-        static readonly Color CSpike = Color.FromArgb(38, 120, 72);
-        static readonly Color CSpikeTop = Color.FromArgb(70, 170, 100);
+        // Boje se postavljaju preko SetColors (vidi Skins.cs). Podrazumijevano: klasična zelena.
+        static Color CTop = Color.FromArgb(150, 220, 120);
+        static Color CBot = Color.FromArgb(56, 150, 70);
+        static Color CFarTop = Color.FromArgb(70, 150, 70);
+        static Color CFarBot = Color.FromArgb(40, 110, 50);
+        static Color COut = Color.FromArgb(24, 70, 36);
+        static Color CBellyTop = Color.FromArgb(235, 248, 205);
+        static Color CBellyBot = Color.FromArgb(200, 228, 160);
+        static Color CSpot = Color.FromArgb(55, 20, 90, 40);
+        static Color CNose = Color.FromArgb(150, 20, 60, 30);
+        static Color CMouth = Color.FromArgb(30, 60, 35);
+        static Color CSpike = Color.FromArgb(38, 120, 72);
+        static Color CSpikeTop = Color.FromArgb(70, 170, 100);
+
+        static Color Mix(Color a, Color b, float t)
+        {
+            return Color.FromArgb(
+                (int)(a.R + (b.R - a.R) * t), (int)(a.G + (b.G - a.G) * t), (int)(a.B + (b.B - a.B) * t));
+        }
+
+        public static void SetClassic()
+        {
+            CTop = Color.FromArgb(150, 220, 120); CBot = Color.FromArgb(56, 150, 70);
+            CFarTop = Color.FromArgb(70, 150, 70); CFarBot = Color.FromArgb(40, 110, 50);
+            COut = Color.FromArgb(24, 70, 36);
+            CBellyTop = Color.FromArgb(235, 248, 205); CBellyBot = Color.FromArgb(200, 228, 160);
+            CSpot = Color.FromArgb(55, 20, 90, 40); CNose = Color.FromArgb(150, 20, 60, 30); CMouth = Color.FromArgb(30, 60, 35);
+            CSpike = Color.FromArgb(38, 120, 72); CSpikeTop = Color.FromArgb(70, 170, 100);
+        }
+
+        // primary = tijelo, secondary = bodlje
+        public static void SetColors(Color primary, Color secondary)
+        {
+            Color w = Color.White, k = Color.Black;
+            CTop = Mix(primary, w, 0.32f);
+            CBot = Mix(primary, k, 0.18f);
+            CFarTop = Mix(primary, k, 0.2f);
+            CFarBot = Mix(primary, k, 0.4f);
+            COut = Mix(primary, k, 0.68f);
+            CBellyTop = Mix(primary, w, 0.82f);
+            CBellyBot = Mix(primary, w, 0.62f);
+            Color sp = Mix(primary, k, 0.5f);
+            CSpot = Color.FromArgb(55, sp.R, sp.G, sp.B);
+            Color ns = Mix(primary, k, 0.7f);
+            CNose = Color.FromArgb(150, ns.R, ns.G, ns.B);
+            CMouth = Mix(primary, k, 0.72f);
+            CSpike = Mix(secondary, k, 0.15f);
+            CSpikeTop = Mix(secondary, w, 0.25f);
+        }
 
         public static void Render(Graphics g, float k, Pose p)
         {
@@ -434,9 +488,9 @@ namespace DinoJoe
                 foreach (GraphicsPath gp in parts) g.FillPath(main, gp);
 
             // stomak + šare (clip na tijelo)
-            using (LinearGradientBrush bb = new LinearGradientBrush(new PointF(0, -52 + bY), new PointF(0, -16 + bY), Color.FromArgb(235, 248, 205), Color.FromArgb(200, 228, 160)))
+            using (LinearGradientBrush bb = new LinearGradientBrush(new PointF(0, -52 + bY), new PointF(0, -16 + bY), CBellyTop, CBellyBot))
                 g.FillEllipse(bb, -3, -52 + bY, 25, 35);
-            using (SolidBrush spot = new SolidBrush(Color.FromArgb(55, 20, 90, 40)))
+            using (SolidBrush spot = new SolidBrush(CSpot))
             {
                 g.FillEllipse(spot, -24, -56 + bY, 10, 7);
                 g.FillEllipse(spot, -12, -60 + bY, 7, 5);
@@ -447,6 +501,9 @@ namespace DinoJoe
             // sjaj na glavi
             using (SolidBrush hl = new SolidBrush(Color.FromArgb(60, 255, 255, 255)))
                 g.FillEllipse(hl, hx + 14, hy + 4, 26, 10);
+
+            // mašna (ženski dino)
+            if (p.Female) DrawBow(g, hx + 20, hy + 1);
 
             // ---------- ruka ----------
             using (GraphicsPath arm = Capsule(20, -45 + bY, 10, 7.5f, armAng))
@@ -460,6 +517,24 @@ namespace DinoJoe
             DrawFace(g, p, hx, hy);
 
             foreach (GraphicsPath gp in parts) gp.Dispose();
+        }
+
+        public static Color BowColor = Color.FromArgb(232, 62, 140);
+
+        static void DrawBow(Graphics g, float x, float y)
+        {
+            Color c = BowColor, d = Mix(BowColor, Color.Black, 0.45f), l = Mix(BowColor, Color.White, 0.35f);
+            using (GraphicsPath left = new GraphicsPath())
+            using (GraphicsPath right = new GraphicsPath())
+            {
+                left.AddPolygon(new PointF[] { new PointF(x, y), new PointF(x - 13, y - 9), new PointF(x - 14, y + 6) });
+                right.AddPolygon(new PointF[] { new PointF(x, y), new PointF(x + 13, y - 9), new PointF(x + 14, y + 6) });
+                using (Pen o = new Pen(d, 2.6f)) { o.LineJoin = LineJoin.Round; g.DrawPath(o, left); g.DrawPath(o, right); }
+                using (LinearGradientBrush b = new LinearGradientBrush(new PointF(0, y - 10), new PointF(0, y + 7), l, c))
+                { g.FillPath(b, left); g.FillPath(b, right); }
+            }
+            using (SolidBrush k = new SolidBrush(c)) g.FillEllipse(k, x - 4, y - 4, 8, 8);
+            using (Pen o = new Pen(d, 1.6f)) g.DrawEllipse(o, x - 4, y - 4, 8, 8);
         }
 
         static void DrawFace(Graphics g, Pose p, float hx, float hy)
@@ -490,6 +565,19 @@ namespace DinoJoe
                     g.FillEllipse(Brushes.White, ex + lx - 3f, ey + 2f, 1.8f, 1.8f);
                 }
 
+                // trepavice (ženski dino)
+                if (p.Female && !sleeping)
+                {
+                    using (Pen lp = new Pen(Color.FromArgb(30, 30, 30), 1.8f))
+                    {
+                        lp.StartCap = LineCap.Round; lp.EndCap = LineCap.Round;
+                        float top = (happy || p.Blink) ? ey - 2 : ey - 8;
+                        g.DrawLine(lp, ex - 2, top, ex - 4, top - 5);
+                        g.DrawLine(lp, ex + 2, top - 0.5f, ex + 2, top - 6);
+                        g.DrawLine(lp, ex + 5.5f, top + 0.5f, ex + 8, top - 4);
+                    }
+                }
+
                 // obrve kad riče
                 if (st == State.Roar) g.DrawLine(dark, ex - 7, ey - 13, ex + 6, ey - 9);
 
@@ -498,7 +586,7 @@ namespace DinoJoe
                     g.FillEllipse(blush, hx + 33, hy + 25, 11, 6);
 
                 // nozdrva
-                using (SolidBrush n = new SolidBrush(Color.FromArgb(150, 20, 60, 30)))
+                using (SolidBrush n = new SolidBrush(CNose))
                     g.FillEllipse(n, hx + 49, hy + 10, 3.5f, 2.5f);
 
                 // usta
@@ -525,7 +613,7 @@ namespace DinoJoe
                 }
                 else
                 {
-                    using (Pen mp = new Pen(Color.FromArgb(30, 60, 35), 2f))
+                    using (Pen mp = new Pen(CMouth, 2f))
                     {
                         mp.StartCap = LineCap.Round; mp.EndCap = LineCap.Round;
                         g.DrawBezier(mp, hx + 36, hy + 30, hx + 41, hy + 34, hx + 47, hy + 33, hx + 52, hy + 28);
@@ -768,6 +856,8 @@ namespace DinoJoe
             try { Directory.CreateDirectory(dir0); } catch { }
             statePath = Path.Combine(dir0, "state.txt");
             LoadState();
+            pose.Female = Settings.Female;
+            pose.Glasses = Settings.Glasses;
             ai = new AiConfig(dir0);
             ai.Persona();
             ApplySize();
@@ -796,15 +886,22 @@ namespace DinoJoe
             timer.Tick += delegate { Step(); };
 
             SetState(State.Happy, 2.5);
-            Say(Greeting());
+            Say(Program.JustSetUp ? Lang.Get("pet.hello") : Greeting());
+        }
 
-            if (!ai.HasKey && !ai.Prompted)
+        void OpenSettings()
+        {
+            using (SetupWizard w = new SetupWizard(false, ai))
             {
-                System.Windows.Forms.Timer once = new System.Windows.Forms.Timer();
-                once.Interval = 4000;
-                once.Tick += delegate { once.Stop(); once.Dispose(); Say("Radim i bez interneta. Ako hoćeš da stvarno pričamo, poveži AI - nije obavezno."); OpenAiSettings(); };
-                once.Start();
+                if (w.ShowDialog() != DialogResult.OK) return;
             }
+            pose.Female = Settings.Female;
+            pose.Glasses = Settings.Glasses;
+            Text = Profile.Name;
+            tray.Text = Profile.TrayText.Length > 63 ? Profile.TrayText.Substring(0, 63) : Profile.TrayText;
+            SaveState();
+            SetState(State.Happy, 2.5);
+            Say(Lang.Get("pet.updated"));
         }
 
         protected override bool ShowWithoutActivation { get { return true; } }
@@ -888,6 +985,7 @@ namespace DinoJoe
             fun.DropDownItems.Add("Otvori folder sa forama", null, delegate { OpenCustom(); });
             fun.DropDownItems.Add("Učitaj fore ponovo", null, delegate { Profile.LoadJokes(); recent.Clear(); Say("Učitao sam " + Profile.JokeCount + " fora. Spreman!"); });
             menu.Items.Add(fun);
+            menu.Items.Add(Lang.Get("menu.settings"), null, delegate { OpenSettings(); });
             miAutostart = new ToolStripMenuItem("Pokreni sa Windowsom", null, delegate { ToggleAutostart(); });
             menu.Items.Add(miAutostart);
             menu.Items.Add(new ToolStripSeparator());
@@ -1075,6 +1173,7 @@ namespace DinoJoe
         void ToggleGlasses()
         {
             pose.Glasses = !pose.Glasses;
+            Settings.Glasses = pose.Glasses; Settings.Save();
             glassesLeft = 0;
             SaveState();
             Say(pose.Glasses ? Profile.Special("naocale", Jokes.Glasses) : "Bez naočala sam ljepši. Mislim.");
@@ -1274,7 +1373,7 @@ namespace DinoJoe
             }
 
             // povremene naočale
-            if (glassesLeft > 0) { glassesLeft -= Dt; if (glassesLeft <= 0) pose.Glasses = false; }
+            if (glassesLeft > 0) { glassesLeft -= Dt; if (glassesLeft <= 0) pose.Glasses = Settings.Glasses; }
             else if (!pose.Glasses && st != State.Sleep && rnd.Next(30 * 60 * 20) == 0)
             {
                 pose.Glasses = true; glassesLeft = 90 + rnd.Next(120);

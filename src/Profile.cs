@@ -29,6 +29,7 @@ namespace DinoJoe
         public static string Name = "ODjordje";
         public static string NameWith = "ODjordjem";   // instrumental: "Pričaj sa ODjordjem"
         public static string TrayText = "Dino Joe";
+        public static bool HasIniName;   // dino.ini definiše ime (personalizovani dino)
 
         static readonly Dictionary<string, string> ini = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         public static readonly List<JokeCat> Cats = new List<JokeCat>();
@@ -57,6 +58,7 @@ namespace DinoJoe
             catch { }
 
             Id = Safe(Get("id", "DinoJoe"));
+            HasIniName = ini.ContainsKey("ime");
             Name = Get("ime", "ODjordje");
             NameWith = Get("ime_sa", Name);
             TrayText = Get("tray", Name + " AI");
