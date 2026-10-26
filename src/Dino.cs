@@ -241,6 +241,7 @@ namespace DinoJoe
         public bool Blink;
         public bool Glasses;
         public bool Female;       // ODjordjina: trepavice + mašna
+        public int Species;       // 0 T-Rex, 1 Triceratops, 2 Brontosaurus, 3 Raptor
         public double JumpY;      // jedinice, pozitivno = gore
         public double HeartsT = -1; // 0..1 dok traju srca
         public bool Chick;
@@ -249,7 +250,7 @@ namespace DinoJoe
         public double BubbleAlpha = 1;
     }
 
-    static class Painter
+    static partial class Painter
     {
         public const float CanvasW = 250, CanvasH = 265, GroundPad = 6;
 
@@ -332,12 +333,13 @@ namespace DinoJoe
             g.Restore(gs);
 
             // Zzz
-            if (p.State == State.Sleep) DrawZzz(g, cx + p.Dir * 34f - 6, gy - 84, p.T);
+            float top = DinoJoe.Species.HeadTop(p.Species), dTop = top + 108;
+            if (p.State == State.Sleep) DrawZzz(g, cx + p.Dir * 34f - 6, gy - 84 + (p.Species == DinoJoe.Species.Bronto ? 40 : dTop), p.T);
 
             // srca
-            if (p.HeartsT >= 0 && p.HeartsT <= 1) DrawHearts(g, cx - p.Dir * 14f, gy - 112, p.HeartsT);
+            if (p.HeartsT >= 0 && p.HeartsT <= 1) DrawHearts(g, cx - p.Dir * 14f, gy - 112 + dTop, p.HeartsT);
 
-            if (!string.IsNullOrEmpty(p.Bubble)) DrawBubble(g, p.Bubble, cx + p.Dir * 26f, gy - 108 - (float)p.JumpY, p.BubbleAlpha);
+            if (!string.IsNullOrEmpty(p.Bubble)) DrawBubble(g, p.Bubble, cx + p.Dir * 26f, gy + top - (float)p.JumpY, p.BubbleAlpha);
 
             g.Restore(gs0);
         }
@@ -400,6 +402,9 @@ namespace DinoJoe
 
         static void DrawDino(Graphics g, Pose p)
         {
+            if (p.Species == DinoJoe.Species.Trike) { DrawTrike(g, p); return; }
+            if (p.Species == DinoJoe.Species.Bronto) { DrawBronto(g, p); return; }
+            if (p.Species == DinoJoe.Species.Raptor) { DrawRaptor(g, p); return; }
             State st = p.State;
             double t = p.T;
             bool walking = st == State.Walk;
@@ -879,6 +884,7 @@ namespace DinoJoe
             needs.Load();
             pose.Female = Settings.Female;
             pose.Glasses = Settings.Glasses;
+            pose.Species = Settings.Species;
             ai = new AiConfig(dir0);
             ai.Persona();
             ApplySize();
@@ -1010,6 +1016,7 @@ namespace DinoJoe
             }
             pose.Female = Settings.Female;
             pose.Glasses = Settings.Glasses;
+            pose.Species = Settings.Species;
             // jezik se možda promijenio: napravi meni ponovo
             ContextMenuStrip old = menu;
             BuildMenu();

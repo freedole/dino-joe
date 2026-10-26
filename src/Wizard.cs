@@ -171,6 +171,7 @@ namespace DinoJoe
         string personality;
         int color1, color2;
         bool glasses;
+        int species;
         string packs;
         bool packsTouched;
         bool autostart;
@@ -196,6 +197,7 @@ namespace DinoJoe
             color1 = Settings.Color1;
             color2 = Settings.Color2;
             glasses = Settings.Glasses;
+            species = Settings.Species;
             packs = Settings.Packs;
             autostart = firstRun ? true : Settings.IsAutostart();
 
@@ -351,7 +353,7 @@ namespace DinoJoe
         }
 
         // ---------------- 3. izgled ----------------
-        ComboBox cbColor1, cbColor2;
+        ComboBox cbColor1, cbColor2, cbSpecies;
         CheckBox chGlasses;
 
         void StepLook()
@@ -361,13 +363,12 @@ namespace DinoJoe
             Lbl(Lang.Get("s.look.species"), 12, 12, 120, 24);
             ComboBox sp = new ComboBox();
             sp.DropDownStyle = ComboBoxStyle.DropDownList;
-            sp.Items.Add("T-Rex");
-            sp.SelectedIndex = 0;
-            sp.SetBounds(140, 9, 200, 28);
+            foreach (string n in DinoJoe.Species.Names) sp.Items.Add(n);
+            sp.SelectedIndex = Math.Max(0, Math.Min(DinoJoe.Species.Count - 1, species));
+            sp.SetBounds(140, 9, 240, 28);
+            sp.SelectedIndexChanged += delegate { species = sp.SelectedIndex; ApplyLookLive(); preview.Happy(1.2); };
             content.Controls.Add(sp);
-            Label soon = Lbl(Lang.Get("s.look.soon"), 140, 40, 300, 22);
-            soon.ForeColor = Color.Gray;
-            soon.Font = new Font("Segoe UI", 8.5f);
+            cbSpecies = sp;
 
             Lbl(Lang.Get("s.look.color"), 12, 78, 120, 24);
             cbColor1 = ColorCombo(false);
@@ -393,6 +394,7 @@ namespace DinoJoe
             egg.SetBounds(140, 206, 240, 38);
             egg.Click += delegate
             {
+                cbSpecies.SelectedIndex = rnd.Next(DinoJoe.Species.Count);
                 cbColor1.SelectedIndex = rnd.Next(Palette.All.Count);
                 cbColor2.SelectedIndex = rnd.Next(3) == 0 ? 1 + rnd.Next(Palette.All.Count) : 0;
                 chGlasses.Checked = rnd.Next(4) == 0;
@@ -435,6 +437,7 @@ namespace DinoJoe
             preview.EggSpots = Palette.Get(color1).Primary;
             preview.Pose.Glasses = glasses;
             preview.Pose.Female = female;
+            preview.Pose.Species = species;
         }
 
         // ---------------- 4. ličnost ----------------
@@ -549,6 +552,7 @@ namespace DinoJoe
             Settings.Color1 = color1;
             Settings.Color2 = color2;
             Settings.Glasses = glasses;
+            Settings.Species = species;
             Settings.Packs = packs;
             Settings.Save();
             Settings.SetAutostart(autostart);

@@ -412,6 +412,7 @@ namespace DinoJoe
         public static int Color1;          // indeks u Palette.All
         public static int Color2 = -1;     // -1 = automatski (od palete)
         public static bool Glasses;
+        public static int Species;          // 0 T-Rex, 1 Triceratops, 2 Brontosaurus, 3 Raptor
         public static string Packs = "odjordje-classic,dino-joe-basic-sr";   // id-ovi uključenih paketa, zarezom
         public static string PackWeights = "";              // id:2,id2:0.5 (1 = normalno)
         public static string ActiveProfile = "";
@@ -438,6 +439,7 @@ namespace DinoJoe
                         else if (k == "color" && int.TryParse(v, out n)) Color1 = n;
                         else if (k == "color2" && int.TryParse(v, out n)) Color2 = n;
                         else if (k == "glasses") Glasses = v == "1";
+                        else if (k == "species" && int.TryParse(v, out n)) Species = Math.Max(0, Math.Min(DinoJoe.Species.Count - 1, n));
                         else if (k == "packs") Packs = v;
                         else if (k == "pack_weights") PackWeights = v;
                         else if (k == "profile") ActiveProfile = v;
@@ -462,6 +464,7 @@ namespace DinoJoe
                     "color=" + Color1 + "\r\n" +
                     "color2=" + Color2 + "\r\n" +
                     "glasses=" + (Glasses ? "1" : "0") + "\r\n" +
+                    "species=" + Species + "\r\n" +
                     "packs=" + Packs + "\r\n" +
                     "pack_weights=" + PackWeights + "\r\n" +
                     "profile=" + ActiveProfile.Replace("\r", "").Replace("\n", "") + "\r\n", new UTF8Encoding(true));
