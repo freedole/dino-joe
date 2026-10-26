@@ -57,9 +57,42 @@ namespace DinoJoe
         }
         public static string IniPath { get { return Path.Combine(Dir, "dino.ini"); } }
 
+        [System.Runtime.InteropServices.DllImport("kernel32.dll", CharSet = System.Runtime.InteropServices.CharSet.Unicode, SetLastError = true)]
+        static extern IntPtr CreateFileW(string name, uint access, uint share, IntPtr sa, uint disp, uint flags, IntPtr tmpl);
+        [System.Runtime.InteropServices.DllImport("kernel32.dll", CharSet = System.Runtime.InteropServices.CharSet.Unicode, SetLastError = true)]
+        static extern uint GetFinalPathNameByHandleW(IntPtr h, StringBuilder buf, uint len, uint flags);
+        [System.Runtime.InteropServices.DllImport("kernel32.dll")]
+        static extern bool CloseHandle(IntPtr h);
+
+        /// Prava putanja exe-a (winget "portable" pokreće preko simboličkog linka; packs-builtin je pored pravog exe-a).
+        static string RealExePath()
+        {
+            string p = Application.ExecutablePath;
+            try
+            {
+                IntPtr h = CreateFileW(p, 0, 7, IntPtr.Zero, 3, 0x02000000, IntPtr.Zero);   // OPEN_EXISTING, BACKUP_SEMANTICS
+                if (h == new IntPtr(-1)) return p;
+                try
+                {
+                    StringBuilder b = new StringBuilder(1024);
+                    uint n = GetFinalPathNameByHandleW(h, b, 1024, 0);
+                    if (n > 0 && n < 1024)
+                    {
+                        string r = b.ToString();
+                        if (r.StartsWith(@"\\?\UNC\")) r = @"\\" + r.Substring(8);
+                        else if (r.StartsWith(@"\\?\")) r = r.Substring(4);
+                        if (File.Exists(r)) return r;
+                    }
+                }
+                finally { CloseHandle(h); }
+            }
+            catch { }
+            return p;
+        }
+
         public static void Load()
         {
-            Dir = Path.GetDirectoryName(Application.ExecutablePath);
+            Dir = Path.GetDirectoryName(RealExePath());
             ini.Clear();
             try
             {
