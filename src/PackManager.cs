@@ -30,7 +30,7 @@ namespace DinoJoe
             StartPosition = FormStartPosition.CenterScreen;
             AutoScaleMode = AutoScaleMode.Dpi;
             ClientSize = new Size(720, 470);
-            TopMost = true;
+            TopMost = false;   // ne pokrivaj browser (npr. stranicu za API ključ)
             try { Icon = Painter.MakeIcon(); } catch { }
 
             // profil
@@ -284,7 +284,7 @@ namespace DinoJoe
             StartPosition = FormStartPosition.CenterParent;
             AutoScaleMode = AutoScaleMode.Dpi;
             ClientSize = new Size(620, 420);
-            TopMost = true;
+            TopMost = false;   // ne pokrivaj browser (npr. stranicu za API ključ)
 
             Label l = new Label(); l.Text = Lang.Get("bl.sub"); l.SetBounds(12, 10, 596, 22); Controls.Add(l);
             list.SetBounds(12, 36, 596, 324);
@@ -344,7 +344,7 @@ namespace DinoJoe
                 f.MaximizeBox = false; f.MinimizeBox = false;
                 f.StartPosition = FormStartPosition.CenterParent;
                 f.ClientSize = new Size(380, 130);
-                f.TopMost = true;
+
                 Label l = new Label(); l.Text = prompt; l.SetBounds(12, 12, 356, 22); f.Controls.Add(l);
                 TextBox tb = new TextBox(); tb.Text = def; tb.MaxLength = 40; tb.SetBounds(12, 40, 356, 26); f.Controls.Add(tb);
                 Button ok = new ModernButton(); ok.Text = "OK"; ok.DialogResult = DialogResult.OK; ok.SetBounds(196, 84, 82, 30); f.Controls.Add(ok);

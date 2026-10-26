@@ -156,7 +156,7 @@ namespace DinoJoe
             StartPosition = FormStartPosition.CenterScreen;
             AutoScaleMode = AutoScaleMode.Dpi;
             ClientSize = new Size(760, 470);
-            TopMost = true;
+            TopMost = false;   // ne pokrivaj browser (npr. stranicu za API ključ)
             try { Icon = Painter.MakeIcon(); } catch { }
 
             Label sub = new Label();

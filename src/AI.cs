@@ -453,7 +453,7 @@ Pravila:
             FormBorderStyle = FormBorderStyle.FixedDialog;
             MaximizeBox = false; MinimizeBox = false;
             StartPosition = FormStartPosition.CenterScreen;
-            TopMost = true;
+            TopMost = false;   // ne pokrivaj browser (npr. stranicu za API ključ)
             AutoScaleMode = AutoScaleMode.Dpi;
             ClientSize = new Size(540, 392);
 
@@ -628,7 +628,7 @@ Pravila:
             Text = string.Format(Lang.Get("ai.chattitle"), Profile.NameWith);
             FormBorderStyle = FormBorderStyle.SizableToolWindow;
             ShowInTaskbar = false;
-            TopMost = true;
+            TopMost = false;   // ne pokrivaj browser (npr. stranicu za API ključ)
             StartPosition = FormStartPosition.Manual;
             Font = new Font("Segoe UI", 10f);
             AutoScaleMode = AutoScaleMode.Font;

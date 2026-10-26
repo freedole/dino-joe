@@ -167,7 +167,7 @@ namespace DinoJoe
             StartPosition = FormStartPosition.CenterScreen;
             AutoScaleMode = AutoScaleMode.Dpi;
             ClientSize = new Size(400, 470);
-            TopMost = true;
+            TopMost = false;   // ne pokrivaj browser (npr. stranicu za API ključ)
             DoubleBuffered = true;
             BackColor = Color.White;
 

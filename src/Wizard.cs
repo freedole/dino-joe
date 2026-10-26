@@ -211,7 +211,7 @@ namespace DinoJoe
             ClientSize = new Size(760, 500);
             BackColor = Color.White;
             try { Icon = Painter.MakeIcon(); } catch { }
-            TopMost = true;
+            TopMost = false;   // ne pokrivaj browser (npr. stranicu za API ključ)
 
             preview = new PreviewBox();
             preview.SetBounds(0, 0, 280, 500);
@@ -531,7 +531,7 @@ namespace DinoJoe
             connect.Click += delegate
             {
                 if (ai == null) return;
-                using (AiSettingsForm f = new AiSettingsForm(ai)) { f.TopMost = true; f.ShowDialog(this); }
+                using (AiSettingsForm f = new AiSettingsForm(ai)) { f.ShowDialog(this); }
                 ai.Prompted = true; ai.Save();
                 status.Text = ai.Ready ? Lang.Get("s.ai.ok") : Lang.Get("s.ai.off");
                 if (ai.Ready) preview.Happy(2);
