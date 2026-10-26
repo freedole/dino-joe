@@ -158,7 +158,7 @@ namespace DinoJoe
     // ======================================================================
     //  ČAROBNJAK
     // ======================================================================
-    class SetupWizard : Form
+    class SetupWizard : ThemedForm
     {
         readonly bool firstRun;
         readonly AiConfig ai;
@@ -180,7 +180,7 @@ namespace DinoJoe
         PreviewBox preview;
         Label lblTitle, lblSub, lblStep;
         Panel content;
-        Button btBack, btNext;
+        ModernButton btBack, btNext;
         readonly Random rnd = new Random();
         static readonly Font FBase = new Font("Segoe UI", 10f);
 
@@ -235,12 +235,13 @@ namespace DinoJoe
             lblStep.SetBounds(302, 456, 160, 24);
             Controls.Add(lblStep);
 
-            btBack = new Button();
+            btBack = new ModernButton();
             btBack.SetBounds(500, 448, 110, 34);
             btBack.Click += delegate { Go(step - 1); };
             Controls.Add(btBack);
 
-            btNext = new Button();
+            btNext = new ModernButton();
+            btNext.Primary = true;
             btNext.SetBounds(625, 448, 120, 34);
             btNext.Font = new Font("Segoe UI Semibold", 10f);
             btNext.Click += delegate { if (step == Steps - 1) Finish(); else Go(step + 1); };
@@ -386,7 +387,7 @@ namespace DinoJoe
             chGlasses.CheckedChanged += delegate { glasses = chGlasses.Checked; ApplyLookLive(); };
             content.Controls.Add(chGlasses);
 
-            Button egg = new Button();
+            Button egg = new ModernButton();
             egg.Text = Lang.Get("s.look.egg");
             egg.SetBounds(140, 206, 240, 38);
             egg.Click += delegate
@@ -466,23 +467,18 @@ namespace DinoJoe
             Header("s.packs", "s.packs.sub");
             List<Pack> list = Packs.All();
             if (list.Count == 0) { Lbl(Lang.Get("s.packs.none"), 12, 12, 400, 24).ForeColor = Color.Gray; return; }
-            CheckedListBox cl = new CheckedListBox();
-            cl.CheckOnClick = true;
-            cl.BorderStyle = BorderStyle.None;
+            ModernCheckList cl = new ModernCheckList();
             cl.SetBounds(10, 8, 425, 300);
             foreach (Pack pi in list)
             {
                 bool on = ("," + packs + ",").Contains("," + pi.Id + ",");
-                cl.Items.Add(pi.Name + "  (" + pi.JokeCount + ")" + (pi.Desc.Length > 0 ? "  -  " + pi.Desc : ""), on);
+                cl.AddItem(pi.Name + "  (" + pi.JokeCount + ")" + (pi.Desc.Length > 0 ? "  -  " + pi.Desc : ""), on);
             }
-            cl.ItemCheck += delegate(object o, ItemCheckEventArgs e)
+            cl.CheckChanged += delegate
             {
-                BeginInvoke((MethodInvoker)delegate
-                {
-                    List<string> ids = new List<string>();
-                    for (int i = 0; i < list.Count; i++) if (cl.GetItemChecked(i)) ids.Add(list[i].Id);
-                    packs = string.Join(",", ids.ToArray());
-                });
+                List<string> ids = new List<string>();
+                for (int i = 0; i < list.Count; i++) if (cl.GetItemChecked(i)) ids.Add(list[i].Id);
+                packs = string.Join(",", ids.ToArray());
             };
             content.Controls.Add(cl);
         }
@@ -497,9 +493,9 @@ namespace DinoJoe
             Label status = Lbl(ai != null && ai.Ready ? Lang.Get("s.ai.ok") : "", 12, 246, 420, 24);
             status.ForeColor = Color.FromArgb(40, 120, 60);
 
-            Button connect = new Button();
+            ModernButton connect = new ModernButton();
             connect.Text = Lang.Get("s.ai.connect");
-            connect.Font = new Font("Segoe UI Semibold", 10f);
+            connect.Primary = true;
             connect.SetBounds(12, 200, 150, 36);
             connect.Click += delegate
             {
@@ -511,7 +507,7 @@ namespace DinoJoe
             };
             content.Controls.Add(connect);
 
-            Button later = new Button();
+            Button later = new ModernButton();
             later.Text = Lang.Get("s.ai.later");
             later.SetBounds(172, 200, 150, 36);
             later.Click += delegate

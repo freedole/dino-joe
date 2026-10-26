@@ -9,12 +9,12 @@ using System.Windows.Forms;
 
 namespace DinoJoe
 {
-    class PackManagerForm : Form
+    class PackManagerForm : ThemedForm
     {
         readonly ListView lv = new ListView();
         readonly ComboBox cbWeight = new ComboBox();
         readonly ComboBox cbProfile = new ComboBox();
-        readonly Button btUnblock = new Button();
+        readonly Button btUnblock = new ModernButton();
         List<Pack> packs = new List<Pack>();
         bool loading;
         public bool Changed;
@@ -57,6 +57,8 @@ namespace DinoJoe
             lv.Columns.Add(Lang.Get("pk.col.ver"), 70);
             lv.Columns.Add(Lang.Get("pk.col.src"), 90);
             lv.Columns.Add(Lang.Get("pk.col.weight"), 90);
+            lv.Resize += delegate { FitLastColumn(lv); };
+            FitLastColumn(lv);
             lv.ItemChecked += delegate(object o, ItemCheckedEventArgs e)
             {
                 if (loading) return;
@@ -86,6 +88,7 @@ namespace DinoJoe
             Button bRemove = Btn(Lang.Get("pk.remove"), 280, 389, 100);
             bRemove.Click += delegate { RemoveSelected(); };
             Button bImport = Btn(Lang.Get("pk.import"), 12, 428, 170);
+            ((ModernButton)bImport).Primary = true;
             bImport.Click += delegate { ImportPack(); };
             Button bFolder = Btn(Lang.Get("pk.folder"), 190, 428, 130);
             bFolder.Click += delegate
@@ -108,9 +111,17 @@ namespace DinoJoe
             UpdateUnblock();
         }
 
+        static void FitLastColumn(ListView lv)
+        {
+            if (lv.Columns.Count == 0) return;
+            int used = 0;
+            for (int i = 0; i < lv.Columns.Count - 1; i++) used += lv.Columns[i].Width;
+            lv.Columns[lv.Columns.Count - 1].Width = Math.Max(60, lv.ClientSize.Width - used);
+        }
+
         Button Btn(string text, int x, int y, int w)
         {
-            Button b = new Button();
+            Button b = new ModernButton();
             b.Text = text; b.SetBounds(x, y, w, 30);
             Controls.Add(b);
             return b;
@@ -251,9 +262,9 @@ namespace DinoJoe
     // ======================================================================
     //  BLOKIRANE FORE: čekiraj šta se vraća
     // ======================================================================
-    class BlockedForm : Form
+    class BlockedForm : ThemedForm
     {
-        readonly CheckedListBox list = new CheckedListBox();
+        readonly ModernCheckList list = new ModernCheckList();
         List<KeyValuePair<string, string>> items;
         public bool Changed;
 
@@ -269,8 +280,6 @@ namespace DinoJoe
             TopMost = true;
 
             Label l = new Label(); l.Text = Lang.Get("bl.sub"); l.SetBounds(12, 10, 596, 22); Controls.Add(l);
-            list.CheckOnClick = true;
-            list.HorizontalScrollbar = true;
             list.SetBounds(12, 36, 596, 324);
             Controls.Add(list);
 
@@ -280,13 +289,13 @@ namespace DinoJoe
             all.CheckedChanged += delegate { for (int i = 0; i < list.Items.Count; i++) list.SetItemChecked(i, all.Checked); };
             Controls.Add(all);
 
-            Button restore = new Button(); restore.Text = Lang.Get("bl.restore"); restore.SetBounds(240, 372, 150, 32);
+            ModernButton restore = new ModernButton(); restore.Primary = true; restore.Text = Lang.Get("bl.restore"); restore.SetBounds(240, 372, 150, 32);
             restore.Click += delegate { Restore(false); };
             Controls.Add(restore);
-            Button restoreAll = new Button(); restoreAll.Text = Lang.Get("bl.restoreall"); restoreAll.SetBounds(396, 372, 110, 32);
+            Button restoreAll = new ModernButton(); restoreAll.Text = Lang.Get("bl.restoreall"); restoreAll.SetBounds(396, 372, 110, 32);
             restoreAll.Click += delegate { Restore(true); };
             Controls.Add(restoreAll);
-            Button close = new Button(); close.Text = Lang.Get("pk.close"); close.SetBounds(512, 372, 96, 32);
+            Button close = new ModernButton(); close.Text = Lang.Get("pk.close"); close.SetBounds(512, 372, 96, 32);
             close.Click += delegate { Close(); };
             Controls.Add(close);
             CancelButton = close;
@@ -298,9 +307,9 @@ namespace DinoJoe
         {
             items = Packs.BlockedList();
             items.Sort(delegate(KeyValuePair<string, string> a, KeyValuePair<string, string> b) { return string.Compare(a.Value ?? "~", b.Value ?? "~", StringComparison.CurrentCultureIgnoreCase); });
-            list.Items.Clear();
+            list.ClearItems();
             foreach (KeyValuePair<string, string> kv in items)
-                list.Items.Add(kv.Value ?? Lang.Get("bl.unknown") + " (" + kv.Key + ")");
+                list.AddItem(kv.Value ?? Lang.Get("bl.unknown") + " (" + kv.Key + ")", false);
         }
 
         void Restore(bool all)
@@ -320,7 +329,7 @@ namespace DinoJoe
     {
         public static string Show(IWin32Window owner, string title, string prompt, string def)
         {
-            using (Form f = new Form())
+            using (ThemedForm f = new ThemedForm())
             {
                 f.Text = title;
                 f.Font = new Font("Segoe UI", 9.5f);
@@ -331,8 +340,8 @@ namespace DinoJoe
                 f.TopMost = true;
                 Label l = new Label(); l.Text = prompt; l.SetBounds(12, 12, 356, 22); f.Controls.Add(l);
                 TextBox tb = new TextBox(); tb.Text = def; tb.MaxLength = 40; tb.SetBounds(12, 40, 356, 26); f.Controls.Add(tb);
-                Button ok = new Button(); ok.Text = "OK"; ok.DialogResult = DialogResult.OK; ok.SetBounds(196, 84, 82, 30); f.Controls.Add(ok);
-                Button cn = new Button(); cn.Text = Lang.Get("pk.close"); cn.DialogResult = DialogResult.Cancel; cn.SetBounds(286, 84, 82, 30); f.Controls.Add(cn);
+                Button ok = new ModernButton(); ok.Text = "OK"; ok.DialogResult = DialogResult.OK; ok.SetBounds(196, 84, 82, 30); f.Controls.Add(ok);
+                Button cn = new ModernButton(); cn.Text = Lang.Get("pk.close"); cn.DialogResult = DialogResult.Cancel; cn.SetBounds(286, 84, 82, 30); f.Controls.Add(cn);
                 f.AcceptButton = ok; f.CancelButton = cn;
                 return f.ShowDialog(owner) == DialogResult.OK ? tb.Text : null;
             }

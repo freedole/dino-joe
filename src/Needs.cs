@@ -150,7 +150,7 @@ namespace DinoJoe
     // ======================================================================
     //  PROZOR STATUS
     // ======================================================================
-    class StatusForm : Form
+    class StatusForm : ThemedForm
     {
         readonly Needs needs;
         readonly Timer timer = new Timer();
@@ -162,7 +162,8 @@ namespace DinoJoe
             this.needs = needs;
             Text = petName + " - " + Lang.Get("st.title");
             Font = new Font("Segoe UI", 9.5f);
-            FormBorderStyle = FormBorderStyle.FixedToolWindow;
+            FormBorderStyle = FormBorderStyle.FixedDialog;
+            MaximizeBox = false; MinimizeBox = false;
             StartPosition = FormStartPosition.CenterScreen;
             AutoScaleMode = AutoScaleMode.Dpi;
             ClientSize = new Size(400, 470);
@@ -174,7 +175,7 @@ namespace DinoJoe
             for (int i = 0; i < acts.Length; i++)
             {
                 string a = acts[i];
-                Button b = new Button();
+                Button b = new ModernButton();
                 b.Text = Lang.Get("act." + a);
                 b.SetBounds(16 + (i % 3) * 124, 360 + (i / 3) * 36, 118, 30);
                 b.Click += delegate { if (ActionClicked != null) ActionClicked(a); Invalidate(); };

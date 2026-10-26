@@ -299,7 +299,7 @@ Pravila:
     // ======================================================================
     //  PODEŠAVANJA AI
     // ======================================================================
-    class AiSettingsForm : Form
+    class AiSettingsForm : ThemedForm
     {
         readonly AiConfig cfg;
         TextBox tbKey, tbUrl, tbModel;
@@ -325,7 +325,7 @@ Pravila:
             intro.SetBounds(16, 12, 490, 40);
             Controls.Add(intro);
 
-            Button btOpen = new Button();
+            Button btOpen = new ModernButton();
             btOpen.Text = "Otvori Groq";
             btOpen.SetBounds(16, 58, 120, 30);
             btOpen.Click += delegate { try { System.Diagnostics.Process.Start(AiConfig.KeysPage); } catch { } };
@@ -356,7 +356,7 @@ Pravila:
             tbModel.Text = cfg.Model;
             Controls.Add(tbModel);
 
-            Button btDef = new Button();
+            Button btDef = new ModernButton();
             btDef.Text = "Groq default";
             new ToolTip().SetToolTip(btDef, "Alternative: qwen/qwen3.6-27b, llama-3.1-8b-instant");
             btDef.SetBounds(388, 190, 116, 28);
@@ -374,19 +374,19 @@ Pravila:
             lbStatus.ForeColor = Color.FromArgb(60, 60, 60);
             Controls.Add(lbStatus);
 
-            btTest = new Button();
+            btTest = new ModernButton();
             btTest.Text = "Testiraj i sačuvaj";
             btTest.SetBounds(16, 292, 150, 30);
             btTest.Click += delegate { TestAndSave(); };
             Controls.Add(btTest);
 
-            btSave = new Button();
+            btSave = new ModernButton();
             btSave.Text = "Sačuvaj bez testa";
             btSave.SetBounds(176, 292, 150, 30);
             btSave.Click += delegate { Apply(); cfg.Save(); DialogResult = DialogResult.OK; Close(); };
             Controls.Add(btSave);
 
-            Button btCancel = new Button();
+            Button btCancel = new ModernButton();
             btCancel.Text = "Zatvori";
             btCancel.SetBounds(404, 292, 100, 30);
             btCancel.Click += delegate { Close(); };
@@ -450,7 +450,7 @@ Pravila:
     // ======================================================================
     //  CHAT PROZOR
     // ======================================================================
-    class ChatForm : Form
+    class ChatForm : ThemedForm
     {
         readonly RichTextBox log;
         readonly TextBox input;
@@ -480,7 +480,7 @@ Pravila:
             bottom.Padding = new Padding(6);
             bottom.BackColor = Color.FromArgb(240, 246, 240);
 
-            send = new Button();
+            send = new ModernButton();
             send.Text = "Pošalji";
             send.Dock = DockStyle.Right;
             send.Width = 80;
