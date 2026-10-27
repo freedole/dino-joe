@@ -1542,6 +1542,13 @@ namespace DinoJoe
             });
             menu.Opening += delegate { miSeason.Checked = Settings.Seasonal; };
             menu.Items.Add(miSeason);
+            ToolStripMenuItem miPrank = new ToolStripMenuItem(Lang.Get("m.prank"), null, delegate
+            {
+                Settings.PrankMode = !Settings.PrankMode; Settings.Save();
+                Say(Settings.PrankMode ? Lang.Get("prank.on") : Lang.Get("prank.off"));
+            });
+            menu.Opening += delegate { miPrank.Checked = Settings.PrankMode; };
+            menu.Items.Add(miPrank);
             ToolStripMenuItem miRem = new ToolStripMenuItem(Lang.Get("m.reminders"));
             int[] remOpts = { 0, 30, 45, 60, 90 };
             foreach (int ro in remOpts)
@@ -1966,6 +1973,27 @@ namespace DinoJoe
         bool quietHidden;
         double quietCheckT = 10;
 
+        // šala: na prezentaciji/filmu (ne u igri) povremeno "upadne" i izvini se - samo ako je uključeno
+        double prankLeft, prankNext = 600;
+
+        void PrankStep()
+        {
+            if (!Settings.PrankMode || IsEgg || needs.RanAway) return;
+            if (Quiet.LastState != 2 && Quiet.LastState != 4) return;
+            prankNext -= 0.5;
+            if (prankNext > 0) return;
+            prankNext = 600 + rnd.Next(900);   // 10-25 min
+            prankLeft = 4.5;
+            Rectangle wa = Screen.PrimaryScreen.Bounds;
+            fx = wa.Right - cw - 40 * k; fy = wa.Bottom - ch; vx = vy = 0; platform = IntPtr.Zero;
+            pose.Dir = -1;
+            timer.Interval = 33;
+            Show();
+            Native.SetWindowPos(Handle, new IntPtr(-1), 0, 0, 0, 0, 0x0001 | 0x0002 | 0x0010);
+            SetState(State.Happy, 1.5);
+            Say(Pick(Lang.Gender(Lang.Get("prank.say")).Split('|')));
+        }
+
         void QuietStep()
         {
             quietCheckT += Dt;
@@ -1993,7 +2021,12 @@ namespace DinoJoe
         {
             if (quietHidden) quietCheckT += Dt * 14;   // dok je pauzirano, timer ide sporije (500 ms)
             QuietStep();
-            if (quietHidden) { if (!IsEgg) needs.Tick(0.5, false); return; }
+            if (quietHidden && prankLeft > 0)
+            {
+                prankLeft -= Dt;
+                if (prankLeft <= 0) { Hide(); timer.Interval = 500; return; }
+            }
+            else if (quietHidden) { if (!IsEgg) needs.Tick(0.5, false); PrankStep(); return; }
             // potrebe
             if (!IsEgg) needs.Tick(Dt, pose.State == State.Sleep);
             needsSaveT += Dt;

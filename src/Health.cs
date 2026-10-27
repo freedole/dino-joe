@@ -77,6 +77,9 @@ namespace DinoJoe
         // 3 QUNS_RUNNING_D3D_FULL_SCREEN (igra), 4 QUNS_PRESENTATION_MODE, 5 QUNS_ACCEPTS_NOTIFICATIONS, 6 QUNS_QUIET_TIME, 7 QUNS_APP
         static bool failed;
 
+        /// Zadnje stanje: 2 cijeli ekran (film/prezentacija), 3 igra (D3D), 4 prezentacijski mod, 1 zaključano.
+        public static int LastState;
+
         [DllImport("user32.dll")] static extern IntPtr GetForegroundWindow();
         [DllImport("user32.dll")] static extern uint GetWindowThreadProcessId(IntPtr h, out uint pid);
 
@@ -107,6 +110,7 @@ namespace DinoJoe
                 {
                     int st;
                     if (SHQueryUserNotificationState(out st) != 0) return false;
+                    LastState = st;
                     if (st == 1) return true;                                   // zaključan ekran
                     if (st == 2 || st == 3 || st == 4) return !RemoteInFront();  // cijeli ekran, osim RDP/VM/udaljenog pristupa
                     return false;

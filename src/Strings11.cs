@@ -174,6 +174,15 @@ namespace DinoJoe
             A("upd.say", "Izašla je nova verzija ({0})! Desni klik na mene -> Preuzmi.", "Izašla je nova verzija ({0})! Desni klik na mene -> Preuzmi.", "Izašla je nova verzija ({0})! Desni klik na mene -> Preuzmi.", "A new version is out ({0})! Right-click me -> Download.");
             A("upd.menu", "Preuzmi novu verziju {0}...", "Preuzmi novu verziju {0}...", "Preuzmi novu verziju {0}...", "Download new version {0}...");
 
+            // šala na prezentaciji
+            A("m.prank", "Šala na prezentaciji (upadne i izvini se)", "Šala na prezentaciji (upadne i izvini se)", "Šala na prezentaciji (upadne i ispriča se)", "Presentation prank (pops in and apologizes)");
+            A("prank.on", "Hehe. Na sljedećoj prezentaciji ću svratiti na sekund.", "Hehe. Na sledećoj prezentaciji ću svratiti na sekund.", "Hehe. Na sljedećoj prezentaciji svratit ću na sekundu.", "Hehe. I'll drop by your next presentation for a second.");
+            A("prank.off", "Dobro, na prezentacijama sam {miran|mirna} kao bubica.", "Dobro, na prezentacijama sam {miran|mirna} kao bubica.", "Dobro, na prezentacijama sam {miran|mirna} kao bubica.", "Okay, I'll be quiet as a mouse during presentations.");
+            A("prank.say", "Ups, izvinite! Pogrešna sala.|Ne obraćajte pažnju na mene, samo prolazim.|Pardon! {Mislio|Mislila} sam da je pauza za kafu.|Ups! Nastavite, odlično vam ide.|Izvinite, je li ovo sastanak za dinosauruse?",
+                           "Ups, izvinite! Pogrešna sala.|Ne obraćajte pažnju na mene, samo prolazim.|Pardon! {Mislio|Mislila} sam da je pauza za kafu.|Ups! Nastavite, odlično vam ide.|Izvinite, je li ovo sastanak za dinosauruse?",
+                           "Ups, ispričavam se! Kriva dvorana.|Ne obraćajte pažnju na mene, samo prolazim.|Pardon! {Mislio|Mislila} sam da je pauza za kavu.|Ups! Nastavite, odlično vam ide.|Oprostite, je li ovo sastanak za dinosaure?",
+                           "Oops, sorry! Wrong room.|Don't mind me, just passing through.|Pardon! I thought it was a coffee break.|Oops! Carry on, you're doing great.|Excuse me, is this the dinosaur meeting?");
+
             // nove šare
             A("pat.gold", "Zlatna", "Zlatna", "Zlatna", "Gold");
             Lang.BsOverride["ach.stylist.d"] = "Promijeni izgled u postavkama.";

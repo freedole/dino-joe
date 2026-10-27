@@ -507,7 +507,8 @@ namespace DinoJoe
         public static int ReminderMinutes = 0;              // podsjetnici: 0 = isključeno
         public static int TipsNext = 0;                     // sljedeći savjet za nove korisnike
         public static string UpdateChecked = "";
-        public static string DisabledPacks = "";            // isključeni paketi ličnosti            // datum zadnje provjere nove verzije               // dino može stajati/šetati po gornjoj ivici prozora                 // "Samo ovaj paket": id paketa ili prazno = svi uključeni
+        public static string DisabledPacks = "";
+        public static bool PrankMode = false;               // šala na prezentaciji (podrazumijevano isključeno)            // isključeni paketi ličnosti            // datum zadnje provjere nove verzije               // dino može stajati/šetati po gornjoj ivici prozora                 // "Samo ovaj paket": id paketa ili prazno = svi uključeni
 
         public static bool IsHidden(string id) { return ("," + HiddenPersonalities + ",").Contains("," + id + ","); }
 
@@ -556,6 +557,7 @@ namespace DinoJoe
                         else if (k == "tips_next" && int.TryParse(v, out n)) TipsNext = Math.Max(0, n);
                         else if (k == "update_checked") UpdateChecked = v;
                         else if (k == "disabled_packs") DisabledPacks = v;
+                        else if (k == "prank") PrankMode = v == "1";
                     }
             }
             catch { }
@@ -590,6 +592,7 @@ namespace DinoJoe
                     "tips_next=" + TipsNext + "\r\n" +
                     "update_checked=" + UpdateChecked + "\r\n" +
                     "disabled_packs=" + DisabledPacks + "\r\n" +
+                    "prank=" + (PrankMode ? "1" : "0") + "\r\n" +
                     "profile=" + ActiveProfile.Replace("\r", "").Replace("\n", "") + "\r\n", new UTF8Encoding(true));
             }
             catch { }
