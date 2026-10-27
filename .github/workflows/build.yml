@@ -87,5 +87,6 @@ jobs:
           files: |
             dist/*.zip
             dist/*.sha256
+            dist/*.msix
           generate_release_notes: true
           prerelease: ${{ contains(github.ref_name, '-') }}
