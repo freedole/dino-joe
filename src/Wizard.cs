@@ -366,10 +366,22 @@ namespace DinoJoe
             Lbl(Lang.Get("s.look.species"), 12, 12, 120, 24);
             ComboBox sp = new ComboBox();
             sp.DropDownStyle = ComboBoxStyle.DropDownList;
-            foreach (string n in DinoJoe.Species.Names) sp.Items.Add(n);
+            for (int i = 0; i < DinoJoe.Species.Count; i++)
+                sp.Items.Add(DinoJoe.Species.Name(i) + (Achievements.SpeciesOpen(i) ? "" : "  " + Lang.Get("s.look.locked")));
+            if (!Achievements.SpeciesOpen(species)) species = 0;
             sp.SelectedIndex = Math.Max(0, Math.Min(DinoJoe.Species.Count - 1, species));
             sp.SetBounds(140, 9, 240, 28);
-            sp.SelectedIndexChanged += delegate { species = sp.SelectedIndex; ApplyLookLive(); preview.Happy(1.2); };
+            sp.SelectedIndexChanged += delegate
+            {
+                if (!Achievements.SpeciesOpen(sp.SelectedIndex))
+                {
+                    ShowLock(Achievements.HowToUnlock("species:" + sp.SelectedIndex));
+                    sp.SelectedIndex = species;
+                    return;
+                }
+                ShowLock(null);
+                species = sp.SelectedIndex; ApplyLookLive(); preview.Happy(1.2);
+            };
             content.Controls.Add(sp);
             cbSpecies = sp;
 
@@ -388,10 +400,22 @@ namespace DinoJoe
             Lbl(Lang.Get("s.look.pattern"), 12, 132, 120, 24);
             cbPattern = new ComboBox();
             cbPattern.DropDownStyle = ComboBoxStyle.DropDownList;
-            for (int i = 0; i < Skins.PatternCount; i++) cbPattern.Items.Add(Skins.PatternName(i));
+            for (int i = 0; i < Skins.PatternCount; i++)
+                cbPattern.Items.Add(Skins.PatternName(i) + (Achievements.PatternOpen(i) ? "" : "  " + Lang.Get("s.look.locked")));
+            if (!Achievements.PatternOpen(pattern)) pattern = 0;
             cbPattern.SelectedIndex = Math.Max(0, Math.Min(Skins.PatternCount - 1, pattern));
             cbPattern.SetBounds(140, 129, 240, 28);
-            cbPattern.SelectedIndexChanged += delegate { pattern = cbPattern.SelectedIndex; ApplyLookLive(); };
+            cbPattern.SelectedIndexChanged += delegate
+            {
+                if (!Achievements.PatternOpen(cbPattern.SelectedIndex))
+                {
+                    ShowLock(Achievements.HowToUnlock("pattern:" + cbPattern.SelectedIndex));
+                    cbPattern.SelectedIndex = pattern;
+                    return;
+                }
+                ShowLock(null);
+                pattern = cbPattern.SelectedIndex; ApplyLookLive();
+            };
             content.Controls.Add(cbPattern);
 
             Lbl(Lang.Get("s.look.accessory"), 12, 172, 120, 24);
@@ -415,15 +439,32 @@ namespace DinoJoe
             egg.SetBounds(140, 244, 240, 38);
             egg.Click += delegate
             {
-                cbSpecies.SelectedIndex = rnd.Next(DinoJoe.Species.Count);
+                int rs; do rs = rnd.Next(DinoJoe.Species.Count); while (!Achievements.SpeciesOpen(rs));
+                cbSpecies.SelectedIndex = rs;
                 cbColor1.SelectedIndex = rnd.Next(Palette.All.Count);
                 cbColor2.SelectedIndex = rnd.Next(3) == 0 ? 1 + rnd.Next(Palette.All.Count) : 0;
                 chGlasses.Checked = rnd.Next(4) == 0;
-                cbPattern.SelectedIndex = rnd.Next(10) < 4 ? 0 : rnd.Next(Skins.PatternCount);
+                int rp; do rp = rnd.Next(10) < 4 ? 0 : rnd.Next(Skins.PatternCount); while (!Achievements.PatternOpen(rp));
+                cbPattern.SelectedIndex = rp;
                 cbAccessory.SelectedIndex = rnd.Next(10) < 4 ? 0 : rnd.Next(Skins.AccessoryCount);
                 preview.Happy(1.5);
             };
             content.Controls.Add(egg);
+
+            lblLock = new Label();
+            lblLock.ForeColor = Color.FromArgb(150, 95, 20);
+            lblLock.SetBounds(140, 288, 240, 40);
+            lblLock.Visible = false;
+            content.Controls.Add(lblLock);
+        }
+
+        Label lblLock;
+
+        void ShowLock(string text)
+        {
+            if (lblLock == null) return;
+            lblLock.Text = "🔒 " + (text ?? "");
+            lblLock.Visible = text != null;
         }
 
         ComboBox ColorCombo(bool withAuto)
@@ -570,6 +611,12 @@ namespace DinoJoe
             };
             content.Controls.Add(later);
 
+            if (Packaged.IsPackaged)
+            {
+                Label st = Lbl(Lang.Get("s.autostart.store"), 12, 290, 420, 44);
+                st.ForeColor = Theme.TextMuted;
+                return;
+            }
             CheckBox auto = new CheckBox();
             auto.Text = Lang.Get("s.autostart");
             auto.Checked = autostart;

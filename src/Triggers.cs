@@ -63,8 +63,12 @@ namespace DinoJoe
             return null;
         }
 
+        /// Ključ zadnjeg okinutog triggera (npr. "trg.midnight") - za dostignuća.
+        public string LastKey;
+
         string Pick(string key)
         {
+            LastKey = key;
             string[] v = Lang.Gender(Lang.Get(key)).Split('|');
             return v[rnd.Next(v.Length)];
         }

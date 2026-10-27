@@ -1,4 +1,4 @@
-// Dino Joe - vrste: Triceratops, Brontosaurus, Raptor (T-Rex je u Dino.cs).
+// Dino Joe - vrste: Triceratops, Brontosaurus, Raptor, Stegosaurus, Pterodaktil (T-Rex je u Dino.cs).
 // Isti vektorski stil kao T-Rex: zajednička glava i lice (DrawFace), boje iz palete, mašna i naočale.
 // Koordinate: (0,0) = tačka na tlu ispod dina, x desno (pogled), y gore negativno.
 // C# 5 kompatibilno.
@@ -12,9 +12,15 @@ namespace DinoJoe
 {
     static class Species
     {
-        public const int Rex = 0, Trike = 1, Bronto = 2, Raptor = 3;
-        public const int Count = 4;
-        public static readonly string[] Names = { "T-Rex", "Triceratops", "Brontosaurus", "Raptor" };
+        public const int Rex = 0, Trike = 1, Bronto = 2, Raptor = 3, Stego = 4, Ptero = 5;
+        public const int Count = 6;   // 4 i 5 se otključavaju dostignućima
+        public static readonly string[] Names = { "T-Rex", "Triceratops", "Brontosaurus", "Raptor", "Stegosaurus", "Pterodactyl" };
+
+        public static string Name(int s)
+        {
+            if (s == Ptero && !Lang.IsEnglish) return "Pterodaktil";
+            return Names[Math.Max(0, Math.Min(Count - 1, s))];
+        }
 
         /// Y vrha glave (za oblačić, srca, Zzz) u odnosu na tlo.
         public static float HeadTop(int s)
@@ -24,6 +30,8 @@ namespace DinoJoe
                 case Trike: return -92;
                 case Bronto: return -172;
                 case Raptor: return -104;
+                case Stego: return -112;
+                case Ptero: return -122;
                 default: return -108;
             }
         }
@@ -403,6 +411,207 @@ namespace DinoJoe
             BowOnHead(g, p, hx, hy, s);
             HeadDetails(g, p, hx, hy, s);
             Dispose(parts);
+        }
+    
+        // ==================================================================
+        //  STEGOSAURUS (otključava se dostignućem)
+        // ==================================================================
+        static void DrawStego(Graphics g, Pose p)
+        {
+            Anim a = Animate(p);
+            float bY = a.bY;
+            float headDY = a.sleeping ? 14 : 0;
+
+            if (!a.sitting)
+            {
+                using (GraphicsPath l = ThickLeg(-28, -30 + bY, a.legB * 0.8f, 26, 17)) FarLeg(g, l);
+                using (GraphicsPath l = ThickLeg(18, -26 + bY, a.legA * 0.8f, 20, 14)) FarLeg(g, l);
+            }
+
+            // ploče na leđima (iza tijela): dva reda, naizmjenično
+            float cxB = -6, cyB = -50 + bY, rx = 46, ry = 30;
+            for (int row = 0; row < 2; row++)
+                for (int i = 0; i < 6; i++)
+                {
+                    float x = cxB - 38 + i * 14 + row * 7;
+                    if (x > cxB + 34) continue;
+                    double u = (x - cxB) / rx;
+                    float y = cyB - ry * (float)Math.Sqrt(Math.Max(0, 1 - u * u)) + 3;
+                    float ang = -90 + (float)(u * 38);
+                    float size = (row == 0 ? 30 : 25) * (1f - (float)Math.Abs(u) * 0.4f);
+                    using (GraphicsPath pl = new GraphicsPath())
+                    {
+                        pl.AddBezier(-size * 0.42f, 2, -size * 0.55f, -size * 0.55f, -size * 0.2f, -size, 0, -size);
+                        pl.AddBezier(0, -size, size * 0.2f, -size, size * 0.55f, -size * 0.55f, size * 0.42f, 2);
+                        pl.CloseFigure();
+                        using (Matrix m = new Matrix()) { m.Translate(x, y); m.Rotate(ang + 90); pl.Transform(m); }
+                        Outline(g, pl, 3.6f);
+                        using (LinearGradientBrush pb = new LinearGradientBrush(new PointF(0, y - size), new PointF(0, y + 2), row == 0 ? CSpikeTop : CSpike, CSpike))
+                            g.FillPath(pb, pl);
+                    }
+                }
+
+            // šiljci na repu
+            float tipY = (a.sitting ? -18 : -30) + bY + a.sway * 0.6f;
+            float[,] ts = { { -78, -46, -120, 16 }, { -86, -42, -145, 15 }, { -92, -38, -125, 14 }, { -98, -34, -155, 13 } };
+            for (int i = 0; i < 4; i++)
+            {
+                float tx = ts[i, 0], ty = ts[i, 1] + bY + a.sway * 0.5f + (a.sitting ? 8 : 0);
+                using (GraphicsPath sp = Spike(tx, ty, ts[i, 2], ts[i, 3]))
+                using (SolidBrush sb = new SolidBrush(Color.FromArgb(246, 238, 214)))
+                {
+                    Outline(g, sp, 3f);
+                    g.FillPath(sb, sp);
+                }
+            }
+
+            List<GraphicsPath> parts = new List<GraphicsPath>();
+            GraphicsPath tail = new GraphicsPath();
+            tail.AddBezier(-40, -60 + bY, -64, -58 + bY, -84, -44 + bY, -100, tipY);
+            tail.AddBezier(-100, tipY, -84, -28 + bY, -62, -28 + bY, -38, -34 + bY);
+            tail.CloseFigure();
+            parts.Add(tail);
+
+            GraphicsPath body = new GraphicsPath();
+            body.AddEllipse(cxB - rx, cyB - ry - a.breathe * 0.4f, rx * 2, ry * 2 + 2 + a.breathe * 0.8f);
+            parts.Add(body);
+
+            float s = 0.6f;
+            float hx = 38, hy = -48 + bY + headDY;
+            if (p.State == State.Roar) hy -= 3;
+            GraphicsPath neck = new GraphicsPath();
+            neck.AddEllipse(26, -54 + bY + headDY * 0.5f, 24, 22);
+            parts.Add(neck);
+            parts.Add(HeadPath(hx, hy, s));
+
+            if (a.sitting)
+            {
+                GraphicsPath thigh = new GraphicsPath();
+                thigh.AddEllipse(-38, -32, 36, 30);
+                thigh.AddPath(RoundRect(-22, -12, 30, 12, 6), false);
+                parts.Add(thigh);
+                GraphicsPath front = new GraphicsPath();
+                front.AddPath(RoundRect(14, -12, 28, 12, 6), false);
+                parts.Add(front);
+            }
+            else
+            {
+                parts.Add(ThickLeg(-18, -30 + bY, a.legA * 0.8f, 26, 18));
+                parts.Add(ThickLeg(26, -26 + bY, a.legB * 0.8f, 20, 15));
+            }
+
+            FillParts(g, parts, -84, 5f);
+            Belly(g, -20, -40 + bY, 44, 22);
+            using (SolidBrush spot = new SolidBrush(CSpot))
+            {
+                g.FillEllipse(spot, -34, -62 + bY, 11, 7);
+                g.FillEllipse(spot, -14, -70 + bY, 9, 6);
+                g.FillEllipse(spot, 8, -64 + bY, 8, 5);
+                g.FillEllipse(spot, -64, -44 + bY, 7, 5);
+            }
+
+            BowOnHead(g, p, hx, hy, s);
+            HeadDetails(g, p, hx, hy, s);
+            Dispose(parts);
+        }
+
+        // ==================================================================
+        //  PTERODAKTIL (otključava se dostignućem)
+        // ==================================================================
+        static void DrawPtero(Graphics g, Pose p)
+        {
+            Anim a = Animate(p);
+            float bY = a.bY;
+            float headDY = a.sleeping ? 16 : 0;
+            float sitDY = a.sitting ? 6 : 0;
+
+            // krila: 0 sklopljena, 1 raširena
+            double open = 0, flap = 0;
+            if (p.State == State.Happy || p.State == State.Roar) { open = 0.85; flap = Math.Sin(p.T * 14) * 0.25; }
+            else if (a.dragged) { open = 1; flap = Math.Sin(p.T * 18) * 0.3; }
+            else if (a.walking) { open = 0.12; flap = Math.Sin(p.T * 8.5) * 0.08; }
+            float w = (float)Math.Max(0, Math.Min(1.1, open + flap));
+
+            if (!a.sitting)
+                using (GraphicsPath far = Leg(-4, -30 + bY, a.legB, 24)) FarLeg(g, far);
+
+            // dalje krilo
+            Wing(g, w, bY + sitDY, true);
+
+            List<GraphicsPath> parts = new List<GraphicsPath>();
+            GraphicsPath tail = new GraphicsPath();
+            tail.AddBezier(-12, -46 + bY + sitDY, -24, -44 + bY + sitDY, -32, -36 + bY + sitDY, -38, -30 + bY + sitDY + a.sway * 0.3f);
+            tail.AddBezier(-38, -30 + bY + sitDY + a.sway * 0.3f, -28, -34 + bY + sitDY, -20, -36 + bY + sitDY, -10, -36 + bY + sitDY);
+            tail.CloseFigure();
+            parts.Add(tail);
+
+            GraphicsPath body = new GraphicsPath();
+            body.AddEllipse(-22, -78 + bY + sitDY - a.breathe * 0.4f, 40, 50 + a.breathe * 0.8f);
+            parts.Add(body);
+
+            float s = 0.7f;
+            float hx = 10, hy = -112 + bY + headDY + sitDY;
+            if (p.State == State.Roar) hy -= 3;
+            GraphicsPath neck = Capsule(6, -72 + bY + sitDY, 22, 14, -170);
+            parts.Add(neck);
+
+            // greben (iza glave)
+            using (GraphicsPath crest = new GraphicsPath())
+            {
+                crest.AddPolygon(new PointF[] { new PointF(hx + 6, hy + 8), new PointF(hx - 30, hy - 10), new PointF(hx - 26, hy - 2), new PointF(hx + 8, hy + 18) });
+                Outline(g, crest, 3.6f);
+                using (LinearGradientBrush cb = new LinearGradientBrush(new PointF(hx - 30, 0), new PointF(hx + 8, 0), CSpikeTop, CSpike)) g.FillPath(cb, crest);
+            }
+            // kljun (ispred glave)
+            using (GraphicsPath beak = new GraphicsPath())
+            {
+                float bx = hx + 50 * s, by = hy + 12 * s;
+                beak.AddPolygon(new PointF[] { new PointF(bx - 4, by), new PointF(bx + 34, by + 9), new PointF(bx - 4, by + 18) });
+                Outline(g, beak, 3.6f);
+                using (LinearGradientBrush kb = new LinearGradientBrush(new PointF(0, by), new PointF(0, by + 18), Color.FromArgb(255, 214, 110), Color.FromArgb(225, 150, 50))) g.FillPath(kb, beak);
+            }
+            parts.Add(HeadPath(hx, hy, s));
+
+            GraphicsPath nearLeg;
+            if (a.sitting)
+            {
+                nearLeg = new GraphicsPath();
+                nearLeg.AddEllipse(-14, -26, 24, 22);
+                nearLeg.AddPath(RoundRect(-2, -9, 22, 9, 4), false);
+            }
+            else nearLeg = Leg(6, -30 + bY, a.legA, 24);
+            parts.Add(nearLeg);
+
+            FillParts(g, parts, -116, 4.5f);
+            Belly(g, -6, -66 + bY + sitDY, 20, 32);
+
+            // bliže krilo
+            Wing(g, w, bY + sitDY, false);
+
+            BowOnHead(g, p, hx, hy, s);
+            HeadDetails(g, p, hx, hy, s);
+            Dispose(parts);
+        }
+
+        static void Wing(Graphics g, float w, float bY, bool far)
+        {
+            float shx = far ? 0 : 6, shy = -68 + bY;
+            float ex = -14 + (-34 + 14) * w, ey = -60 + bY + (-108 + 60) * w;  // lakat (sklopljeno: uz leđa)
+            float tx = -22 + (-92 + 22) * w, ty = -28 + bY + (-82 + 28) * w;   // vrh krila
+            if (far) { ex -= 10 * w; tx -= 14 * w; ey += 6; ty += 4; }
+            using (GraphicsPath m = new GraphicsPath())
+            {
+                m.AddLine(shx, shy, ex, ey);
+                m.AddLine(ex, ey, tx, ty);
+                m.AddBezier(tx, ty, tx + 10, ty + 4 + 8 * w, -4, -40 + bY, -2, -44 + bY);
+                m.CloseFigure();
+                Color top = far ? CFarTop : CSpikeTop, bot = far ? CFarBot : CSpike;
+                Outline(g, m, 3.6f);
+                using (LinearGradientBrush b = new LinearGradientBrush(new PointF(0, Math.Min(ey, ty) - 1), new PointF(0, -36 + bY), top, bot)) g.FillPath(b, m);
+                using (Pen bone = new Pen(Color.FromArgb(120, COut), 2.2f)) { bone.StartCap = LineCap.Round; bone.EndCap = LineCap.Round; g.DrawLine(bone, shx, shy, ex, ey); g.DrawLine(bone, ex, ey, tx, ty); }
+            }
+            // kandžica na laktu
+            using (SolidBrush cl = new SolidBrush(Color.FromArgb(246, 238, 214))) g.FillEllipse(cl, ex - 3, ey - 3, 6, 6);
         }
     }
 }

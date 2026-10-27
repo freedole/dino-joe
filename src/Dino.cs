@@ -19,7 +19,7 @@ using Microsoft.Win32;
 
 [assembly: System.Reflection.AssemblyTitle("Dino Joe - Desktop Pet")]
 [assembly: System.Reflection.AssemblyProduct("Dino Joe")]
-[assembly: System.Reflection.AssemblyVersion("1.0.0.0")]
+[assembly: System.Reflection.AssemblyVersion("1.1.0.0")]
 
 namespace DinoJoe
 {
@@ -80,12 +80,16 @@ namespace DinoJoe
                 Application.SetCompatibleTextRenderingDefault(false);
                 Settings.Load();
                 Settings.Apply();
+                Life.Load();
+                Achievements.Load();
+                bool firstRun = !Settings.SetupDone;
                 if (!Settings.SetupDone || (args.Length >= 1 && args[0] == "--setup"))
                 {
                     string dir0 = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), Profile.Id);
                     try { Directory.CreateDirectory(dir0); } catch { }
                     using (SetupWizard w = new SetupWizard(true, new AiConfig(dir0))) w.ShowDialog();
                     JustSetUp = true;
+                    if (firstRun && !Life.Exists) Life.StartEgg();   // novi dino počinje kao jaje
                 }
                 Settings.Apply();
                 Application.Run(new PetForm());
@@ -250,6 +254,9 @@ namespace DinoJoe
         public double ChickPhase;
         public string Bubble;
         public double BubbleAlpha = 1;
+        public int Stage = Life.Adult;  // jaje, beba, mladunče, odrasli
+        public double Warmth;           // jaje: 0..100
+        public double HatchT = -1;      // jaje: animacija izlijeganja 0..1
     }
 
     static partial class Painter
@@ -321,27 +328,38 @@ namespace DinoJoe
             float cx = CanvasW / 2f, gy = CanvasH - GroundPad;
 
             // senka
-            float shW = 86f - (float)p.JumpY * 0.8f;
+            float sc = p.Stage == Life.Egg ? 0.7f : Life.StageScale[Math.Max(0, Math.Min(3, p.Stage))];
+            float shW = (86f - (float)p.JumpY * 0.8f) * sc;
             using (SolidBrush b = new SolidBrush(Color.FromArgb(55, 0, 0, 0)))
                 g.FillEllipse(b, cx - shW / 2f, gy - 4, shW, 8);
 
             // pile iza
             if (p.Chick) DrawChick(g, cx - p.Dir * 92f, gy, p);
 
+            if (p.Stage == Life.Egg)
+            {
+                DrawDesktopEgg(g, cx, gy - (float)p.JumpY, p);
+                if (p.HeartsT >= 0 && p.HeartsT <= 1) DrawHearts(g, cx, gy - 120, p.HeartsT);
+                if (!string.IsNullOrEmpty(p.Bubble)) DrawBubble(g, p.Bubble, cx + 10, gy - 112 - (float)p.JumpY, p.BubbleAlpha);
+                g.Restore(gs0);
+                return;
+            }
+
             GraphicsState gs = g.Save();
             g.TranslateTransform(cx, gy - (float)p.JumpY);
             if (p.Dir < 0) g.ScaleTransform(-1, 1);
+            if (sc != 1f) g.ScaleTransform(sc, sc);
             DrawDino(g, p);
             g.Restore(gs);
 
             // Zzz
-            float top = DinoJoe.Species.HeadTop(p.Species), dTop = top + 108;
-            if (p.State == State.Sleep) DrawZzz(g, cx + p.Dir * 34f - 6, gy - 84 + (p.Species == DinoJoe.Species.Bronto ? 40 : dTop), p.T);
+            float top = DinoJoe.Species.HeadTop(p.Species);
+            if (p.State == State.Sleep) DrawZzz(g, cx + p.Dir * 34f * sc - 6, gy + (p.Species == DinoJoe.Species.Bronto ? -44 : top + 24) * sc, p.T);
 
             // srca
-            if (p.HeartsT >= 0 && p.HeartsT <= 1) DrawHearts(g, cx - p.Dir * 14f, gy - 112 + dTop, p.HeartsT);
+            if (p.HeartsT >= 0 && p.HeartsT <= 1) DrawHearts(g, cx - p.Dir * 14f * sc, gy + (top - 4) * sc, p.HeartsT);
 
-            if (!string.IsNullOrEmpty(p.Bubble)) DrawBubble(g, p.Bubble, cx + p.Dir * 26f, gy + top - (float)p.JumpY, p.BubbleAlpha);
+            if (!string.IsNullOrEmpty(p.Bubble)) DrawBubble(g, p.Bubble, cx + p.Dir * 26f * sc, gy + top * sc - (float)p.JumpY, p.BubbleAlpha);
 
             g.Restore(gs0);
         }
@@ -408,6 +426,8 @@ namespace DinoJoe
             if (p.Species == DinoJoe.Species.Trike) { DrawTrike(g, p); return; }
             if (p.Species == DinoJoe.Species.Bronto) { DrawBronto(g, p); return; }
             if (p.Species == DinoJoe.Species.Raptor) { DrawRaptor(g, p); return; }
+            if (p.Species == DinoJoe.Species.Stego) { DrawStego(g, p); return; }
+            if (p.Species == DinoJoe.Species.Ptero) { DrawPtero(g, p); return; }
             State st = p.State;
             double t = p.T;
             bool walking = st == State.Walk;
@@ -544,6 +564,82 @@ namespace DinoJoe
             foreach (GraphicsPath gp in parts) gp.Dispose();
         }
 
+        // jaje na desktopu: boja tijela kao tufne, pukotine po toplini, ljuljanje
+        static void DrawDesktopEgg(Graphics g, float cx, float gy, Pose p)
+        {
+            float w = 74, h = 94;
+            double t = p.T;
+            double wob = p.HatchT >= 0 ? Math.Sin(p.HatchT * 60) * (6 + p.HatchT * 14)
+                       : (p.State == State.Happy || p.State == State.Drag ? Math.Sin(t * 16) * 9 : Math.Sin(t * 2.2) * (1.5 + p.Warmth / 40.0));
+            GraphicsState gs = g.Save();
+            g.TranslateTransform(cx, gy);
+            g.RotateTransform((float)wob);
+
+            // toplina: blagi narandžasti sjaj
+            if (p.Warmth > 5)
+            {
+                int al = (int)Math.Min(90, p.Warmth * 0.9);
+                using (GraphicsPath glow = new GraphicsPath())
+                {
+                    glow.AddEllipse(-w * 0.75f, -h * 1.12f, w * 1.5f, h * 1.2f);
+                    using (PathGradientBrush pg = new PathGradientBrush(glow))
+                    {
+                        pg.CenterColor = Color.FromArgb(al, 255, 190, 90);
+                        pg.SurroundColors = new Color[] { Color.FromArgb(0, 255, 190, 90) };
+                        g.FillPath(pg, glow);
+                    }
+                }
+            }
+
+            using (GraphicsPath egg = new GraphicsPath())
+            {
+                egg.AddBezier(0, -h, w * 0.62f, -h, w * 0.58f, 0, 0, 0);
+                egg.AddBezier(0, 0, -w * 0.58f, 0, -w * 0.62f, -h, 0, -h);
+                egg.CloseFigure();
+                using (LinearGradientBrush b = new LinearGradientBrush(new PointF(-w / 2, -h), new PointF(w / 2, 0), Color.FromArgb(255, 252, 238), Color.FromArgb(232, 220, 190)))
+                    g.FillPath(b, egg);
+                Region old = g.Clip;
+                g.SetClip(egg, CombineMode.Intersect);
+                using (SolidBrush sp = new SolidBrush(Color.FromArgb(170, CBot)))
+                {
+                    g.FillEllipse(sp, -24, -74, 15, 11);
+                    g.FillEllipse(sp, 8, -58, 18, 13);
+                    g.FillEllipse(sp, -18, -36, 12, 9);
+                    g.FillEllipse(sp, 14, -24, 10, 8);
+                    g.FillEllipse(sp, -5, -88, 8, 7);
+                }
+                using (SolidBrush hl = new SolidBrush(Color.FromArgb(110, 255, 255, 255)))
+                    g.FillEllipse(hl, -20, -78, 13, 24);
+                g.Clip = old;
+                using (Pen o = new Pen(Color.FromArgb(150, 120, 80), 2.5f)) g.DrawPath(o, egg);
+
+                using (Pen c = new Pen(Color.FromArgb(110, 80, 50), 2f))
+                {
+                    c.LineJoin = LineJoin.Round;
+                    if (p.Warmth >= 50)
+                        g.DrawLines(c, new PointF[] { new PointF(6, -h * 0.82f), new PointF(1, -h * 0.72f), new PointF(8, -h * 0.64f), new PointF(3, -h * 0.55f) });
+                    if (p.Warmth >= 80)
+                        g.DrawLines(c, new PointF[] { new PointF(-w * 0.42f, -h * 0.5f), new PointF(-w * 0.28f, -h * 0.57f), new PointF(-w * 0.16f, -h * 0.47f), new PointF(-w * 0.05f, -h * 0.55f) });
+                    if (p.HatchT >= 0)
+                    {
+                        float y = -h * 0.55f;
+                        g.DrawLines(c, new PointF[] {
+                            new PointF(-w * 0.45f, y), new PointF(-w * 0.3f, y - 8), new PointF(-w * 0.15f, y + 4),
+                            new PointF(0, y - 9), new PointF(w * 0.15f, y + 3), new PointF(w * 0.3f, y - 7), new PointF(w * 0.45f, y) });
+                    }
+                }
+            }
+            g.Restore(gs);
+
+            // traka topline ispod jajeta
+            if (p.HatchT < 0)
+            {
+                float bw = 60, bx = cx - bw / 2, by = gy + 1;
+                using (SolidBrush bg = new SolidBrush(Color.FromArgb(120, 255, 255, 255))) g.FillRectangle(bg, bx, by, bw, 4);
+                using (SolidBrush fg = new SolidBrush(Color.FromArgb(220, 255, 150, 60))) g.FillRectangle(fg, bx, by, bw * (float)Math.Min(1, p.Warmth / 100.0), 4);
+            }
+        }
+
         public static Color BowColor = Color.FromArgb(232, 62, 140);
 
         static void DrawBow(Graphics g, float x, float y)
@@ -567,6 +663,7 @@ namespace DinoJoe
             State st = p.State;
             float ex = hx + 30, ey = hy + 16;
             bool happy = st == State.Happy || st == State.Drag;
+            float eyeK = p.Stage == Life.Baby ? 1.3f : (p.Stage == Life.Juvenile ? 1.12f : 1f);
             bool sleeping = st == State.Sleep;
 
             using (Pen dark = new Pen(Color.FromArgb(30, 30, 30), 2.4f))
@@ -581,13 +678,14 @@ namespace DinoJoe
                     g.DrawLine(dark, ex - 6, ey + 1, ex + 6, ey + 1);
                 else
                 {
-                    g.FillEllipse(Brushes.White, ex - 7, ey - 8.5f, 14, 17);
-                    using (Pen ep = new Pen(Color.FromArgb(60, 30, 30, 30), 1f)) g.DrawEllipse(ep, ex - 7, ey - 8.5f, 14, 17);
+                    float q = eyeK;
+                    g.FillEllipse(Brushes.White, ex - 7 * q, ey - 8.5f * q, 14 * q, 17 * q);
+                    using (Pen ep = new Pen(Color.FromArgb(60, 30, 30, 30), 1f)) g.DrawEllipse(ep, ex - 7 * q, ey - 8.5f * q, 14 * q, 17 * q);
                     float lx = st == State.Roar ? 0 : 1.8f;
                     using (SolidBrush pupil = new SolidBrush(Color.FromArgb(25, 25, 35)))
-                        g.FillEllipse(pupil, ex - 4.5f + lx, ey - 5.5f, 9.5f, 11.5f);
-                    g.FillEllipse(Brushes.White, ex + lx + 0.5f, ey - 4.5f, 3.6f, 3.6f);
-                    g.FillEllipse(Brushes.White, ex + lx - 3f, ey + 2f, 1.8f, 1.8f);
+                        g.FillEllipse(pupil, ex - 4.5f * q + lx, ey - 5.5f * q, 9.5f * q, 11.5f * q);
+                    g.FillEllipse(Brushes.White, ex + lx + 0.5f, ey - 4.5f * q, 3.6f * q, 3.6f * q);
+                    g.FillEllipse(Brushes.White, ex + lx - 3f * q, ey + 2f * q, 1.8f * q, 1.8f * q);
                 }
 
                 // trepavice (ženski dino)
@@ -872,6 +970,10 @@ namespace DinoJoe
         bool thinking;
         DateTime aiPauseUntil = DateTime.MinValue;
 
+        // evolucija i dostignuća
+        double growAcc, lifeSaveT, dayCheckT, eggTalkT;
+        bool veteranNew;
+
         public PetForm()
         {
             using (Graphics g = Graphics.FromHwnd(IntPtr.Zero)) dpiK = g.DpiX / 96f;
@@ -892,6 +994,15 @@ namespace DinoJoe
             pose.Species = Settings.Species;
             pose.Pattern = Settings.Pattern;
             pose.Accessory = Settings.Accessory;
+            if (!Life.Exists) { Life.StartAdult(); veteranNew = true; }   // korisnik iz v1.0 ostaje odrasli
+            else if (Life.CatchUp(needs.Vacation || needs.RanAway))
+            {
+                Achievements.Unlock("juvenile");
+                if (Life.Stage == Life.Adult) Achievements.Unlock("adult");
+            }
+            pose.Stage = Life.Stage;
+            pose.Warmth = Life.Warmth;
+            Achievements.Unlocked += OnAchievement;
             ai = new AiConfig(dir0);
             ai.Persona();
             ApplySize();
@@ -920,7 +1031,121 @@ namespace DinoJoe
             timer.Tick += delegate { Step(); };
 
             SetState(State.Happy, 2.5);
-            Say(Program.JustSetUp ? Lang.Get("pet.hello") : Greeting());
+            if (Life.Stage == Life.Egg) { SetState(State.Idle, 3); Say(Lang.Get("egg.hello")); }
+            else Say(Program.JustSetUp ? Lang.Get("pet.hello") : Greeting());
+            Achievements.TouchDay();
+            if (veteranNew) Achievements.Unlock("veteran");
+        }
+
+        // ---------------- evolucija i dostignuća ----------------
+        void OnAchievement(Achievement a)
+        {
+            try
+            {
+                string r = Achievements.RewardName(a.Reward);
+                string msg = r == null ? string.Format(Lang.Get("ach.got"), a.Name) : string.Format(Lang.Get("ach.gotreward"), a.Name, r);
+                if (Life.Stage == Life.Egg) return;
+                Say(msg);
+                heartsStart = pose.T;
+                SetState(State.Happy, 2);
+                tray.ShowBalloonTip(5000, Profile.Name, msg, ToolTipIcon.Info);
+            }
+            catch { }
+        }
+
+        bool IsEgg { get { return Life.Stage == Life.Egg; } }
+
+        /// Akcije koje jaje ne može: kaže "prvo me izlegni".
+        bool EggBlock()
+        {
+            if (!IsEgg) return false;
+            Say(Lang.Get("egg.notyet"));
+            SetState(State.Happy, 0.6);
+            return true;
+        }
+
+        void WarmEgg(double amount, bool talk)
+        {
+            if (!IsEgg || pose.HatchT >= 0) return;
+            double before = Life.Warmth;
+            bool ready = Life.Warm(amount);
+            if ((before < 50 && Life.Warmth >= 50) || (before < 80 && Life.Warmth >= 80)) { Say(Lang.Get("egg.crack")); SetState(State.Happy, 0.8); }
+            else if (talk) { Say(Pick(Lang.Get("egg.click").Split('|'))); SetState(State.Happy, 0.6); }
+            if (ready) { pose.HatchT = 0; pose.Bubble = null; bubbleLeft = 0; SetState(State.Idle, 1e9); }
+        }
+
+        void LifeStep()
+        {
+            if (IsEgg)
+            {
+                if (pose.HatchT >= 0)
+                {
+                    pose.HatchT += Dt / 2.2;
+                    if (pose.HatchT >= 1)
+                    {
+                        pose.HatchT = -1;
+                        Life.Hatched();
+                        pose.Stage = Life.Stage;
+                        for (int i = 0; i < Needs.Count; i++) needs.Add((Need)i, 100);
+                        needs.Save();
+                        heartsStart = pose.T;
+                        SetState(State.Happy, 3);
+                        Say(string.Format(Lang.Get("egg.hatched"), Profile.Name));
+                        Achievements.Unlock("hatch");
+                        if (Life.Eggs >= 2) Achievements.Unlock("newegg");
+                    }
+                    return;
+                }
+                // pasivno grijanje (~3 min samo), miš iznad jajeta grije brže
+                bool hover = Bounds.Contains(Cursor.Position);
+                WarmEgg(Dt * (hover ? 1.6 : 0.5), false);
+                lifeSaveT += Dt;
+                if (lifeSaveT > 15) { lifeSaveT = 0; Life.Save(); }
+                return;
+            }
+
+            // rast: računa se svakih 10 s, brže uz dobru brigu
+            if (Life.Stage == Life.Baby || Life.Stage == Life.Juvenile)
+            {
+                if (!needs.Vacation && !needs.RanAway) growAcc += Dt;
+                if (growAcc >= 10)
+                {
+                    if (Life.Grow(growAcc, needs.Happiness))
+                    {
+                        pose.Stage = Life.Stage;
+                        heartsStart = pose.T;
+                        SetState(State.Happy, 3);
+                        if (Life.Stage == Life.Juvenile) { Say(Lang.Get("life.grew1")); Achievements.Unlock("juvenile"); }
+                        else { Say(Lang.Get("life.grew2")); Achievements.Unlock("adult"); }
+                    }
+                    growAcc = 0;
+                }
+            }
+            lifeSaveT += Dt;
+            if (lifeSaveT > 60)
+            {
+                lifeSaveT = 0;
+                Life.Save();
+                if (needs.Happiness >= 95) Achievements.Unlock("happy");
+                if (needs.Vacation) Achievements.Unlock("vacation");
+            }
+            dayCheckT += Dt;
+            if (dayCheckT > 300) { dayCheckT = 0; Achievements.TouchDay(); }
+        }
+
+        void NewEgg()
+        {
+            if (MessageBox.Show(Lang.Get("newegg.confirm"), Profile.Name, MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes) return;
+            Life.StartEgg();
+            pose.Stage = Life.Stage; pose.Warmth = 0; pose.HatchT = -1;
+            forcedSleep = false;
+            SetState(State.Idle, 3);
+            Say(Lang.Get("egg.hello"));
+        }
+
+        void OpenAchievements()
+        {
+            using (AchievementsForm f = new AchievementsForm()) f.ShowDialog();
         }
 
         // ---------------- potrebe / status ----------------
@@ -937,6 +1162,12 @@ namespace DinoJoe
 
         void DoAction(string a)
         {
+            if (IsEgg)
+            {
+                if (a == "pet") { WarmEgg(12, true); heartsStart = pose.T; }
+                else EggBlock();
+                return;
+            }
             switch (a)
             {
                 case "feed": Feed(); break;
@@ -951,6 +1182,7 @@ namespace DinoJoe
 
         void GiveWater()
         {
+            if (EggBlock()) return;
             forcedSleep = false;
             needs.Add(Need.Water, 40);
             Say(Lang.Get("say.water"));
@@ -959,6 +1191,7 @@ namespace DinoJoe
 
         void Play()
         {
+            if (EggBlock()) return;
             forcedSleep = false;
             if (needs[Need.Energy] < 10) { Say(Lang.Get("say.tired")); return; }
             needs.Add(Need.Fun, 30); needs.Add(Need.Energy, -6); needs.Add(Need.Love, 5); needs.Add(Need.Hygiene, -4);
@@ -969,6 +1202,7 @@ namespace DinoJoe
 
         void Bath()
         {
+            if (EggBlock()) return;
             forcedSleep = false;
             needs.Add(Need.Hygiene, 100);
             Say(Lang.Get("say.bath"));
@@ -1002,6 +1236,7 @@ namespace DinoJoe
                 f.ShowDialog();
                 if (!f.Changed) return;
             }
+            Achievements.Unlock("pack");
             Profile.LoadJokes();
             recent.Clear();
             Say(string.Format(Lang.Get("pk.loaded"), Profile.JokeCount));
@@ -1029,6 +1264,7 @@ namespace DinoJoe
 
         void OpenSettings()
         {
+            string look0 = Settings.Species + "/" + Settings.Color1 + "/" + Settings.Color2 + "/" + Settings.Pattern + "/" + Settings.Accessory + "/" + Settings.Glasses;
             using (SetupWizard w = new SetupWizard(false, ai))
             {
                 if (w.ShowDialog() != DialogResult.OK) return;
@@ -1048,7 +1284,9 @@ namespace DinoJoe
             tray.Text = Profile.TrayText.Length > 63 ? Profile.TrayText.Substring(0, 63) : Profile.TrayText;
             SaveState();
             SetState(State.Happy, 2.5);
-            Say(Lang.Get("pet.updated"));
+            Say(IsEgg ? Lang.Get("egg.hello") : Lang.Get("pet.updated"));
+            string look1 = Settings.Species + "/" + Settings.Color1 + "/" + Settings.Color2 + "/" + Settings.Pattern + "/" + Settings.Accessory + "/" + Settings.Glasses;
+            if (look1 != look0) Achievements.Unlock("stylist");
         }
 
         protected override bool ShowWithoutActivation { get { return true; } }
@@ -1134,7 +1372,7 @@ namespace DinoJoe
             aiMenu.DropDownItems.Add(Lang.Get("m.clear"), null, delegate { history.Clear(); if (chat != null) chat.AppendNote(Lang.Get("s.cleared")); Say(Lang.Get("s.forgot")); });
             menu.Items.Add(aiMenu);
             ToolStripMenuItem fun = new ToolStripMenuItem(Lang.Get("m.jokes"));
-            miLike = new ToolStripMenuItem(Lang.Get("pk.like"), null, delegate { if (lastJoke != null) { Packs.Like(lastJoke); Say(Lang.Get("pk.liked")); Profile.LoadJokes(); } });
+            miLike = new ToolStripMenuItem(Lang.Get("pk.like"), null, delegate { if (lastJoke != null) { Packs.Like(lastJoke); Say(Lang.Get("pk.liked")); Profile.LoadJokes(); Achievements.Add("like", 1); } });
             miBlock = new ToolStripMenuItem(Lang.Get("pk.block"), null, delegate { if (lastJoke != null) { Packs.Block(lastJoke); lastJoke = null; recent.Clear(); Profile.LoadJokes(); Say(Lang.Get("pk.blocked")); } });
             fun.DropDownItems.Add(miLike);
             fun.DropDownItems.Add(miBlock);
@@ -1147,9 +1385,11 @@ namespace DinoJoe
             fun.DropDownItems.Add(Lang.Get("m.jokefolder"), null, delegate { OpenCustom(); });
             fun.DropDownItems.Add(Lang.Get("m.reload"), null, delegate { Profile.LoadJokes(); recent.Clear(); Say(string.Format(Lang.Get("pk.loaded"), Profile.JokeCount)); });
             menu.Items.Add(fun);
+            menu.Items.Add(Lang.Get("m.achievements"), null, delegate { OpenAchievements(); });
             menu.Items.Add(Lang.Get("menu.settings"), null, delegate { OpenSettings(); });
             miAutostart = new ToolStripMenuItem(Lang.Get("s.autostart"), null, delegate { ToggleAutostart(); });
             menu.Items.Add(miAutostart);
+            menu.Items.Add(Lang.Get("m.newegg"), null, delegate { NewEgg(); });
             menu.Items.Add(new ToolStripSeparator());
             menu.Items.Add(Lang.Get("m.exit"), null, delegate { Close(); });
             menu.Opening += delegate
@@ -1166,6 +1406,7 @@ namespace DinoJoe
 
         bool IsAutostart()
         {
+            if (Packaged.IsPackaged) return false;
             try
             {
                 using (RegistryKey rk = Registry.CurrentUser.OpenSubKey(RunKey, false))
@@ -1176,6 +1417,7 @@ namespace DinoJoe
 
         void ToggleAutostart()
         {
+            if (Packaged.IsPackaged) { Packaged.OpenStartupSettings(); Say(Lang.Get("s.autostart.store")); return; }
             try
             {
                 using (RegistryKey rk = Registry.CurrentUser.OpenSubKey(RunKey, true))
@@ -1283,6 +1525,7 @@ namespace DinoJoe
                 else s = Profile.RandomJoke();
                 if (!recent.Contains(s) || attempt == 7)
                 {
+                    Achievements.Add("jokes", 1);
                     lastJoke = s;
                     recent.Enqueue(s);
                     while (recent.Count > 25) recent.Dequeue();
@@ -1315,6 +1558,7 @@ namespace DinoJoe
 
         void TellJoke(bool manual)
         {
+            if (IsEgg) { if (manual) EggBlock(); return; }
             if (pose.State == State.Sleep) { forcedSleep = false; SetState(State.Idle, 2); }
             Say(PickJoke());
             needs.Add(Need.Fun, manual ? 4 : 1.5);
@@ -1323,8 +1567,10 @@ namespace DinoJoe
 
         void Feed()
         {
+            if (IsEgg) { WarmEgg(6, true); return; }
             int h = 100 - (int)needs[Need.Food];
             needs.Add(Need.Food, 35);
+            Achievements.Add("feed", 1);
             lastFed = DateTime.Now; SaveState();
             forcedSleep = false;
             heartsStart = pose.T;
@@ -1336,6 +1582,7 @@ namespace DinoJoe
         {
             forcedSleep = false;
             needs.Add(Need.Love, 25);
+            Achievements.Add("pet", 1);
             heartsStart = pose.T;
             Say("Prrr... <3");
             SetState(State.Happy, 2);
@@ -1343,6 +1590,7 @@ namespace DinoJoe
 
         void Roar()
         {
+            if (EggBlock()) return;
             forcedSleep = false;
             Say("ROAAAAAR!");
             SetState(State.Roar, 1.6);
@@ -1365,6 +1613,7 @@ namespace DinoJoe
 
         void ToggleSleep()
         {
+            if (EggBlock()) return;
             if (pose.State == State.Sleep) { forcedSleep = false; Say(Lang.Get("s.morning")); SetState(State.Idle, 2); }
             else { forcedSleep = true; Say(Lang.Get("s.night")); SetState(State.Sleep, 1e9); }
         }
@@ -1441,6 +1690,7 @@ namespace DinoJoe
             if (r.Ok)
             {
                 history.Add(new ChatMsg("assistant", r.Text));
+                Achievements.Unlock("ai");
                 chat.Append(Profile.Name, r.Text, true);
                 SayAnswer(r.Text);
                 SetState(State.Happy, 1.2);
@@ -1511,6 +1761,7 @@ namespace DinoJoe
 
         void NextRandomState()
         {
+            if (IsEgg) { SetState(State.Idle, 3); return; }
             int hour = DateTime.Now.Hour;
             bool night = hour >= 23 || hour < 6;
             int r = rnd.Next(100);
@@ -1528,11 +1779,13 @@ namespace DinoJoe
         void Step()
         {
             // potrebe
-            needs.Tick(Dt, pose.State == State.Sleep);
+            if (!IsEgg) needs.Tick(Dt, pose.State == State.Sleep);
             needsSaveT += Dt;
             if (needsSaveT > 60) { needsSaveT = 0; needs.Save(); }
             if (needs.RanAway) return;
-            if (needs.ShouldRunAway && pose.Bubble == null) { RunAway(); return; }
+            if (!IsEgg && needs.ShouldRunAway && pose.Bubble == null) { RunAway(); return; }
+            LifeStep();
+            pose.Warmth = Life.Warmth;
 
             pose.T += Dt; stateT += Dt; sinceTalk += Dt;
             Rectangle wa = CurrentArea();
@@ -1568,7 +1821,7 @@ namespace DinoJoe
             else
             {
                 pose.Chick = false;
-                if (pose.T > nextChick && st != State.Sleep)
+                if (pose.T > nextChick && st != State.Sleep && !IsEgg)
                 {
                     nextChick = pose.T + 600 + rnd.Next(900);
                     CallChick();
@@ -1577,7 +1830,7 @@ namespace DinoJoe
 
             // povremene naočale
             if (glassesLeft > 0) { glassesLeft -= Dt; if (glassesLeft <= 0) pose.Glasses = Settings.Glasses; }
-            else if (!pose.Glasses && st != State.Sleep && rnd.Next(30 * 60 * 20) == 0)
+            else if (!pose.Glasses && st != State.Sleep && !IsEgg && rnd.Next(30 * 60 * 20) == 0)
             {
                 pose.Glasses = true; glassesLeft = 90 + rnd.Next(120);
                 Say(Profile.Special("glasses", Jokes.Glasses));
@@ -1625,7 +1878,12 @@ namespace DinoJoe
             }
 
             // pričanje
-            if (pose.Bubble == null && !thinking && !(chat != null && chat.Visible) && st != State.Sleep && st != State.Drag && st != State.Fall)
+            if (IsEgg)
+            {
+                eggTalkT += Dt;
+                if (pose.Bubble == null && pose.HatchT < 0 && eggTalkT > 45) { eggTalkT = 0; Say(Pick(Lang.Get("egg.click").Split('|'))); }
+            }
+            else if (pose.Bubble == null && !thinking && !(chat != null && chat.Visible) && st != State.Sleep && st != State.Drag && st != State.Fall)
             {
                 DateTime n = DateTime.Now;
                 string trig;
@@ -1635,7 +1893,12 @@ namespace DinoJoe
                     if (n.Hour == 12) Say(G("noon", "podne", Lang.Get("g.noon")));
                     else if (n.Hour == 15 && n.DayOfWeek != DayOfWeek.Saturday && n.DayOfWeek != DayOfWeek.Sunday) Say(G("endwork", "kraj_radnog", Lang.Get("g.endwork")));
                 }
-                else if ((trig = triggers.Step(Dt)) != null) { Say(trig); SetState(State.Happy, 1.5); }
+                else if ((trig = triggers.Step(Dt)) != null)
+                {
+                    Say(trig); SetState(State.Happy, 1.5);
+                    if (triggers.LastKey == "trg.midnight") Achievements.Unlock("night");
+                    else if (triggers.LastKey == "trg.monday") Achievements.Unlock("monday");
+                }
                 else if (needs[needs.Lowest] < 30 && !needs.Vacation && sinceTalk > (Needs.Hardcore ? 45 : 100) && rnd.Next(200) == 0) Say(NeedLine(needs.Lowest));
                 else if (sinceTalk > nextTalk) TellJoke(false);
             }
@@ -1690,7 +1953,7 @@ namespace DinoJoe
             {
                 dragging = true; forcedSleep = false;
                 SetState(State.Drag, 0);
-                Say("Wiii!");
+                if (pose.HatchT < 0) Say("Wiii!");
             }
             if (dragging) { fx = downFx + dx; fy = downFy + dy; }
         }
@@ -1701,6 +1964,7 @@ namespace DinoJoe
             bool wasDrag = dragging;
             mouseDown = false; dragging = false;
             if (wasDrag) { vy = 0; SetState(State.Fall, 0); }
+            else if (IsEgg) WarmEgg(6, true);
             else if (pose.State == State.Sleep) { forcedSleep = false; Say(Lang.Get("s.notsleep")); SetState(State.Idle, 2); }
             else
             {
@@ -1713,6 +1977,8 @@ namespace DinoJoe
         {
             SaveState();
             needs.Save();
+            Life.Save();
+            Achievements.Save();
             timer.Stop();
             if (tray != null) { tray.Visible = false; tray.Dispose(); }
             if (chat != null) chat.Dispose();

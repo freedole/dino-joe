@@ -2,7 +2,7 @@
 
 **EN** | [SR](#sr)
 
-A tiny dinosaur that lives on your Windows desktop. It walks around, sleeps, tells jokes, wants to be fed and petted - and, if you want, becomes an AI chatbot.
+A tiny dinosaur that lives on your Windows desktop. It hatches from an egg, grows up, walks around, sleeps, tells jokes, wants to be fed and petted - and, if you want, becomes an AI chatbot.
 
 - **Works offline.** No account, no internet needed - jokes, moods and care work out of the box.
 - **Optional AI.** Bring your own key (Groq, Gemini, OpenAI, Claude, OpenRouter or local Ollama) and the dino starts chatting. Your key is stored locally, encrypted (DPAPI).
@@ -10,7 +10,7 @@ A tiny dinosaur that lives on your Windows desktop. It walks around, sleeps, tel
 - **Tiny.** ~100 KB exe, no runtime to install (uses .NET Framework 4.x that ships with Windows 10/11).
 - **Balkan humor** built in. English packs too.
 
-> **v1.0** - 4 species, 12 colors, 5 patterns, 10 accessories, 9 personalities, care status, ~1000 jokes (SR + EN), joke packs with an online catalog, optional AI.
+> **v1.1** - evolution (egg -> baby -> juvenile -> adult), 18 achievements, 6 species (Stegosaurus and Pterodactyl unlockable), 12 colors, 7 patterns, 10 accessories, 9 personalities, care status, ~1000 jokes (SR + EN), joke packs with an online catalog, optional AI.
 
 ![preview](assets/preview.png)
 
@@ -35,8 +35,12 @@ Output: `build\DinoJoe.exe`. Every push is also built by GitHub Actions; tags `v
 ## Roadmap
 
 - **v1.0** ✓ - first-run wizard, 5 languages, ODjordje / ODjordjina, 4 species, colors, patterns, accessories, 9 personalities incl. *Hardcore Tamagotchi mode*, care status, joke packs & profiles & catalog, AI services (Groq, Gemini, OpenAI, Claude, OpenRouter, Ollama)
-- **v1.1** - Microsoft Store, achievements, evolution (egg → baby → adult)
+- **v1.1** ✓ - evolution (egg → baby → juvenile → adult), achievements, Stegosaurus & Pterodactyl, Gold & Rainbow patterns, MSIX package for Microsoft Store
 - **v1.2+** - mini games, seasonal skins, physics
+
+## Privacy
+
+No account, no ads, no telemetry. See [PRIVACY.md](PRIVACY.md).
 
 ## License
 
@@ -47,7 +51,7 @@ Code: [MIT](LICENSE). Joke packs: CC BY-SA 4.0.
 <a id="sr"></a>
 ## SR
 
-Mali dinosaurus koji živi na tvom Windows desktopu. Šeta, spava, priča fore, traži da ga nahraniš i pomaziš, a ako želiš, postaje i AI chatbot.
+Mali dinosaurus koji živi na tvom Windows desktopu. Izleže se iz jajeta, raste, šeta, spava, priča fore, traži da ga nahraniš i pomaziš, a ako želiš, postaje i AI chatbot.
 
 - **Radi offline.** Bez naloga i bez interneta: fore, raspoloženja i briga rade odmah.
 - **AI nije obavezan.** Ubaciš svoj ključ (Groq, Gemini, OpenAI, Claude, OpenRouter ili lokalni Ollama) i dino počne da priča. Ključ se čuva lokalno, enkriptovan.

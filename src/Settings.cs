@@ -26,7 +26,7 @@ namespace DinoJoe
         // indeks u nizovima prevoda (bosanski -> ijekavica)
         public static int Idx { get { return Current == Bs ? SrIjek : Current; } }
 
-        static readonly Dictionary<string, string> BsOverride = new Dictionary<string, string>();
+        internal static readonly Dictionary<string, string> BsOverride = new Dictionary<string, string>();
 
         public static int Current = SrIjek;
 
@@ -51,7 +51,7 @@ namespace DinoJoe
         }
 
         static readonly Dictionary<string, string[]> T = new Dictionary<string, string[]>();
-        static void Add(string key, string ijek, string ekav, string hr, string en) { T[key] = new string[] { ijek, ekav, hr, en }; }
+        internal static void Add(string key, string ijek, string ekav, string hr, string en) { T[key] = new string[] { ijek, ekav, hr, en }; }
 
         public static string Get(string key)
         {
@@ -78,7 +78,7 @@ namespace DinoJoe
 
             // 2. ko si ti
             Add("s.who", "Ko si ti?", "Ko si ti?", "Tko si ti?", "Who are you?");
-            Add("s.who.sub", "Izlegao se novi dino! Muško ili žensko?", "Izlegao se novi dino! Muško ili žensko?", "Izlegao se novi dino! Muško ili žensko?", "A new dino just hatched! Boy or girl?");
+            Add("s.who.sub", "Stiže novi dino! Muško ili žensko?", "Stiže novi dino! Muško ili žensko?", "Stiže novi dino! Muško ili žensko?", "A new dino is on the way! Boy or girl?");
             Add("s.who.male", "Muški", "Muški", "Muški", "Boy");
             Add("s.who.female", "Ženski", "Ženski", "Ženski", "Girl");
             Add("s.who.name", "Ime (ostavi prazno za podrazumijevano):", "Ime (ostavi prazno za podrazumevano):", "Ime (ostavi prazno za zadano):", "Name (leave empty for default):");
@@ -361,6 +361,7 @@ namespace DinoJoe
             BsOverride["ai.title"] = "{0} AI - postavke";
             BsOverride["aip.gemini.info"] = "Besplatan nivo uz Google račun (Google AI Studio).";
             BsOverride["aip.openai.info"] = "Plaća se po potrošnji (API račun nije isto što i ChatGPT pretplata).";
+            Strings11.Add();
             BsOverride["s.ai.text"] = "Zdravo! Ja sam {0}. Radim i bez interneta i bez računa: jedem, spavam, pričam fore i pravim ti društvo.\r\n\r\nAko želiš, poveži AI račun i postajem pravi chatbot - odgovaram na pitanja, pomažem oko posla i pamtim naše razgovore.\r\n\r\nOvo nije obavezno. Možeš preskočiti i uključiti kasnije u Postavkama.";
         }
     }
@@ -645,12 +646,14 @@ namespace DinoJoe
 
         public static bool IsAutostart()
         {
+            if (Packaged.IsPackaged) return false;
             try { using (RegistryKey rk = Registry.CurrentUser.OpenSubKey(RunKey, false)) return rk != null && rk.GetValue(Profile.Id) != null; }
             catch { return false; }
         }
 
         public static void SetAutostart(bool on)
         {
+            if (Packaged.IsPackaged) return;   // Store: StartupTask, korisnik bira u Postavkama
             try
             {
                 using (RegistryKey rk = Registry.CurrentUser.OpenSubKey(RunKey, true))

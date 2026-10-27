@@ -166,7 +166,7 @@ namespace DinoJoe
             MaximizeBox = false; MinimizeBox = false;
             StartPosition = FormStartPosition.CenterScreen;
             AutoScaleMode = AutoScaleMode.Dpi;
-            ClientSize = new Size(400, 470);
+            ClientSize = new Size(400, 490);
             TopMost = false;   // ne pokrivaj browser (npr. stranicu za API ključ)
             DoubleBuffered = true;
             BackColor = Color.White;
@@ -177,13 +177,13 @@ namespace DinoJoe
                 string a = acts[i];
                 Button b = new ModernButton();
                 b.Text = Lang.Get("act." + a);
-                b.SetBounds(16 + (i % 3) * 124, 360 + (i / 3) * 36, 118, 30);
+                b.SetBounds(16 + (i % 3) * 124, 380 + (i / 3) * 36, 118, 30);
                 b.Click += delegate { if (ActionClicked != null) ActionClicked(a); Invalidate(); };
                 Controls.Add(b);
             }
             chVacation.Text = Lang.Get("st.vacation");
             chVacation.Checked = needs.Vacation;
-            chVacation.SetBounds(16, 434, 360, 26);
+            chVacation.SetBounds(16, 454, 360, 26);
             chVacation.CheckedChanged += delegate { needs.Vacation = chVacation.Checked; needs.Save(); Invalidate(); };
             Controls.Add(chVacation);
 
@@ -207,9 +207,18 @@ namespace DinoJoe
             for (int i = 0; i < Needs.Count; i++)
                 SmallBar(g, 16, 130 + i * 31, Needs.Label((Need)i), (int)Math.Round(needs.V[i]));
 
+            string life = Life.Stage == Life.Egg ? string.Format(Lang.Get("life.egg"), (int)Life.Warmth)
+                        : Life.Stage == Life.Adult ? Lang.Get("life.stage") + " " + Life.StageName(Life.Adult)
+                        : string.Format(Lang.Get("life.next"), Life.StageName(Life.Stage), (int)(Life.Progress * 100));
+            using (SolidBrush lb = new SolidBrush(Color.FromArgb(90, 100, 110)))
+            {
+                SizeF ls = g.MeasureString(life, Font);
+                g.DrawString(life, Font, lb, 384 - ls.Width, 350);
+            }
+
             string state = needs.Vacation ? Lang.Get("st.onvacation") : (needs.Sick ? Lang.Get("st.sick") : "");
             if (state.Length > 0)
-                using (SolidBrush b = new SolidBrush(Color.FromArgb(180, 90, 30))) g.DrawString(state, Font, b, 16, 348 - 4 - Font.Height);
+                using (SolidBrush b = new SolidBrush(Color.FromArgb(180, 90, 30))) g.DrawString(state, Font, b, 16, 350);
         }
 
         static Color BarColor(int v, bool inverse)

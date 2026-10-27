@@ -11,9 +11,9 @@ namespace DinoJoe
 {
     static class Skins
     {
-        public const int PatternCount = 6;      // 0 = bez šare
+        public const int PatternCount = 8;      // 0 = bez šare; 6 i 7 se otključavaju dostignućima
         public const int AccessoryCount = 11;   // 0 = bez dodatka
-        public static readonly string[] PatternKeys = { "none", "stripes", "dots", "gradient", "camo", "galaxy" };
+        public static readonly string[] PatternKeys = { "none", "stripes", "dots", "gradient", "camo", "galaxy", "gold", "rainbow" };
         public static readonly string[] AccessoryKeys = { "none", "beanie", "tophat", "tie", "headphones", "crown", "helmet", "scarf", "flower", "mustache", "bowtie" };
 
         public static string PatternName(int i) { return Lang.Get("pat." + PatternKeys[Math.Max(0, Math.Min(PatternCount - 1, i))]); }
@@ -89,6 +89,34 @@ namespace DinoJoe
                                     g.FillEllipse(star, b.Left + (float)r.NextDouble() * b.Width, b.Top + (float)r.NextDouble() * b.Height, s, s);
                                 }
                             }
+                        }
+                        break;
+                    case 6: // zlatna (sjaj + iskrice)
+                        using (LinearGradientBrush lg = new LinearGradientBrush(new PointF(b.Left, b.Top), new PointF(b.Right, b.Bottom), Color.FromArgb(170, 255, 214, 90), Color.FromArgb(170, 190, 130, 20)))
+                        {
+                            ColorBlend cb = new ColorBlend(4);
+                            cb.Colors = new Color[] { Color.FromArgb(175, 250, 205, 70), Color.FromArgb(185, 255, 244, 190), Color.FromArgb(175, 225, 165, 40), Color.FromArgb(185, 170, 115, 20) };
+                            cb.Positions = new float[] { 0f, 0.35f, 0.6f, 1f };
+                            lg.InterpolationColors = cb;
+                            g.FillRectangle(lg, b);
+                        }
+                        {
+                            Random r = new Random(11);
+                            using (Pen sp = new Pen(Color.FromArgb(230, 255, 255, 235), 1.4f))
+                                for (int i = 0; i < 14; i++)
+                                {
+                                    float x = b.Left + (float)r.NextDouble() * b.Width, y = b.Top + (float)r.NextDouble() * b.Height, z = 2 + (float)r.NextDouble() * 2.5f;
+                                    g.DrawLine(sp, x - z, y, x + z, y); g.DrawLine(sp, x, y - z, x, y + z);
+                                }
+                        }
+                        break;
+                    case 7: // duga
+                        {
+                            Color[] rb = { Color.FromArgb(150, 235, 70, 70), Color.FromArgb(150, 245, 150, 50), Color.FromArgb(150, 245, 220, 60),
+                                           Color.FromArgb(150, 80, 190, 90), Color.FromArgb(150, 70, 140, 230), Color.FromArgb(150, 150, 90, 210) };
+                            float bw = b.Height / rb.Length + 1;
+                            for (int i = 0; i < rb.Length; i++)
+                                using (SolidBrush br = new SolidBrush(rb[i])) g.FillRectangle(br, b.Left, b.Top + i * (bw - 1), b.Width, bw);
                         }
                         break;
                 }
