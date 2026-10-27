@@ -945,7 +945,10 @@ namespace DinoJoe
 
         readonly Pose pose = new Pose();
         double stateT, stateDur;
-        double fx, fy, vy;
+        double fx, fy, vy, vx;
+        IntPtr platform = IntPtr.Zero;          // prozor na čijoj gornjoj ivici dino stoji (Zero = taskbar/tlo)
+        bool bounced;
+        readonly List<KeyValuePair<int, Point>> dragSamples = new List<KeyValuePair<int, Point>>();
         double nextBlink = 2, blinkUntil;
         double bubbleLeft, bubbleTotal;
         double sinceTalk, nextTalk = 25;
@@ -1445,7 +1448,14 @@ namespace DinoJoe
             menu.Items.Add(fun);
             menu.Items.Add(Lang.Get("m.achievements"), null, delegate { OpenAchievements(); });
             menu.Items.Add(Lang.Get("menu.settings"), null, delegate { OpenSettings(); });
+            ToolStripMenuItem miWin = new ToolStripMenuItem(Lang.Get("m.windowwalk"), null, delegate
+            {
+                Settings.WindowWalk = !Settings.WindowWalk; Settings.Save();
+                if (!Settings.WindowWalk) platform = IntPtr.Zero;
+            });
+            menu.Opening += delegate { miWin.Checked = Settings.WindowWalk; };
             miAutostart = new ToolStripMenuItem(Lang.Get("s.autostart"), null, delegate { ToggleAutostart(); });
+            menu.Items.Add(miWin);
             menu.Items.Add(miAutostart);
             menu.Items.Add(Lang.Get("m.newegg"), null, delegate { NewEgg(); });
             menu.Items.Add(Lang.Get("m.report"), null, delegate { ErrorLog.OpenReport(); });
@@ -1896,6 +1906,15 @@ namespace DinoJoe
             pose.T += Dt; stateT += Dt; sinceTalk += Dt;
             Rectangle wa = CurrentArea();
             double ground = GroundFor(wa);
+            // stoji na prozoru: tlo je gornja ivica prozora (prati ga ako se prozor pomjeri)
+            if (platform != IntPtr.Zero)
+            {
+                Rectangle pr;
+                int cxp = (int)(fx + cw / 2.0);
+                if (Settings.WindowWalk && WindowPlatforms.TryRect(platform, out pr) && cxp > pr.Left + 8 && cxp < pr.Right - 8 && pr.Top > wa.Top + 40)
+                    ground = Math.Min(ground, pr.Top - ch + 2 * k);
+                else platform = IntPtr.Zero;
+            }
             State st = pose.State;
 
             // treptanje
@@ -1955,13 +1974,49 @@ namespace DinoJoe
                     else fy = ground;
                     break;
                 case State.Fall:
-                    vy += 0.9 * k;
-                    fy += vy;
-                    if (fy >= ground)
                     {
-                        fy = ground; vy = 0;
-                        Say(rnd.Next(2) == 0 ? "Uf!" : Lang.Get("s.floor"));
-                        SetState(State.Idle, 1.2);
+                        double prevFeet = fy + ch - 2 * k;
+                        vy += 0.9 * k;
+                        fy += vy;
+                        fx += vx;
+                        vx *= 0.985;
+                        // zidovi i plafon (samo spoljne ivice desktopa)
+                        if (fx < wa.Left - 40 * k && !HasNeighbor(-1)) { fx = wa.Left - 40 * k; vx = Math.Abs(vx) * 0.6; pose.Dir = 1; }
+                        if (fx > wa.Right - cw + 40 * k && !HasNeighbor(1)) { fx = wa.Right - cw + 40 * k; vx = -Math.Abs(vx) * 0.6; pose.Dir = -1; }
+                        if (fy < wa.Top - ch * 0.5 && vy < 0) { vy = -vy * 0.5; }
+                        // sletanje na prozor
+                        if (Settings.WindowWalk && vy > 0 && platform == IntPtr.Zero)
+                        {
+                            double feet = fy + ch - 2 * k;
+                            int cxw = (int)(fx + cw / 2.0);
+                            foreach (WindowPlatforms.Win w in WindowPlatforms.List())
+                            {
+                                Rectangle r = w.Rect;
+                                if (cxw <= r.Left + 8 || cxw >= r.Right - 8 || r.Top <= wa.Top + 40) continue;
+                                if (prevFeet <= r.Top + 2 && feet >= r.Top && WindowPlatforms.TopVisibleAt(w.Handle, cxw, r.Top))
+                                {
+                                    platform = w.Handle;
+                                    ground = r.Top - ch + 2 * k;
+                                    Achievements.Unlock("climber");
+                                    break;
+                                }
+                            }
+                        }
+                        if (fy >= ground)
+                        {
+                            fy = ground;
+                            if (vy > 11 * k && !bounced)
+                            {
+                                vy = -vy * 0.45; vx *= 0.7; bounced = true;   // odskok
+                                Say("Boing!");
+                            }
+                            else
+                            {
+                                vy = 0; vx = 0; bounced = false;
+                                Say(rnd.Next(2) == 0 ? "Uf!" : Lang.Get("s.floor"));
+                                SetState(State.Idle, 1.2);
+                            }
+                        }
                     }
                     break;
                 case State.Drag:
@@ -2050,6 +2105,7 @@ namespace DinoJoe
             if (e.Button != MouseButtons.Left) return;
             mouseDown = true; dragging = false;
             downScreen = Cursor.Position; downFx = fx; downFy = fy;
+            dragSamples.Clear(); platform = IntPtr.Zero;
         }
 
         void OnMove(object sender, MouseEventArgs e)
@@ -2063,7 +2119,12 @@ namespace DinoJoe
                 SetState(State.Drag, 0);
                 if (pose.HatchT < 0) Say("Wiii!");
             }
-            if (dragging) { fx = downFx + dx; fy = downFy + dy; }
+            if (dragging)
+            {
+                fx = downFx + dx; fy = downFy + dy;
+                dragSamples.Add(new KeyValuePair<int, Point>(Environment.TickCount, p));
+                while (dragSamples.Count > 12) dragSamples.RemoveAt(0);
+            }
         }
 
         void OnUp(object sender, MouseEventArgs e)
@@ -2071,7 +2132,28 @@ namespace DinoJoe
             if (e.Button != MouseButtons.Left) return;
             bool wasDrag = dragging;
             mouseDown = false; dragging = false;
-            if (wasDrag) { vy = 0; SetState(State.Fall, 0); }
+            if (wasDrag)
+            {
+                // bacanje: brzina iz zadnjih ~100 ms pomjeranja miša
+                vx = 0; vy = 0; bounced = false; platform = IntPtr.Zero;
+                int now = Environment.TickCount;
+                for (int i = 0; i < dragSamples.Count; i++)
+                {
+                    int dt = now - dragSamples[i].Key;
+                    if (dt > 120 || dt < 15) continue;
+                    Point last = Cursor.Position;
+                    double f = 33.0 / dt;
+                    vx = (last.X - dragSamples[i].Value.X) * f;
+                    vy = (last.Y - dragSamples[i].Value.Y) * f;
+                    break;
+                }
+                double lim = 55 * k;
+                vx = Math.Max(-lim, Math.Min(lim, vx)); vy = Math.Max(-lim, Math.Min(lim, vy));
+                if (Math.Abs(vx) > 25 * k || vy < -25 * k) { Say("Wheee!"); Achievements.Unlock("fly"); }
+                if (vx != 0) pose.Dir = vx > 0 ? 1 : -1;
+                dragSamples.Clear();
+                SetState(State.Fall, 0);
+            }
             else if (IsEgg) WarmEgg(6, true);
             else if (pose.State == State.Sleep) { forcedSleep = false; Say(Lang.Get("s.notsleep")); SetState(State.Idle, 2); }
             else

@@ -60,6 +60,9 @@ namespace DinoJoe
             Def("happy", null, 0, null);
             Def("stylist", null, 0, null);
             Def("newegg", null, 0, null);
+            Def("fly", null, 0, null);
+            Def("climber", null, 0, null);
+            Def("games5", "gamewins", 5, null);
         }
 
         static string FilePath

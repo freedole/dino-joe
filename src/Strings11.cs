@@ -109,6 +109,15 @@ namespace DinoJoe
             A("pk.solo.on", "Sad pričam samo fore iz paketa: {0}.", "Sad pričam samo fore iz paketa: {0}.", "Sada pričam samo fore iz paketa: {0}.", "Now I only tell jokes from: {0}.");
             A("pk.solo.off", "Opet pričam fore iz svih uključenih paketa.", "Opet pričam fore iz svih uključenih paketa.", "Opet pričam fore iz svih uključenih paketa.", "Back to jokes from all enabled packs.");
 
+            // fizika, igre
+            A("ach.fly", "Leteći dino", "Leteći dino", "Leteći dino", "Flying dino");
+            A("ach.fly.d", "Baci dinu mišem.", "Baci dinu mišem.", "Baci dina mišem.", "Throw your dino with the mouse.");
+            A("ach.climber", "Penjač", "Penjač", "Penjač", "Climber");
+            A("ach.climber.d", "Spusti dinu na vrh nekog prozora.", "Spusti dinu na vrh nekog prozora.", "Spusti dina na vrh nekog prozora.", "Drop your dino on top of a window.");
+            A("ach.games5", "Pobjednik", "Pobednik", "Pobjednik", "Winner");
+            A("ach.games5.d", "Pobijedi dinu 5 puta u igrama.", "Pobedi dinu 5 puta u igrama.", "Pobijedi dina 5 puta u igrama.", "Beat your dino 5 times in games.");
+            A("m.windowwalk", "Šetaj po prozorima", "Šetaj po prozorima", "Šeći po prozorima", "Walk on windows");
+
             // nove šare
             A("pat.gold", "Zlatna", "Zlatna", "Zlatna", "Gold");
             Lang.BsOverride["ach.stylist.d"] = "Promijeni izgled u postavkama.";

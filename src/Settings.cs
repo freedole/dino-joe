@@ -499,7 +499,8 @@ namespace DinoJoe
         public static string PackWeights = "";              // id:2,id2:0.5 (1 = normalno)
         public static string ActiveProfile = "";
         public static string HiddenPersonalities = "";      // id-ovi sakrivenih ugrađenih ličnosti
-        public static string SoloPack = "";                 // "Samo ovaj paket": id paketa ili prazno = svi uključeni
+        public static string SoloPack = "";
+        public static bool WindowWalk = true;               // dino može stajati/šetati po gornjoj ivici prozora                 // "Samo ovaj paket": id paketa ili prazno = svi uključeni
 
         public static bool IsHidden(string id) { return ("," + HiddenPersonalities + ",").Contains("," + id + ","); }
 
@@ -542,6 +543,7 @@ namespace DinoJoe
                         else if (k == "profile") ActiveProfile = v;
                         else if (k == "hidden_personalities") HiddenPersonalities = v;
                         else if (k == "solo_pack") SoloPack = v;
+                        else if (k == "window_walk") WindowWalk = v != "0";
                     }
             }
             catch { }
@@ -570,6 +572,7 @@ namespace DinoJoe
                     "pack_weights=" + PackWeights + "\r\n" +
                     "hidden_personalities=" + HiddenPersonalities + "\r\n" +
                     "solo_pack=" + SoloPack + "\r\n" +
+                    "window_walk=" + (WindowWalk ? "1" : "0") + "\r\n" +
                     "profile=" + ActiveProfile.Replace("\r", "").Replace("\n", "") + "\r\n", new UTF8Encoding(true));
             }
             catch { }
