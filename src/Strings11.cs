@@ -75,7 +75,7 @@ namespace DinoJoe
             A("ach.pet100", "Mazilica", "Mazilica", "Mazilica", "Cuddle champion");
             A("ach.pet100.d", "Pomazi dinu 100 puta.", "Pomazi dinu 100 puta.", "Pomazi dina 100 puta.", "Pet your dino 100 times.");
             A("ach.like10", "Kritičar", "Kritičar", "Kritičar", "Critic");
-            A("ach.like10.d", "Označi 10 fora sa 👍.", "Označi 10 fora sa 👍.", "Označi 10 fora s 👍.", "Give 👍 to 10 jokes.");
+            A("ach.like10.d", "Označi 10 fora kao \"Dobra fora!\".", "Označi 10 fora kao \"Dobra fora!\".", "Označi 10 fora kao \"Dobra fora!\".", "Mark 10 jokes as \"Good one!\".");
             A("ach.night", "Noćna ptica", "Noćna ptica", "Noćna ptica", "Night owl");
             A("ach.night.d", "Budi uz dinu u ponoć.", "Budi uz dinu u ponoć.", "Budi uz dina u ponoć.", "Be with your dino at midnight.");
             A("ach.monday", "Preživjeli ponedjeljak", "Preživeli ponedeljak", "Preživjeli ponedjeljak", "Monday survivor");

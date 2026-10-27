@@ -218,7 +218,7 @@ namespace DinoJoe
 
             string state = needs.Vacation ? Lang.Get("st.onvacation") : (needs.Sick ? Lang.Get("st.sick") : "");
             if (state.Length > 0)
-                using (SolidBrush b = new SolidBrush(Color.FromArgb(180, 90, 30))) g.DrawString(state, Font, b, 16, 350);
+                TextRenderer.DrawText(g, state, Font, new Point(16, 350), Color.FromArgb(180, 90, 30), TextFormatFlags.NoPrefix);   // GDI: emoji fallback
         }
 
         static Color BarColor(int v, bool inverse)

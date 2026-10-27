@@ -280,7 +280,7 @@ namespace DinoJoe
                 }
 
                 Color tc = on ? Theme.Text : Theme.TextMuted;
-                using (SolidBrush b = new SolidBrush(tc)) g.DrawString(a.Name, Theme.Bold, b, 52, 6);
+                TextRenderer.DrawText(g, a.Name, Theme.Bold, new Point(52, 6), tc, TextFormatFlags.NoPrefix);
                 if (on)
                     using (SolidBrush b = new SolidBrush(Theme.TextMuted))
                     {
@@ -291,8 +291,9 @@ namespace DinoJoe
                 string d = a.Desc;
                 if (!on && a.Counter != null) d += "  (" + Math.Min(Achievements.Count(a.Counter), a.Goal) + "/" + a.Goal + ")";
                 if (a.Reward != null) d += "  " + string.Format(Lang.Get("ach.reward"), Achievements.RewardName(a.Reward));
-                using (SolidBrush b = new SolidBrush(Theme.TextMuted))
-                    g.DrawString(d, Font, b, new RectangleF(52, 26, Width - 60, Height - 26));
+                // TextRenderer (GDI) ima font fallback, pa se i emoji/simboli prikažu ispravno
+                TextRenderer.DrawText(g, d, Font, new Rectangle(52, 26, Width - 60, Height - 26), Theme.TextMuted,
+                    TextFormatFlags.WordBreak | TextFormatFlags.NoPrefix | TextFormatFlags.Left | TextFormatFlags.Top);
             }
         }
     }
