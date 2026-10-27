@@ -23,8 +23,8 @@ namespace DinoJoe
     static class Profile
     {
         // specijalne kategorije (nisu u nasumičnom izboru): chick (pile), food (hrana), poke (bockanje), glasses (naočale)
-        public static readonly string[] SpecialNames = { "chick", "food", "poke", "glasses" };
-        static readonly string[] SpecialOld = { "pile", "hrana", "bockanje", "naocale" };   // stari nazivi fajlova
+        public static readonly string[] SpecialNames = { "chick", "food", "poke", "glasses", "wall", "wallhit" };
+        static readonly string[] SpecialOld = { "pile", "hrana", "bockanje", "naocale", "zid", "zidudarac" };   // stari nazivi fajlova
 
         static string Canonical(string name)
         {

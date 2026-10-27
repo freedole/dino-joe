@@ -209,6 +209,7 @@ namespace DinoJoe
             Add("m.chat", "Pričaj sa mnom", "Pričaj sa mnom", "Pričaj sa mnom", "Chat with me");
             Add("m.joke", "Ispričaj foru", "Ispričaj foru", "Ispričaj foru", "Tell a joke");
             Add("m.roar", "Riči!", "Riči!", "Riči!", "Roar!");
+            Add("m.wall", "Zid! (ovan mod)", "Zid! (ovan mod)", "Zid! (ovan mod)", "Wall! (ram mode)");
             Add("m.chick", "Pozovi pile", "Pozovi pile", "Pozovi pile", "Call the chick");
             Add("m.glasses", "Naočale", "Naočare", "Naočale", "Glasses");
             Add("m.sleep", "Spavaj", "Spavaj", "Spavaj", "Sleep");

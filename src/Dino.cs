@@ -204,6 +204,20 @@ namespace DinoJoe
             "Ja ne prigovaram. Ja ričem."
         };
 
+        public static readonly string[] Wall = {
+            "Gdje je zid? Aha, evo ga.",
+            "Zalet... i...",
+            "Ovaj zid me gleda nekako čudno.",
+            "Sklanjaj se, zide!"
+        };
+
+        public static readonly string[] WallHit = {
+            "BUM! Zid 0, ja 1.",
+            "Au. Ali vrijedilo je.",
+            "Zid je pao. Ja nisam. Skoro.",
+            "Vidim zvjezdice. Lijepe su."
+        };
+
         public static readonly string[] Glasses = {
             "Četvorooki? Da, i šta?",
             "Four eyes, two arms. Kratke.",
@@ -259,6 +273,7 @@ namespace DinoJoe
         public double Warmth;           // jaje: 0..100
         public double HatchT = -1;      // jaje: animacija izlijeganja 0..1
         public int Mouth = -1;          // -1 automatski po stanju, 0 zatvorena, 1 otvorena (npr. pjevanje u videu)
+        public double WallT = -1;       // "ovan mod": zid i zalet u njega, 0..1 (paket sa feature.wall=1)
     }
 
     static partial class Painter
@@ -348,7 +363,7 @@ namespace DinoJoe
             }
 
             GraphicsState gs = g.Save();
-            g.TranslateTransform(cx, gy - (float)p.JumpY);
+            g.TranslateTransform(cx + (p.WallT >= 0 ? p.Dir * WallOffset(p.WallT) : 0f), gy - (float)p.JumpY);
             if (p.Dir < 0) g.ScaleTransform(-1, 1);
             if (sc != 1f) g.ScaleTransform(sc, sc);
             if (p.State == State.Stretch)
@@ -360,6 +375,7 @@ namespace DinoJoe
             }
             DrawDino(g, p);
             g.Restore(gs);
+            if (p.WallT >= 0) DrawWall(g, cx, gy, sc, p);
 
             // Zzz
             float top = DinoJoe.Species.HeadTop(p.Species);
@@ -371,6 +387,82 @@ namespace DinoJoe
             if (!string.IsNullOrEmpty(p.Bubble)) DrawBubble(g, p.Bubble, cx + p.Dir * 26f * sc, gy + top * sc - (float)p.JumpY, p.BubbleAlpha);
 
             g.Restore(gs0);
+        }
+
+        // ---------------- ovan mod: zid ----------------
+        /// Pomjeraj dina za vrijeme zaleta: odmakne se, zaleti, odbije od zida, pa se lagano vrati.
+        static float WallOffset(double t)
+        {
+            if (t < 0.2) return (float)(-18 * (t / 0.2));
+            if (t < 0.4) { double u = (t - 0.2) / 0.2; return (float)(-18 + 60 * u * u); }
+            if (t < 0.5) return (float)(42 - 14 * ((t - 0.4) / 0.1));
+            return (float)(28 * (1 - (t - 0.5) / 0.5));
+        }
+
+        static void DrawWall(Graphics g, float cx, float gy, float sc, Pose p)
+        {
+            double t = p.WallT;
+            float wx = cx + p.Dir * 110f, ww = 20f, wh = 118f;
+            int alpha = (int)(255 * Math.Min(1, Math.Min(t / 0.08, (1 - t) / 0.15)));
+            if (alpha <= 0) return;
+            bool hit = t >= 0.4;
+            float shake = hit && t < 0.55 ? (float)Math.Sin(t * 260) * 2.5f : 0f;
+            float fall = t > 0.62 ? (float)((t - 0.62) / 0.38) : 0f;
+            Color brick = Color.FromArgb(alpha, 178, 74, 52), brick2 = Color.FromArgb(alpha, 150, 58, 42), mortar = Color.FromArgb(alpha, 222, 205, 180);
+            int rows = 10;
+            float bh = wh / rows;
+            for (int r = 0; r < rows; r++)
+            {
+                for (int c = 0; c < 2; c++)
+                {
+                    float off = (r % 2 == 0) ? 0 : -ww / 2f;
+                    float bx = wx - ww / 2f + off + c * ww + shake;
+                    float bw = ww;
+                    float x0 = Math.Max(bx, wx - ww / 2f), x1 = Math.Min(bx + bw, wx + ww / 2f);
+                    if (x1 - x0 < 2) continue;
+                    float by = gy - wh + r * bh;
+                    // raspad: gornji redovi padaju i rotiraju se
+                    float drop = fall * fall * (rows - r) * 9f, rot = fall * (r % 2 == 0 ? 35 : -28) * (rows - r) / rows;
+                    GraphicsState st = g.Save();
+                    g.TranslateTransform((x0 + x1) / 2f + p.Dir * fall * (rows - r) * 3f, by + bh / 2f + drop);
+                    g.RotateTransform(rot);
+                    using (SolidBrush b = new SolidBrush((r + c) % 2 == 0 ? brick : brick2)) g.FillRectangle(b, -(x1 - x0) / 2f, -bh / 2f, x1 - x0, bh - 1.5f);
+                    using (Pen pn = new Pen(mortar, 1.2f)) g.DrawRectangle(pn, -(x1 - x0) / 2f, -bh / 2f, x1 - x0, bh - 1.5f);
+                    g.Restore(st);
+                }
+            }
+            // pukotina na mjestu udarca
+            if (hit && fall < 0.3f)
+                using (Pen cp = new Pen(Color.FromArgb(alpha, 60, 30, 20), 1.6f))
+                {
+                    float hx = wx - p.Dir * ww / 2f + shake, hy = gy - wh * 0.62f;
+                    g.DrawLines(cp, new PointF[] { new PointF(hx, hy), new PointF(hx + p.Dir * 5, hy - 9), new PointF(hx + p.Dir * 3, hy - 18), new PointF(hx + p.Dir * 9, hy - 26) });
+                    g.DrawLines(cp, new PointF[] { new PointF(hx, hy), new PointF(hx + p.Dir * 7, hy + 8), new PointF(hx + p.Dir * 4, hy + 17) });
+                }
+            // zvjezdice oko glave poslije udarca
+            if (hit && t < 0.92)
+            {
+                float top = DinoJoe.Species.HeadTop(p.Species);
+                float hx = cx + p.Dir * (30f * sc + WallOffset(t)), hy = gy + (top - 10) * sc;
+                for (int i = 0; i < 3; i++)
+                {
+                    double a = t * 14 + i * 2.094;
+                    float sx = hx + (float)Math.Cos(a) * 20f, sy = hy + (float)Math.Sin(a) * 6f;
+                    DrawStar(g, sx, sy, 5.5f, Color.FromArgb(alpha, 255, 214, 60));
+                }
+            }
+        }
+
+        static void DrawStar(Graphics g, float x, float y, float r, Color c)
+        {
+            PointF[] pts = new PointF[10];
+            for (int i = 0; i < 10; i++)
+            {
+                double a = -Math.PI / 2 + i * Math.PI / 5;
+                float rr = i % 2 == 0 ? r : r * 0.45f;
+                pts[i] = new PointF(x + (float)Math.Cos(a) * rr, y + (float)Math.Sin(a) * rr);
+            }
+            using (SolidBrush b = new SolidBrush(c)) g.FillPolygon(b, pts);
         }
 
         // ------------------------------------------------------------------
@@ -1484,6 +1576,7 @@ namespace DinoJoe
             menu.Items.Add(Lang.Get("act.play"), null, delegate { DoAction("play"); });
             menu.Items.Add(Lang.Get("act.bath"), null, delegate { DoAction("bath"); });
             menu.Items.Add(Lang.Get("m.roar"), null, delegate { Roar(); });
+            if (WallEnabled) menu.Items.Add(Lang.Get("m.wall"), null, delegate { StartWall(); });
             menu.Items.Add(Lang.Get("m.chick"), null, delegate { CallChick(); });
             miGlasses = new ToolStripMenuItem(Lang.Get("m.glasses"), null, delegate { ToggleGlasses(); });
             menu.Items.Add(miGlasses);
@@ -1777,6 +1870,37 @@ namespace DinoJoe
             SetState(State.Happy, 2);
         }
 
+        // ---------------- ovan mod (paket sa feature.wall=1) ----------------
+        double wallT = -1, nextWall = 1800 + new Random().Next(1800);
+        static bool WallEnabled { get { return Packs.ActiveValue("feature.wall") == "1"; } }
+
+        void StartWall()
+        {
+            if (IsEgg || wallT >= 0 || pose.State == State.Sleep) return;
+            forcedSleep = false;
+            vx = 0; platform = IntPtr.Zero;
+            SetState(State.Idle, 3.6);
+            wallT = 0;
+            Say(Profile.Special("wall", Jokes.Wall));
+        }
+
+        void WallStep()
+        {
+            if (wallT >= 0)
+            {
+                double prev = wallT;
+                wallT += Dt / 3.4;
+                if (prev < 0.4 && wallT >= 0.4) Say(Profile.Special("wallhit", Jokes.WallHit));
+                if (wallT > 1) wallT = -1;
+            }
+            else if (WallEnabled && pose.T > nextWall && pose.State == State.Idle && !IsEgg && pose.Bubble == null)
+            {
+                nextWall = pose.T + 2400 + rnd.Next(3600);
+                StartWall();
+            }
+            pose.WallT = wallT;
+        }
+
         void Roar()
         {
             if (EggBlock()) return;
@@ -2054,6 +2178,7 @@ namespace DinoJoe
             if (needs.RanAway) return;
             if (!IsEgg && needs.ShouldRunAway && pose.Bubble == null) { RunAway(); return; }
             LifeStep();
+            WallStep();
             TipTick();
             pose.Warmth = Life.Warmth;
 
