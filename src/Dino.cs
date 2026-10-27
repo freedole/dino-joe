@@ -19,7 +19,7 @@ using Microsoft.Win32;
 
 [assembly: System.Reflection.AssemblyTitle("Dino Joe - Desktop Pet")]
 [assembly: System.Reflection.AssemblyProduct("Dino Joe")]
-[assembly: System.Reflection.AssemblyVersion("1.1.1.0")]
+[assembly: System.Reflection.AssemblyVersion("1.2.0.0")]
 
 namespace DinoJoe
 {
@@ -1050,7 +1050,7 @@ namespace DinoJoe
             try
             {
                 string r = Achievements.RewardName(a.Reward);
-                string msg = r == null ? string.Format(Lang.Get("ach.got"), a.Name) : string.Format(Lang.Get("ach.gotreward"), a.Name, r);
+                string msg = r == null ? string.Format(Lang.Gender(Lang.Get("ach.got")), a.Name) : string.Format(Lang.Gender(Lang.Get("ach.gotreward")), a.Name, r);
                 if (Life.Stage == Life.Egg) return;
                 Say(msg);
                 heartsStart = pose.T;
@@ -1097,7 +1097,7 @@ namespace DinoJoe
                         needs.Save();
                         heartsStart = pose.T;
                         SetState(State.Happy, 3);
-                        Say(string.Format(Lang.Get("egg.hatched"), Profile.Name));
+                        Say(string.Format(Lang.Gender(Lang.Get("egg.hatched")), Profile.Name));
                         Achievements.Unlock("hatch");
                         if (Life.Eggs >= 2) Achievements.Unlock("newegg");
                     }
@@ -1137,7 +1137,7 @@ namespace DinoJoe
                 if (needs.Vacation) Achievements.Unlock("vacation");
             }
             dayCheckT += Dt;
-            if (dayCheckT > 300) { dayCheckT = 0; Achievements.TouchDay(); pose.Accessory = LookAccessory(); }
+            if (dayCheckT > 300) { dayCheckT = 0; Achievements.TouchDay(); pose.Accessory = LookAccessory(); Updater.CheckDaily(OnUpdateFound); }
         }
 
         void NewEgg()
@@ -1186,6 +1186,21 @@ namespace DinoJoe
         void TipTick()
         {
             tipT += Dt; reminderT += Dt;
+        }
+
+        ToolStripMenuItem miUpdate;
+
+        void OnUpdateFound()
+        {
+            try
+            {
+                BeginInvoke((MethodInvoker)delegate
+                {
+                    Say(string.Format(Lang.Gender(Lang.Get("upd.say")), Updater.NewTag));
+                    if (miUpdate != null) { miUpdate.Text = string.Format(Lang.Gender(Lang.Get("upd.menu")), Updater.NewTag); miUpdate.Visible = true; }
+                });
+            }
+            catch { }
         }
 
         GamesForm gamesForm;
@@ -1289,7 +1304,7 @@ namespace DinoJoe
             }
             Profile.LoadJokes();
             recent.Clear();
-            Say(string.Format(Lang.Get("pk.loaded"), Profile.JokeCount));
+            Say(string.Format(Lang.Gender(Lang.Get("pk.loaded")), Profile.JokeCount));
         }
 
         void OpenCatalog()
@@ -1302,7 +1317,7 @@ namespace DinoJoe
             Achievements.Unlock("pack");
             Profile.LoadJokes();
             recent.Clear();
-            Say(string.Format(Lang.Get("pk.loaded"), Profile.JokeCount));
+            Say(string.Format(Lang.Gender(Lang.Get("pk.loaded")), Profile.JokeCount));
         }
 
         /// Fore -> Samo ovaj paket: dino priča samo izabrani paket (dok se ne vrati "Svi uključeni paketi").
@@ -1326,7 +1341,7 @@ namespace DinoJoe
                 {
                     Settings.SoloPack = p.Id; Settings.Save();
                     Profile.LoadJokes(); recent.Clear();
-                    Say(string.Format(Lang.Get("pk.solo.on"), p.Name));
+                    Say(string.Format(Lang.Gender(Lang.Get("pk.solo.on")), p.Name));
                 });
                 it.Checked = p.Id.Equals(Settings.SoloPack, StringComparison.OrdinalIgnoreCase);
                 miSolo.DropDownItems.Add(it);
@@ -1347,7 +1362,7 @@ namespace DinoJoe
                     Settings.SoloPack = ""; Settings.Save();   // profil vraća normalno miješanje
                     Profile.LoadJokes();
                     recent.Clear();
-                    Say(string.Format(Lang.Get("pk.switched"), p.Name));
+                    Say(string.Format(Lang.Gender(Lang.Get("pk.switched")), p.Name));
                 });
                 it.Checked = p.Name.Equals(Settings.ActiveProfile, StringComparison.OrdinalIgnoreCase);
                 miProfiles.DropDownItems.Add(it);
@@ -1415,6 +1430,7 @@ namespace DinoJoe
         protected override void OnShown(EventArgs e)
         {
             base.OnShown(e);
+            Updater.CheckDaily(OnUpdateFound);
             try { hotkeyOk = RegisterHotKey(Handle, HotkeyStatus, MOD_CONTROL | MOD_ALT | MOD_NOREPEAT, (uint)Keys.D); } catch { }
             try { hotkeyJokeOk = RegisterHotKey(Handle, HotkeyJoke, MOD_CONTROL | MOD_ALT | MOD_NOREPEAT, (uint)Keys.F); } catch { }
             Present();
@@ -1436,6 +1452,10 @@ namespace DinoJoe
         void BuildMenu()
         {
             menu = new ContextMenuStrip();
+            miUpdate = new ToolStripMenuItem(Updater.NewTag == null ? "" : string.Format(Lang.Gender(Lang.Get("upd.menu")), Updater.NewTag), null, delegate { Updater.OpenRelease(); });
+            miUpdate.Font = new Font(miUpdate.Font, FontStyle.Bold);
+            miUpdate.Visible = Updater.NewTag != null;
+            menu.Items.Add(miUpdate);
             ToolStripMenuItem miChat = new ToolStripMenuItem(Lang.Get("m.chat"), null, delegate { OpenChat(); });
             miChat.Font = new Font(miChat.Font, FontStyle.Bold);
             menu.Items.Add(miChat);
@@ -1502,7 +1522,7 @@ namespace DinoJoe
             fun.DropDownItems.Add(miProfiles);
             fun.DropDownItems.Add(new ToolStripSeparator());
             fun.DropDownItems.Add(Lang.Get("m.jokefolder"), null, delegate { OpenCustom(); });
-            fun.DropDownItems.Add(Lang.Get("m.reload"), null, delegate { Profile.LoadJokes(); recent.Clear(); Say(string.Format(Lang.Get("pk.loaded"), Profile.JokeCount)); });
+            fun.DropDownItems.Add(Lang.Get("m.reload"), null, delegate { Profile.LoadJokes(); recent.Clear(); Say(string.Format(Lang.Gender(Lang.Get("pk.loaded")), Profile.JokeCount)); });
             menu.Items.Add(fun);
             menu.Items.Add(Lang.Get("m.games"), null, delegate { OpenGames(); });
             menu.Items.Add(Lang.Get("m.achievements"), null, delegate { OpenAchievements(); });
@@ -1527,10 +1547,10 @@ namespace DinoJoe
             foreach (int ro in remOpts)
             {
                 int v = ro;
-                ToolStripMenuItem it = new ToolStripMenuItem(v == 0 ? Lang.Get("rem.off") : string.Format(Lang.Get("rem.every"), v), null, delegate
+                ToolStripMenuItem it = new ToolStripMenuItem(v == 0 ? Lang.Get("rem.off") : string.Format(Lang.Gender(Lang.Get("rem.every")), v), null, delegate
                 {
                     Settings.ReminderMinutes = v; Settings.Save(); reminderT = 0;
-                    Say(v == 0 ? Lang.Get("rem.saidoff") : string.Format(Lang.Get("rem.saidon"), v));
+                    Say(v == 0 ? Lang.Get("rem.saidoff") : string.Format(Lang.Gender(Lang.Get("rem.saidon")), v));
                 });
                 miRem.DropDownItems.Add(it);
             }
@@ -1701,7 +1721,7 @@ namespace DinoJoe
             if (n.DayOfWeek == DayOfWeek.Monday && h < 12) return G("monday", "pozdrav_ponedjeljak", Lang.Get("g.mon"));
             if (n.DayOfWeek == DayOfWeek.Friday && h >= 12) return G("friday", "pozdrav_petak", Lang.Get("g.fri"));
             if (h < 10) return G("morning", "pozdrav_jutro", Lang.Get("g.morning"));
-            if (h < 17) return G("day", "pozdrav_dan", string.Format(Lang.Get("g.day"), Profile.Name));
+            if (h < 17) return G("day", "pozdrav_dan", string.Format(Lang.Gender(Lang.Get("g.day")), Profile.Name));
             if (h < 22) return G("evening", "pozdrav_vece", Lang.Get("g.eve"));
             return G("night", "pozdrav_noc", Lang.Get("g.night"));
         }
@@ -1795,7 +1815,7 @@ namespace DinoJoe
             if (chat == null)
             {
                 chat = new ChatForm(Ask);
-                chat.AppendNote(ai.Ready ? string.Format(Lang.Get("s.aion"), ai.Model)
+                chat.AppendNote(ai.Ready ? string.Format(Lang.Gender(Lang.Get("s.aion")), ai.Model)
                                          : Lang.Get("s.aioff"));
             }
             if (pose.State == State.Sleep) { forcedSleep = false; SetState(State.Idle, 3); }
@@ -1877,7 +1897,7 @@ namespace DinoJoe
             ai.Save();
             aiPauseUntil = DateTime.MinValue;
             if (ai.Ready) Say(Lang.Get("s.connected"));
-            if (chat != null) chat.AppendNote(ai.Ready ? string.Format(Lang.Get("s.aion2"), ai.Model) : Lang.Get("s.ai.off"));
+            if (chat != null) chat.AppendNote(ai.Ready ? string.Format(Lang.Gender(Lang.Get("s.aion2")), ai.Model) : Lang.Get("s.ai.off"));
         }
 
         void EditPersona()
@@ -2150,8 +2170,16 @@ namespace DinoJoe
 
             if ((int)(pose.T * 30) % 150 == 0) Native.SetWindowPos(Handle, new IntPtr(-1), 0, 0, 0, 0, 0x0001 | 0x0002 | 0x0010);
 
+            // štednja: kad dino miruje (spava/sjedi, bez oblačića i srca), crta se rjeđe
+            frameNo++;
+            bool calm = (st == State.Sleep || st == State.Sit) && pose.Bubble == null && pose.HeartsT < 0 && !dragging && !thinking;
+            bool idleCalm = st == State.Idle && pose.Bubble == null && pose.HeartsT < 0 && !dragging && !IsEgg;
+            if (calm && frameNo % 3 != 0) return;
+            if (idleCalm && frameNo % 2 != 0) return;
             Present();
         }
+
+        int frameNo;
 
         void Present()
         {

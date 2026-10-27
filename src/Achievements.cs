@@ -168,7 +168,7 @@ namespace DinoJoe
         {
             List<string> l = new List<string>();
             foreach (Achievement a in All) if (a.Reward == reward && a.Id != "veteran") l.Add(a.Name);
-            return string.Format(Lang.Get("ach.howto"), string.Join(" / ", l.ToArray()));
+            return string.Format(Lang.Gender(Lang.Get("ach.howto")), string.Join(" / ", l.ToArray()));
         }
 
         public static string RewardName(string reward)
@@ -208,7 +208,7 @@ namespace DinoJoe
 
             Label sub = new Label();
             sub.ForeColor = Theme.TextMuted;
-            sub.Text = string.Format(Lang.Get("ach.progress"), Achievements.UnlockedCount, Achievements.All.Count) +
+            sub.Text = string.Format(Lang.Gender(Lang.Get("ach.progress")), Achievements.UnlockedCount, Achievements.All.Count) +
                        "   " + Lang.Get("life.stage") + " " + Life.StageName(Life.Stage);
             sub.SetBounds(16, 46, 428, 22);
             Controls.Add(sub);
@@ -293,7 +293,7 @@ namespace DinoJoe
                     }
                 string d = a.Desc;
                 if (!on && a.Counter != null) d += "  (" + Math.Min(Achievements.Count(a.Counter), a.Goal) + "/" + a.Goal + ")";
-                if (a.Reward != null) d += "  " + string.Format(Lang.Get("ach.reward"), Achievements.RewardName(a.Reward));
+                if (a.Reward != null) d += "  " + string.Format(Lang.Gender(Lang.Get("ach.reward")), Achievements.RewardName(a.Reward));
                 // TextRenderer (GDI) ima font fallback, pa se i emoji/simboli prikažu ispravno
                 TextRenderer.DrawText(g, d, Font, new Rectangle(52, 26, Width - 60, Height - 26), Theme.TextMuted,
                     TextFormatFlags.WordBreak | TextFormatFlags.NoPrefix | TextFormatFlags.Left | TextFormatFlags.Top);

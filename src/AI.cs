@@ -449,7 +449,7 @@ Pravila:
         public AiSettingsForm(AiConfig c)
         {
             cfg = c;
-            Text = string.Format(Lang.Get("ai.title"), Profile.Name);
+            Text = string.Format(Lang.Gender(Lang.Get("ai.title")), Profile.Name);
             FormBorderStyle = FormBorderStyle.FixedDialog;
             MaximizeBox = false; MinimizeBox = false;
             StartPosition = FormStartPosition.CenterScreen;
@@ -594,13 +594,13 @@ Pravila:
                         {
                             cfg.Save();
                             lbStatus.ForeColor = Color.SeaGreen;
-                            lbStatus.Text = string.Format(Lang.Get("ai.works"), Profile.Name, r.Text);
+                            lbStatus.Text = string.Format(Lang.Gender(Lang.Get("ai.works")), Profile.Name, r.Text);
                             DialogResult = DialogResult.OK;
                         }
                         else
                         {
                             lbStatus.ForeColor = Color.Firebrick;
-                            lbStatus.Text = string.Format(Lang.Get("ai.fail"), r.Text);
+                            lbStatus.Text = string.Format(Lang.Gender(Lang.Get("ai.fail")), r.Text);
                         }
                     });
                 }
@@ -625,7 +625,7 @@ Pravila:
         public ChatForm(Action<string> sendHandler)
         {
             onSend = sendHandler;
-            Text = string.Format(Lang.Get("ai.chattitle"), Profile.NameWith);
+            Text = string.Format(Lang.Gender(Lang.Get("ai.chattitle")), Profile.NameWith);
             FormBorderStyle = FormBorderStyle.SizableToolWindow;
             ShowInTaskbar = false;
             TopMost = false;   // ne pokrivaj browser (npr. stranicu za API ključ)

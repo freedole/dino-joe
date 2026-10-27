@@ -29,7 +29,7 @@ namespace DinoJoe
             get
             {
                 if (!Packs.LangCompatible(Lang)) return false;
-                if (IsPersonality) return Personality == Settings.PersonalityId;
+                if (IsPersonality) return Personality == Settings.PersonalityId && !Packs.IsDisabled(Id);
                 return Enabled;
             }
         }
@@ -222,6 +222,25 @@ namespace DinoJoe
         {
             foreach (string s in Settings.Packs.Split(',')) if (s.Trim().Equals(id, StringComparison.OrdinalIgnoreCase)) return true;
             return false;
+        }
+
+        /// Isključeni paketi ličnosti (podrazumijevano su uključeni uz svoju ličnost).
+        public static bool IsDisabled(string id)
+        {
+            foreach (string s in Settings.DisabledPacks.Split(',')) if (s.Trim().Equals(id, StringComparison.OrdinalIgnoreCase)) return true;
+            return false;
+        }
+
+        public static void SetDisabled(string id, bool off)
+        {
+            List<string> ids = new List<string>();
+            foreach (string s in Settings.DisabledPacks.Split(','))
+            {
+                string t = s.Trim();
+                if (t.Length > 0 && !t.Equals(id, StringComparison.OrdinalIgnoreCase)) ids.Add(t);
+            }
+            if (off) ids.Add(id);
+            Settings.DisabledPacks = string.Join(",", ids.ToArray());
         }
 
         public static void SetEnabled(string id, bool on)

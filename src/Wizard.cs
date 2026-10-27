@@ -267,7 +267,7 @@ namespace DinoJoe
             step = s;
             Lang.Current = Lang.FromCode(langCode);
             Text = Lang.Get(firstRun ? "wiz.title" : "wiz.settings");
-            lblStep.Text = string.Format(Lang.Get("wiz.step"), step + 1, Steps);
+            lblStep.Text = string.Format(Lang.Gender(Lang.Get("wiz.step")), step + 1, Steps);
             btBack.Text = Lang.Get("wiz.back");
             btBack.Enabled = step > 0;
             btNext.Text = Lang.Get(step == Steps - 1 ? "wiz.finish" : "wiz.next");
@@ -582,7 +582,7 @@ namespace DinoJoe
         {
             Header("s.ai", "");
             lblSub.Text = "";
-            Lbl(string.Format(Lang.Get("s.ai.text"), CurrentName()), 12, 0, 425, 190);
+            Lbl(string.Format(Lang.Gender(Lang.Get("s.ai.text")), CurrentName()), 12, 0, 425, 190);
 
             Label status = Lbl(ai != null && ai.Ready ? Lang.Get("s.ai.ok") : "", 12, 246, 420, 24);
             status.ForeColor = Color.FromArgb(40, 120, 60);

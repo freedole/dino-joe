@@ -110,7 +110,7 @@ namespace DinoJoe
 
         void UpdateScore()
         {
-            lblRpsScore.Text = string.Format(Lang.Get("g.score"), rpsYou, rpsDino);
+            lblRpsScore.Text = string.Format(Lang.Gender(Lang.Get("g.score")), rpsYou, rpsDino);
         }
 
         void NewNumber()
@@ -128,8 +128,8 @@ namespace DinoJoe
             if (secret < 0) { NewNumber(); return; }
             if (!int.TryParse(tbGuess.Text.Trim(), out n) || n < 1 || n > 100) { lblGuess.Text = Lang.Get("g.guess.bad"); return; }
             tries++;
-            if (n < secret) lblGuess.Text = string.Format(Lang.Get("g.guess.up"), n);
-            else if (n > secret) lblGuess.Text = string.Format(Lang.Get("g.guess.down"), n);
+            if (n < secret) lblGuess.Text = string.Format(Lang.Gender(Lang.Get("g.guess.up")), n);
+            else if (n > secret) lblGuess.Text = string.Format(Lang.Gender(Lang.Get("g.guess.down")), n);
             else
             {
                 lblGuess.Text = string.Format(Lang.Gender(Lang.Get("g.guess.ok")), secret, tries);

@@ -207,9 +207,9 @@ namespace DinoJoe
             for (int i = 0; i < Needs.Count; i++)
                 SmallBar(g, 16, 130 + i * 31, Needs.Label((Need)i), (int)Math.Round(needs.V[i]));
 
-            string life = Life.Stage == Life.Egg ? string.Format(Lang.Get("life.egg"), (int)Life.Warmth)
+            string life = Life.Stage == Life.Egg ? string.Format(Lang.Gender(Lang.Get("life.egg")), (int)Life.Warmth)
                         : Life.Stage == Life.Adult ? Lang.Get("life.stage") + " " + Life.StageName(Life.Adult)
-                        : string.Format(Lang.Get("life.next"), Life.StageName(Life.Stage), (int)(Life.Progress * 100));
+                        : string.Format(Lang.Gender(Lang.Get("life.next")), Life.StageName(Life.Stage), (int)(Life.Progress * 100));
             using (SolidBrush lb = new SolidBrush(Color.FromArgb(90, 100, 110)))
             {
                 SizeF ls = g.MeasureString(life, Font);

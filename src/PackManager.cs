@@ -63,7 +63,14 @@ namespace DinoJoe
             {
                 if (loading) return;
                 Pack p = (Pack)e.Item.Tag;
-                if (p.IsPersonality) { loading = true; e.Item.Checked = p.Active; loading = false; return; }   // prati ličnost
+                if (p.IsPersonality)
+                {
+                    // paket ličnosti: može se isključiti samo za trenutnu ličnost (drugih ličnosti nije aktivan)
+                    if (p.Personality != Settings.PersonalityId || !Packs.LangCompatible(p.Lang)) { loading = true; e.Item.Checked = false; loading = false; return; }
+                    Packs.SetDisabled(p.Id, !e.Item.Checked);
+                    Dirty();
+                    return;
+                }
                 Packs.SetEnabled(p.Id, e.Item.Checked);
                 Dirty();
             };
@@ -163,7 +170,7 @@ namespace DinoJoe
                 it.SubItems.Add(WeightName(p.Weight));
                 it.ToolTipText = p.Desc + (p.Author.Length > 0 ? "  (" + p.Author + ")" : "");
                 it.Checked = p.Active;
-                if (p.IsPersonality || !Packs.LangCompatible(p.Lang)) it.ForeColor = Theme.TextMuted;
+                if ((p.IsPersonality && p.Personality != Settings.PersonalityId) || !Packs.LangCompatible(p.Lang)) it.ForeColor = Theme.TextMuted;
                 it.Tag = p;
                 lv.Items.Add(it);
             }
@@ -188,7 +195,7 @@ namespace DinoJoe
         void UpdateUnblock()
         {
             int n = Packs.BlockedCount;
-            btUnblock.Text = string.Format(Lang.Get("pk.unblock"), n);
+            btUnblock.Text = string.Format(Lang.Gender(Lang.Get("pk.unblock")), n);
             btUnblock.Enabled = n > 0;
         }
 
@@ -204,7 +211,7 @@ namespace DinoJoe
                     Pack p = Packs.Import(d.FileName);
                     Changed = true;
                     ReloadList();
-                    MessageBox.Show(this, string.Format(Lang.Get("pk.imported"), p.Name, p.JokeCount), Text, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show(this, string.Format(Lang.Gender(Lang.Get("pk.imported")), p.Name, p.JokeCount), Text, MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 catch (Exception ex)
                 {
@@ -218,7 +225,7 @@ namespace DinoJoe
             if (lv.SelectedItems.Count == 0) return;
             Pack p = (Pack)lv.SelectedItems[0].Tag;
             if (p.Builtin) { MessageBox.Show(this, Lang.Get("pk.builtin.noremove"), Text, MessageBoxButtons.OK, MessageBoxIcon.Information); return; }
-            if (MessageBox.Show(this, string.Format(Lang.Get("pk.remove.q"), p.Name), Text, MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes) return;
+            if (MessageBox.Show(this, string.Format(Lang.Gender(Lang.Get("pk.remove.q")), p.Name), Text, MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes) return;
             try { Packs.Remove(p); } catch (Exception ex) { MessageBox.Show(this, ex.Message, Text); }
             Changed = true;
             ReloadList();

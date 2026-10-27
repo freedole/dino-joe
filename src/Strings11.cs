@@ -170,6 +170,10 @@ namespace DinoJoe
                           "desni klik na mene otvara sve opcije.|dvostruki klik me nahrani.|Ctrl+Alt+D otvara moj Status odakle god.|Ctrl+Alt+F i ispričam foru.|uhvati me mišem i baci. Volim letjeti!|spusti me na vrh prozora, pa šećem po njemu.|desni klik -> Igre... za kamen-škare-papir.|Fore -> Preuzmi pakete s interneta... ima fora za tvoju struku.|Fore -> Samo ovaj paket, ako želiš samo jednu temu.|Postignuća otključavaju nove vrste i uzorke.",
                           "right-click me for all options.|double-click to feed me.|Ctrl+Alt+D opens my Status from anywhere.|Ctrl+Alt+F and I tell a joke.|grab me with the mouse and throw me. I love flying!|drop me on top of a window and I'll walk on it.|right-click -> Games... for rock-paper-scissors.|Jokes -> Download packs... has jokes for your job.|Jokes -> Only this pack, if you want just one topic.|Achievements unlock new species and patterns.");
 
+            // nova verzija
+            A("upd.say", "Izašla je nova verzija ({0})! Desni klik na mene -> Preuzmi.", "Izašla je nova verzija ({0})! Desni klik na mene -> Preuzmi.", "Izašla je nova verzija ({0})! Desni klik na mene -> Preuzmi.", "A new version is out ({0})! Right-click me -> Download.");
+            A("upd.menu", "Preuzmi novu verziju {0}...", "Preuzmi novu verziju {0}...", "Preuzmi novu verziju {0}...", "Download new version {0}...");
+
             // nove šare
             A("pat.gold", "Zlatna", "Zlatna", "Zlatna", "Gold");
             Lang.BsOverride["ach.stylist.d"] = "Promijeni izgled u postavkama.";

@@ -239,7 +239,7 @@ namespace DinoJoe
             canInstall = true;
             if (p == null) return Lang.Get("cat.state.new");
             int cmp = Catalog.CompareVersions(c.Version, p.Version);
-            if (cmp > 0) return string.Format(Lang.Get("cat.state.update"), p.Version);
+            if (cmp > 0) return string.Format(Lang.Gender(Lang.Get("cat.state.update")), p.Version);
             canInstall = false;
             return Lang.Get("cat.state.installed");
         }
@@ -267,7 +267,7 @@ namespace DinoJoe
             }
             lv.EndUpdate();
             status.ForeColor = Theme.TextMuted;
-            status.Text = string.Format(Lang.Get("cat.count"), shown);
+            status.Text = string.Format(Lang.Gender(Lang.Get("cat.count")), shown);
             SyncButton();
         }
 
@@ -286,7 +286,7 @@ namespace DinoJoe
             if (!can) return;
             btInstall.Enabled = false;
             status.ForeColor = Theme.TextMuted;
-            status.Text = string.Format(Lang.Get("cat.installing"), c.Name);
+            status.Text = string.Format(Lang.Gender(Lang.Get("cat.installing")), c.Name);
             ThreadPool.QueueUserWorkItem(delegate
             {
                 string err = null;
@@ -299,7 +299,7 @@ namespace DinoJoe
                         Changed = true;
                         Fill();
                         status.ForeColor = Theme.Accent;
-                        status.Text = string.Format(Lang.Get("cat.installed"), c.Name);
+                        status.Text = string.Format(Lang.Gender(Lang.Get("cat.installed")), c.Name);
                     });
                 }
                 catch { }

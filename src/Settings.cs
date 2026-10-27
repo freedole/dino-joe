@@ -505,7 +505,9 @@ namespace DinoJoe
         public static bool WindowWalk = true;
         public static bool Seasonal = true;                 // sezonski izgled (Noć vještica, Božić) kad nema dodatka
         public static int ReminderMinutes = 0;              // podsjetnici: 0 = isključeno
-        public static int TipsNext = 0;                     // sljedeći savjet za nove korisnike               // dino može stajati/šetati po gornjoj ivici prozora                 // "Samo ovaj paket": id paketa ili prazno = svi uključeni
+        public static int TipsNext = 0;                     // sljedeći savjet za nove korisnike
+        public static string UpdateChecked = "";
+        public static string DisabledPacks = "";            // isključeni paketi ličnosti            // datum zadnje provjere nove verzije               // dino može stajati/šetati po gornjoj ivici prozora                 // "Samo ovaj paket": id paketa ili prazno = svi uključeni
 
         public static bool IsHidden(string id) { return ("," + HiddenPersonalities + ",").Contains("," + id + ","); }
 
@@ -552,6 +554,8 @@ namespace DinoJoe
                         else if (k == "seasonal") Seasonal = v != "0";
                         else if (k == "reminder_min" && int.TryParse(v, out n)) ReminderMinutes = Math.Max(0, Math.Min(240, n));
                         else if (k == "tips_next" && int.TryParse(v, out n)) TipsNext = Math.Max(0, n);
+                        else if (k == "update_checked") UpdateChecked = v;
+                        else if (k == "disabled_packs") DisabledPacks = v;
                     }
             }
             catch { }
@@ -584,6 +588,8 @@ namespace DinoJoe
                     "seasonal=" + (Seasonal ? "1" : "0") + "\r\n" +
                     "reminder_min=" + ReminderMinutes + "\r\n" +
                     "tips_next=" + TipsNext + "\r\n" +
+                    "update_checked=" + UpdateChecked + "\r\n" +
+                    "disabled_packs=" + DisabledPacks + "\r\n" +
                     "profile=" + ActiveProfile.Replace("\r", "").Replace("\n", "") + "\r\n", new UTF8Encoding(true));
             }
             catch { }
