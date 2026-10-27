@@ -1301,9 +1301,28 @@ namespace DinoJoe
             }
         }
 
+        // globalna prečica Ctrl+Alt+D: otvori/zatvori Status
+        [DllImport("user32.dll")] static extern bool RegisterHotKey(IntPtr hWnd, int id, uint fsModifiers, uint vk);
+        [DllImport("user32.dll")] static extern bool UnregisterHotKey(IntPtr hWnd, int id);
+        const int HotkeyStatus = 0xD1;
+        const uint MOD_ALT = 0x1, MOD_CONTROL = 0x2, MOD_NOREPEAT = 0x4000;
+        bool hotkeyOk;
+
+        protected override void WndProc(ref Message m)
+        {
+            if (m.Msg == 0x0312 && m.WParam.ToInt32() == HotkeyStatus)   // WM_HOTKEY
+            {
+                if (statusForm != null && !statusForm.IsDisposed) statusForm.Close();
+                else { OpenStatus(); try { statusForm.Activate(); } catch { } }
+                return;
+            }
+            base.WndProc(ref m);
+        }
+
         protected override void OnShown(EventArgs e)
         {
             base.OnShown(e);
+            try { hotkeyOk = RegisterHotKey(Handle, HotkeyStatus, MOD_CONTROL | MOD_ALT | MOD_NOREPEAT, (uint)Keys.D); } catch { }
             Present();
             timer.Start();
             if (needs.RanAway) { Hide(); tray.ShowBalloonTip(5000, Profile.Name, Lang.Get("say.ranaway"), ToolTipIcon.Warning); }
@@ -1328,7 +1347,9 @@ namespace DinoJoe
             menu.Items.Add(miChat);
             menu.Items.Add(new ToolStripSeparator());
             menu.Items.Add(Lang.Get("m.joke"), null, delegate { TellJoke(true); });
-            menu.Items.Add(Lang.Get("st.menu"), null, delegate { OpenStatus(); });
+            ToolStripMenuItem miStatus = new ToolStripMenuItem(Lang.Get("st.menu"), null, delegate { OpenStatus(); });
+            miStatus.ShortcutKeyDisplayString = "Ctrl+Alt+D";
+            menu.Items.Add(miStatus);
             menu.Items.Add(Lang.Get("act.feed"), null, delegate { DoAction("feed"); });
             menu.Items.Add(Lang.Get("act.water"), null, delegate { DoAction("water"); });
             menu.Items.Add(Lang.Get("act.pet"), null, delegate { DoAction("pet"); });
@@ -1993,6 +2014,7 @@ namespace DinoJoe
 
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
+            if (hotkeyOk) try { UnregisterHotKey(Handle, HotkeyStatus); } catch { }
             SaveState();
             needs.Save();
             Life.Save();
