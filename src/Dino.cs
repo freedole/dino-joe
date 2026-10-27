@@ -930,7 +930,7 @@ namespace DinoJoe
         readonly System.Windows.Forms.Timer timer = new System.Windows.Forms.Timer();
         NotifyIcon tray;
         ContextMenuStrip menu;
-        ToolStripMenuItem miSleep, miAutostart, miGlasses, miLike, miBlock, miProfiles;
+        ToolStripMenuItem miSleep, miAutostart, miGlasses, miLike, miBlock, miProfiles, miSolo;
         string lastJoke;   // zadnja ispričana fora (za 👍 / 👎)
         readonly Needs needs = new Needs();
         readonly Triggers triggers = new Triggers();
@@ -1242,6 +1242,34 @@ namespace DinoJoe
             Say(string.Format(Lang.Get("pk.loaded"), Profile.JokeCount));
         }
 
+        /// Fore -> Samo ovaj paket: dino priča samo izabrani paket (dok se ne vrati "Svi uključeni paketi").
+        void BuildSoloMenu()
+        {
+            miSolo.DropDownItems.Clear();
+            ToolStripMenuItem all = new ToolStripMenuItem(Lang.Get("pk.solo.all"), null, delegate
+            {
+                Settings.SoloPack = ""; Settings.Save();
+                Profile.LoadJokes(); recent.Clear();
+                Say(Lang.Get("pk.solo.off"));
+            });
+            all.Checked = Settings.SoloPack.Length == 0;
+            miSolo.DropDownItems.Add(all);
+            miSolo.DropDownItems.Add(new ToolStripSeparator());
+            foreach (Pack pk in Packs.All())
+            {
+                if (pk.IsPersonality || !Packs.LangCompatible(pk.Lang) || pk.JokeCount == 0) continue;
+                Pack p = pk;
+                ToolStripMenuItem it = new ToolStripMenuItem(p.Name + "  (" + p.JokeCount + ")", null, delegate
+                {
+                    Settings.SoloPack = p.Id; Settings.Save();
+                    Profile.LoadJokes(); recent.Clear();
+                    Say(string.Format(Lang.Get("pk.solo.on"), p.Name));
+                });
+                it.Checked = p.Id.Equals(Settings.SoloPack, StringComparison.OrdinalIgnoreCase);
+                miSolo.DropDownItems.Add(it);
+            }
+        }
+
         void BuildProfilesMenu()
         {
             miProfiles.DropDownItems.Clear();
@@ -1253,6 +1281,7 @@ namespace DinoJoe
                 ToolStripMenuItem it = new ToolStripMenuItem(p.Name, null, delegate
                 {
                     Packs.Activate(p);
+                    Settings.SoloPack = ""; Settings.Save();   // profil vraća normalno miješanje
                     Profile.LoadJokes();
                     recent.Clear();
                     Say(string.Format(Lang.Get("pk.switched"), p.Name));
@@ -1404,6 +1433,8 @@ namespace DinoJoe
             fun.DropDownItems.Add(new ToolStripSeparator());
             fun.DropDownItems.Add(Lang.Get("pk.menu"), null, delegate { OpenPacks(); });
             fun.DropDownItems.Add(Lang.Get("cat.menu"), null, delegate { OpenCatalog(); });
+            miSolo = new ToolStripMenuItem(Lang.Get("pk.solo"));
+            fun.DropDownItems.Add(miSolo);
             miProfiles = new ToolStripMenuItem(Lang.Get("pk.profiles"));
             fun.DropDownItems.Add(miProfiles);
             fun.DropDownItems.Add(new ToolStripSeparator());
@@ -1423,6 +1454,7 @@ namespace DinoJoe
                 miGlasses.Checked = pose.Glasses;
                 miLike.Enabled = miBlock.Enabled = lastJoke != null;
                 BuildProfilesMenu();
+                BuildSoloMenu();
                 miAutostart.Checked = IsAutostart();
                 for (int i = 0; i < 3; i++) miTalk[i].Checked = talkLevel == i;
                 miSize[0].Checked = sizeMul < 0.9f; miSize[1].Checked = sizeMul >= 0.9f && sizeMul < 1.2f; miSize[2].Checked = sizeMul >= 1.2f;

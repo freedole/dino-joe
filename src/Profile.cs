@@ -161,12 +161,17 @@ namespace DinoJoe
             foreach (KeyValuePair<string, List<string>> kv in files)
                 AddCat(kv.Key, kv.Value, Get("weight." + kv.Key, Get("tezina." + kv.Key, "10")), Get("keywords." + kv.Key, Get("kljucne." + kv.Key, "")), 1.0);
 
-            // 2) uključeni paketi
+            // 2) uključeni paketi (ili samo jedan, ako je izabrano "Samo ovaj paket")
+            Pack solo = null;
+            if (Settings.SoloPack.Length > 0)
+                foreach (Pack p in Packs.All())
+                    if (p.Id.Equals(Settings.SoloPack, StringComparison.OrdinalIgnoreCase) && Packs.LangCompatible(p.Lang) && Directory.Exists(p.FunDir)) solo = p;
             try
             {
                 foreach (Pack p in Packs.All())
                 {
-                    if (!p.Active || !Directory.Exists(p.FunDir)) continue;
+                    if (solo != null ? !p.Id.Equals(solo.Id, StringComparison.OrdinalIgnoreCase) : !p.Active) continue;
+                    if (!Directory.Exists(p.FunDir)) continue;
                     double mul = p.Weight;
                     foreach (string f in Directory.GetFiles(p.FunDir, "*.txt"))
                     {

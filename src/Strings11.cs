@@ -99,6 +99,12 @@ namespace DinoJoe
                                    "Pokretanje s Windowsima: Postavke > Aplikacije > Pokretanje (Dino Joe).",
                                    "Start with Windows: Settings > Apps > Startup (Dino Joe).");
 
+            // "Samo ovaj paket"
+            A("pk.solo", "Samo ovaj paket", "Samo ovaj paket", "Samo ovaj paket", "Only this pack");
+            A("pk.solo.all", "Svi uključeni paketi", "Svi uključeni paketi", "Svi uključeni paketi", "All enabled packs");
+            A("pk.solo.on", "Sad pričam samo fore iz paketa: {0}.", "Sad pričam samo fore iz paketa: {0}.", "Sada pričam samo fore iz paketa: {0}.", "Now I only tell jokes from: {0}.");
+            A("pk.solo.off", "Opet pričam fore iz svih uključenih paketa.", "Opet pričam fore iz svih uključenih paketa.", "Opet pričam fore iz svih uključenih paketa.", "Back to jokes from all enabled packs.");
+
             // nove šare
             A("pat.gold", "Zlatna", "Zlatna", "Zlatna", "Gold");
             Lang.BsOverride["ach.stylist.d"] = "Promijeni izgled u postavkama.";
