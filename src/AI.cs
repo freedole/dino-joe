@@ -95,6 +95,39 @@ namespace DinoJoe
             else if (File.Exists(localOld)) PersonaPath = localOld;
             else PersonaPath = File.Exists(user) || !File.Exists(userOld) ? user : userOld;
             Load();
+            ImportDefaults();
+        }
+
+        /// defaults.ini pored exe-a može donijeti AI ključ (pripremljen dino za nekoga).
+        /// Ključ se šifruje DPAPI-jem u ai.cfg, a iz defaults.ini se briše (ako je folder upisiv).
+        void ImportDefaults()
+        {
+            try
+            {
+                if (HasKey || Profile.Dir == null) return;
+                string f = Path.Combine(Profile.Dir, "defaults.ini");
+                if (!File.Exists(f)) return;
+                string[] lines = File.ReadAllLines(f, Encoding.UTF8);
+                string key = "", prov = "";
+                List<string> keep = new List<string>();
+                foreach (string raw in lines)
+                {
+                    int i = raw.IndexOf('=');
+                    string k = i > 0 ? raw.Substring(0, i).Trim() : "", v = i > 0 ? raw.Substring(i + 1).Trim() : "";
+                    if (k == "ai_key") { key = v; continue; }
+                    if (k == "ai_provider") prov = v;
+                    keep.Add(raw);
+                }
+                if (key.Length == 0) return;
+                AiProvider p = AiProvider.Find(prov.Length > 0 ? prov : "groq");
+                if (p == null) return;
+                ProviderId = p.Id; Url = p.Url; Model = p.Model;
+                Enabled = true; Prompted = true;
+                Key = key;
+                Save();
+                try { File.WriteAllLines(f, keep.ToArray(), new UTF8Encoding(false)); } catch { }
+            }
+            catch { }
         }
 
         public bool HasKey { get { return !string.IsNullOrEmpty(keyEnc); } }

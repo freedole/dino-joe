@@ -163,6 +163,8 @@ namespace DinoJoe
         readonly bool firstRun;
         readonly AiConfig ai;
         bool committed;
+        string look0;
+        string LookKey() { return species + "/" + color1 + "/" + color2 + "/" + pattern + "/" + accessory + "/" + glasses; }
 
         // radne vrijednosti
         string langCode;
@@ -202,6 +204,7 @@ namespace DinoJoe
             pattern = Settings.Pattern;
             accessory = Settings.Accessory;
             packs = Settings.Packs;
+            look0 = LookKey();
             autostart = firstRun ? true : Settings.IsAutostart();
 
             Font = FBase;
@@ -648,6 +651,8 @@ namespace DinoJoe
             Settings.Species = species;
             Settings.Pattern = pattern;
             Settings.Accessory = accessory;
+            // korisnik je sam uredio izgled: sezonski šešir (Noć vještica, Božić) više ne smije da ga pregazi
+            if (LookKey() != look0) Settings.Seasonal = false;
             Settings.Packs = packs;
             Settings.Save();
             // prvo pokretanje: izbor paketa i ličnosti postaje prvi profil
