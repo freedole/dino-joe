@@ -1304,9 +1304,9 @@ namespace DinoJoe
         // globalna prečica Ctrl+Alt+D: otvori/zatvori Status
         [DllImport("user32.dll")] static extern bool RegisterHotKey(IntPtr hWnd, int id, uint fsModifiers, uint vk);
         [DllImport("user32.dll")] static extern bool UnregisterHotKey(IntPtr hWnd, int id);
-        const int HotkeyStatus = 0xD1;
+        const int HotkeyStatus = 0xD1, HotkeyJoke = 0xD2;
         const uint MOD_ALT = 0x1, MOD_CONTROL = 0x2, MOD_NOREPEAT = 0x4000;
-        bool hotkeyOk;
+        bool hotkeyOk, hotkeyJokeOk;
 
         protected override void WndProc(ref Message m)
         {
@@ -1316,6 +1316,7 @@ namespace DinoJoe
                 else { OpenStatus(); try { statusForm.Activate(); } catch { } }
                 return;
             }
+            if (m.Msg == 0x0312 && m.WParam.ToInt32() == HotkeyJoke) { TellJoke(true); return; }   // Ctrl+Alt+F: fora
             base.WndProc(ref m);
         }
 
@@ -1323,6 +1324,7 @@ namespace DinoJoe
         {
             base.OnShown(e);
             try { hotkeyOk = RegisterHotKey(Handle, HotkeyStatus, MOD_CONTROL | MOD_ALT | MOD_NOREPEAT, (uint)Keys.D); } catch { }
+            try { hotkeyJokeOk = RegisterHotKey(Handle, HotkeyJoke, MOD_CONTROL | MOD_ALT | MOD_NOREPEAT, (uint)Keys.F); } catch { }
             Present();
             timer.Start();
             if (needs.RanAway) { Hide(); tray.ShowBalloonTip(5000, Profile.Name, Lang.Get("say.ranaway"), ToolTipIcon.Warning); }
@@ -1346,7 +1348,9 @@ namespace DinoJoe
             miChat.Font = new Font(miChat.Font, FontStyle.Bold);
             menu.Items.Add(miChat);
             menu.Items.Add(new ToolStripSeparator());
-            menu.Items.Add(Lang.Get("m.joke"), null, delegate { TellJoke(true); });
+            ToolStripMenuItem miJoke = new ToolStripMenuItem(Lang.Get("m.joke"), null, delegate { TellJoke(true); });
+            miJoke.ShortcutKeyDisplayString = "Ctrl+Alt+F";
+            menu.Items.Add(miJoke);
             ToolStripMenuItem miStatus = new ToolStripMenuItem(Lang.Get("st.menu"), null, delegate { OpenStatus(); });
             miStatus.ShortcutKeyDisplayString = "Ctrl+Alt+D";
             menu.Items.Add(miStatus);
@@ -2015,6 +2019,7 @@ namespace DinoJoe
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
             if (hotkeyOk) try { UnregisterHotKey(Handle, HotkeyStatus); } catch { }
+            if (hotkeyJokeOk) try { UnregisterHotKey(Handle, HotkeyJoke); } catch { }
             SaveState();
             needs.Save();
             Life.Save();
