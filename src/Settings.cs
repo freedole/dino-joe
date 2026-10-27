@@ -532,8 +532,15 @@ namespace DinoJoe
         {
             try
             {
-                if (File.Exists(PathIni))
-                    foreach (string raw in File.ReadAllLines(PathIni, Encoding.UTF8))
+                // prvo pokretanje: ako nema settings.ini, a pored exe-a postoji defaults.ini (pripremljen dino za nekoga), uzmi te vrijednosti
+                string src = PathIni;
+                if (!File.Exists(PathIni) && Profile.Dir != null && File.Exists(Path.Combine(Profile.Dir, "defaults.ini")))
+                {
+                    src = Path.Combine(Profile.Dir, "defaults.ini");
+                    fromDefaults = true;
+                }
+                if (File.Exists(src))
+                    foreach (string raw in File.ReadAllLines(src, Encoding.UTF8))
                     {
                         int i = raw.IndexOf('=');
                         if (i <= 0 || raw.TrimStart().StartsWith("#")) continue;
@@ -566,7 +573,14 @@ namespace DinoJoe
             }
             catch { }
             Lang.Current = Lang.FromCode(LangCode);
+            if (fromDefaults)
+            {
+                SetupDone = false;   // čarobnjak se ipak prikaže, ali sa pripremljenim izborima
+                if (Packs == "*") Packs = DinoJoe.Packs.DefaultPacks();
+            }
         }
+
+        static bool fromDefaults;
 
         public static void Save()
         {
