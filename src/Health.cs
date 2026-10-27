@@ -77,6 +77,27 @@ namespace DinoJoe
         // 3 QUNS_RUNNING_D3D_FULL_SCREEN (igra), 4 QUNS_PRESENTATION_MODE, 5 QUNS_ACCEPTS_NOTIFICATIONS, 6 QUNS_QUIET_TIME, 7 QUNS_APP
         static bool failed;
 
+        [DllImport("user32.dll")] static extern IntPtr GetForegroundWindow();
+        [DllImport("user32.dll")] static extern uint GetWindowThreadProcessId(IntPtr h, out uint pid);
+
+        /// Programi za udaljeni rad i virtuelne mašine: preko cijelog ekrana su "radni", ne film/igra, pa dino ostaje.
+        static readonly string[] RemoteApps = { "mstsc", "msrdc", "rdcman", "vmconnect", "vmware", "vmware-vmx", "virtualboxvm",
+                                                "teamviewer", "anydesk", "rustdesk", "vncviewer", "tvnviewer", "remotedesktopmanager", "parsecd", "citrix", "wfica32", "cdviewer" };
+
+        static bool RemoteInFront()
+        {
+            try
+            {
+                uint pid;
+                GetWindowThreadProcessId(GetForegroundWindow(), out pid);
+                if (pid == 0) return false;
+                string name = System.Diagnostics.Process.GetProcessById((int)pid).ProcessName.ToLowerInvariant();
+                foreach (string r in RemoteApps) if (name == r || name.StartsWith(r)) return true;
+            }
+            catch { }
+            return false;
+        }
+
         public static bool ShouldHide
         {
             get
@@ -86,7 +107,9 @@ namespace DinoJoe
                 {
                     int st;
                     if (SHQueryUserNotificationState(out st) != 0) return false;
-                    return st == 1 || st == 2 || st == 3 || st == 4;
+                    if (st == 1) return true;                                   // zaključan ekran
+                    if (st == 2 || st == 3 || st == 4) return !RemoteInFront();  // cijeli ekran, osim RDP/VM/udaljenog pristupa
+                    return false;
                 }
                 catch { failed = true; return false; }   // stariji Windows / mono
             }
