@@ -1040,7 +1040,9 @@ namespace DinoJoe
             MouseDown += OnDown;
             MouseMove += OnMove;
             MouseUp += OnUp;
-            MouseDoubleClick += delegate(object s, MouseEventArgs e) { if (e.Button == MouseButtons.Left) Feed(); };
+            // jedan klik = fora/mazenje, dupli klik = hranjenje; jedan klik čeka da prođe vrijeme duplog klika
+            clickTimer.Interval = Math.Max(150, Math.Min(700, SystemInformation.DoubleClickTime));
+            clickTimer.Tick += delegate { clickTimer.Stop(); SingleClick(); };
 
             timer.Interval = 33;
             timer.Tick += delegate { Step(); };
@@ -2320,12 +2322,23 @@ namespace DinoJoe
                 SetState(State.Fall, 0);
             }
             else if (IsEgg) WarmEgg(6, true);
-            else if (pose.State == State.Sleep) { forcedSleep = false; Say(Lang.Get("s.notsleep")); SetState(State.Idle, 2); }
-            else
+            else if (clickTimer.Enabled)
             {
-                if (rnd.Next(3) == 0) Say(Profile.Special("poke", Jokes.Poke)); else Say(PickJoke());
-                SetState(State.Happy, 1.2);
+                // drugi klik unutar vremena duplog klika: hranjenje (bez fore)
+                clickTimer.Stop();
+                Feed();
             }
+            else clickTimer.Start();
+        }
+
+        readonly System.Windows.Forms.Timer clickTimer = new System.Windows.Forms.Timer();
+
+        void SingleClick()
+        {
+            if (IsEgg || mouseDown || dragging) return;
+            if (pose.State == State.Sleep) { forcedSleep = false; Say(Lang.Get("s.notsleep")); SetState(State.Idle, 2); return; }
+            if (rnd.Next(3) == 0) Say(Profile.Special("poke", Jokes.Poke)); else Say(PickJoke());
+            SetState(State.Happy, 1.2);
         }
 
         protected override void OnFormClosing(FormClosingEventArgs e)
