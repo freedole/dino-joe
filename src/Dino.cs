@@ -1148,6 +1148,24 @@ namespace DinoJoe
             Say(Lang.Get("egg.hello"));
         }
 
+        GamesForm gamesForm;
+
+        void OpenGames()
+        {
+            if (EggBlock()) return;
+            if (gamesForm != null && !gamesForm.IsDisposed) { gamesForm.Activate(); return; }
+            gamesForm = new GamesForm();
+            gamesForm.Played += delegate(bool youWon, bool draw)
+            {
+                needs.Add(Need.Fun, 6); needs.Add(Need.Energy, -1);
+                if (draw) return;
+                if (youWon) { Achievements.Add("gamewins", 1); Say(Pick(Lang.Gender(Lang.Get("g.say.win")).Split('|'))); SetState(State.Sit, 2); }
+                else { Say(Pick(Lang.Get("g.say.lose").Split('|'))); SetState(State.Happy, 2); heartsStart = pose.T; }
+            };
+            gamesForm.FormClosed += delegate { gamesForm = null; needs.Save(); };
+            gamesForm.Show();
+        }
+
         void OpenAchievements()
         {
             using (AchievementsForm f = new AchievementsForm()) f.ShowDialog();
@@ -1446,6 +1464,7 @@ namespace DinoJoe
             fun.DropDownItems.Add(Lang.Get("m.jokefolder"), null, delegate { OpenCustom(); });
             fun.DropDownItems.Add(Lang.Get("m.reload"), null, delegate { Profile.LoadJokes(); recent.Clear(); Say(string.Format(Lang.Get("pk.loaded"), Profile.JokeCount)); });
             menu.Items.Add(fun);
+            menu.Items.Add(Lang.Get("m.games"), null, delegate { OpenGames(); });
             menu.Items.Add(Lang.Get("m.achievements"), null, delegate { OpenAchievements(); });
             menu.Items.Add(Lang.Get("menu.settings"), null, delegate { OpenSettings(); });
             ToolStripMenuItem miWin = new ToolStripMenuItem(Lang.Get("m.windowwalk"), null, delegate

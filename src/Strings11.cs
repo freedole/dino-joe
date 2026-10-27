@@ -118,6 +118,29 @@ namespace DinoJoe
             A("ach.games5.d", "Pobijedi dinu 5 puta u igrama.", "Pobedi dinu 5 puta u igrama.", "Pobijedi dina 5 puta u igrama.", "Beat your dino 5 times in games.");
             A("m.windowwalk", "Šetaj po prozorima", "Šetaj po prozorima", "Šeći po prozorima", "Walk on windows");
 
+            // mini igre
+            A("m.games", "Igre...", "Igre...", "Igre...", "Games...");
+            A("g.title", "Igre", "Igre", "Igre", "Games");
+            A("g.rps", "Kamen, papir, makaze", "Kamen, papir, makaze", "Kamen, škare, papir", "Rock, paper, scissors");
+            A("g.rock", "Kamen", "Kamen", "Kamen", "Rock");
+            A("g.paper", "Papir", "Papir", "Papir", "Paper");
+            A("g.scissors", "Makaze", "Makaze", "Škare", "Scissors");
+            A("g.rps.picked", "Dino je {izabrao|izabrala}: {0}.", "Dino je {izabrao|izabrala}: {0}.", "Dino je {odabrao|odabrala}: {0}.", "Dino picked: {0}.");
+            A("g.draw", "Nerješeno!", "Nerešeno!", "Neriješeno!", "Draw!");
+            A("g.youwin", "Pobijedio si! Ajde još jednom.", "Pobedio si! Ajde još jednom.", "Pobijedio si! Hajde još jednom.", "You win! One more?");
+            A("g.dinowin", "Dino pobjeđuje! ROAR!", "Dino pobeđuje! ROAR!", "Dino pobjeđuje! ROAR!", "Dino wins! ROAR!");
+            A("g.score", "Rezultat: ti {0} - dino {1}", "Rezultat: ti {0} - dino {1}", "Rezultat: ti {0} - dino {1}", "Score: you {0} - dino {1}");
+            A("g.guess", "Pogodi broj", "Pogodi broj", "Pogodi broj", "Guess the number");
+            A("g.guess.start", "{Zamislio|Zamislila} sam broj od 1 do 100. Pogađaj!", "{Zamislio|Zamislila} sam broj od 1 do 100. Pogađaj!", "{Zamislio|Zamislila} sam broj od 1 do 100. Pogađaj!", "I'm thinking of a number from 1 to 100. Guess!");
+            A("g.guess.bad", "Upiši broj od 1 do 100.", "Upiši broj od 1 do 100.", "Upiši broj od 1 do 100.", "Type a number from 1 to 100.");
+            A("g.guess.up", "{0}? Više!", "{0}? Više!", "{0}? Više!", "{0}? Higher!");
+            A("g.guess.down", "{0}? Manje!", "{0}? Manje!", "{0}? Manje!", "{0}? Lower!");
+            A("g.guess.ok", "Bravo! Broj je {0}, pogodio si iz {1}. pokušaja.", "Bravo! Broj je {0}, pogodio si iz {1}. pokušaja.", "Bravo! Broj je {0}, pogodio si iz {1}. pokušaja.", "Yes! It was {0}, you got it in {1} tries.");
+            A("g.try", "Pokušaj", "Pokušaj", "Pokušaj", "Guess");
+            A("g.new", "Novi broj", "Novi broj", "Novi broj", "New number");
+            A("g.say.win", "Dobro igraš! Ali sljedeći put sam ja na redu.|Ma {pustio|pustila} sam te.|Revanš! Odmah!", "Dobro igraš! Ali sledeći put sam ja na redu.|Ma {pustio|pustila} sam te.|Revanš! Odmah!", "Dobro igraš! Ali sljedeći put sam ja na redu.|Ma {pustio|pustila} sam te.|Revanš! Odmah!", "Nice one! Next time it's mine.|I let you win.|Rematch! Now!");
+            A("g.say.lose", "ROAR! Pobjeda!|Dinosaurusi su prvaci!|Hoćeš revanš?", "ROAR! Pobeda!|Dinosaurusi su prvaci!|Hoćeš revanš?", "ROAR! Pobjeda!|Dinosauri su prvaci!|Hoćeš revanš?", "ROAR! Victory!|Dinosaurs are champions!|Want a rematch?");
+
             // nove šare
             A("pat.gold", "Zlatna", "Zlatna", "Zlatna", "Gold");
             Lang.BsOverride["ach.stylist.d"] = "Promijeni izgled u postavkama.";
