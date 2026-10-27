@@ -2,9 +2,9 @@
 
 ## 1. Nalog (jednom)
 1. https://storedeveloper.microsoft.com -> **Individual developer** (besplatno, potrebna lična karta/pasoš za verifikaciju).
-2. Publisher display name: `cyber-security.ba` (mora se poklapati sa `PUBLISHER_DISPLAY` u `msix/identity.ini`).
+2. Publisher display name: `freedole` (mora se poklapati sa `PUBLISHER_DISPLAY` u `msix/identity.ini`).
 
-## 2. Rezervacija imena
+## 2. Rezervacija imena (urađeno 2026-10-27, Store ID 9NH8W79H7S60)
 Partner Center -> **Apps and games** -> **New product** -> **MSIX or PWA app** -> ime: `Dino Joe - Desktop Pet`.
 
 ## 3. Identitet paketa
