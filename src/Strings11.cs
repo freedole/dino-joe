@@ -141,6 +141,35 @@ namespace DinoJoe
             A("g.say.win", "Dobro igraš! Ali sljedeći put sam ja na redu.|Ma {pustio|pustila} sam te.|Revanš! Odmah!", "Dobro igraš! Ali sledeći put sam ja na redu.|Ma {pustio|pustila} sam te.|Revanš! Odmah!", "Dobro igraš! Ali sljedeći put sam ja na redu.|Ma {pustio|pustila} sam te.|Revanš! Odmah!", "Nice one! Next time it's mine.|I let you win.|Rematch! Now!");
             A("g.say.lose", "ROAR! Pobjeda!|Dinosaurusi su prvaci!|Hoćeš revanš?", "ROAR! Pobeda!|Dinosaurusi su prvaci!|Hoćeš revanš?", "ROAR! Pobjeda!|Dinosauri su prvaci!|Hoćeš revanš?", "ROAR! Victory!|Dinosaurs are champions!|Want a rematch?");
 
+            // sezonski izgled
+            A("m.seasonal", "Sezonski izgled", "Sezonski izgled", "Sezonski izgled", "Seasonal look");
+            A("season.halloween", "Bu! {Uplašio|Uplašila} sam te? Sretna Noć vještica!|Vidi mi šešir. Strašno, a?|Noć vještica je. Ja sam već {dovoljno strašan|dovoljno strašna}, sa zubima.",
+                                  "Bu! {Uplašio|Uplašila} sam te? Srećna Noć veštica!|Vidi mi šešir. Strašno, a?|Noć veštica je. Ja sam već {dovoljno strašan|dovoljno strašna}, sa zubima.",
+                                  "Bu! Jesam li te {prestrašio|prestrašila}? Sretna Noć vještica!|Vidi mi šešir. Strašno, a?|Noć vještica je. Ja sam već {dovoljno strašan|dovoljno strašna}, sa zubima.",
+                                  "Boo! Scared you? Happy Halloween!|Check out my hat. Spooky, huh?|It's Halloween. I'm scary enough already, with these teeth.");
+            A("season.xmas", "Ho-ho-ho! Sretni praznici!|Kapa je od Djed Mraza. {Posudio|Posudila} sam je.|Snijeg, kolači i ja. Savršeno.",
+                             "Ho-ho-ho! Srećni praznici!|Kapa je od Deda Mraza. {Pozajmio|Pozajmila} sam je.|Sneg, kolači i ja. Savršeno.",
+                             "Ho-ho-ho! Sretni blagdani!|Kapa je od Djedice Mraza. {Posudio|Posudila} sam je.|Snijeg, kolači i ja. Savršeno.",
+                             "Ho-ho-ho! Happy holidays!|The hat is Santa's. I borrowed it.|Snow, cookies and me. Perfect.");
+
+            // podsjetnici
+            A("m.reminders", "Podsjetnici", "Podsetnici", "Podsjetnici", "Reminders");
+            A("rem.off", "Isključeno", "Isključeno", "Isključeno", "Off");
+            A("rem.every", "Svakih {0} min", "Svakih {0} min", "Svakih {0} min", "Every {0} min");
+            A("rem.saidon", "Dogovoreno. Podsjećam te svakih {0} minuta.", "Dogovoreno. Podsećam te svakih {0} minuta.", "Dogovoreno. Podsjećam te svakih {0} minuta.", "Deal. I'll remind you every {0} minutes.");
+            A("rem.saidoff", "Dobro, neću te više podsjećati.", "Dobro, neću te više podsećati.", "Dobro, neću te više podsjećati.", "Okay, no more reminders.");
+            A("rem.say", "Ustani i protegni se malo. I ja ću.|Popij čašu vode. Dinosaurusi koji piju vodu ne izumiru.|Odmori oči: 20 sekundi gledaj nešto daleko.|Ispravi leđa. Izgledaš kao Raptor.|Pauza od dva minuta. Šef neće primijetiti.",
+                          "Ustani i protegni se malo. I ja ću.|Popij čašu vode. Dinosaurusi koji piju vodu ne izumiru.|Odmori oči: 20 sekundi gledaj nešto daleko.|Ispravi leđa. Izgledaš kao Raptor.|Pauza od dva minuta. Šef neće primetiti.",
+                          "Ustani i protegni se malo. I ja ću.|Popij čašu vode. Dinosauri koji piju vodu ne izumiru.|Odmori oči: 20 sekundi gledaj nešto daleko.|Ispravi leđa. Izgledaš kao Raptor.|Pauza od dvije minute. Šef neće primijetiti.",
+                          "Stand up and stretch a bit. Me too.|Drink a glass of water. Dinosaurs who drink water don't go extinct.|Rest your eyes: look at something far away for 20 seconds.|Sit up straight. You look like a Raptor.|Two-minute break. The boss won't notice.");
+
+            // savjeti za nove korisnike
+            A("tip.prefix", "Savjet: ", "Savet: ", "Savjet: ", "Tip: ");
+            A("tip.list", "desni klik na mene otvara sve opcije.|dupli klik me nahrani.|Ctrl+Alt+D otvara moj Status odakle god.|Ctrl+Alt+F i ispričam foru.|uhvati me mišem i baci. Volim da letim!|spusti me na vrh prozora, pa šetam po njemu.|desni klik -> Igre... za kamen-papir-makaze.|Fore -> Preuzmi pakete sa interneta... ima fore za tvoju struku.|Fore -> Samo ovaj paket, ako hoćeš samo jednu temu.|Dostignuća otključavaju nove vrste i šare.",
+                          "desni klik na mene otvara sve opcije.|dupli klik me nahrani.|Ctrl+Alt+D otvara moj Status odakle god.|Ctrl+Alt+F i ispričam foru.|uhvati me mišem i baci. Volim da letim!|spusti me na vrh prozora, pa šetam po njemu.|desni klik -> Igre... za kamen-papir-makaze.|Fore -> Preuzmi pakete sa interneta... ima fore za tvoju struku.|Fore -> Samo ovaj paket, ako hoćeš samo jednu temu.|Dostignuća otključavaju nove vrste i šare.",
+                          "desni klik na mene otvara sve opcije.|dvostruki klik me nahrani.|Ctrl+Alt+D otvara moj Status odakle god.|Ctrl+Alt+F i ispričam foru.|uhvati me mišem i baci. Volim letjeti!|spusti me na vrh prozora, pa šećem po njemu.|desni klik -> Igre... za kamen-škare-papir.|Fore -> Preuzmi pakete s interneta... ima fora za tvoju struku.|Fore -> Samo ovaj paket, ako želiš samo jednu temu.|Postignuća otključavaju nove vrste i uzorke.",
+                          "right-click me for all options.|double-click to feed me.|Ctrl+Alt+D opens my Status from anywhere.|Ctrl+Alt+F and I tell a joke.|grab me with the mouse and throw me. I love flying!|drop me on top of a window and I'll walk on it.|right-click -> Games... for rock-paper-scissors.|Jokes -> Download packs... has jokes for your job.|Jokes -> Only this pack, if you want just one topic.|Achievements unlock new species and patterns.");
+
             // nove šare
             A("pat.gold", "Zlatna", "Zlatna", "Zlatna", "Gold");
             Lang.BsOverride["ach.stylist.d"] = "Promijeni izgled u postavkama.";

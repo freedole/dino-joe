@@ -997,7 +997,7 @@ namespace DinoJoe
             pose.Glasses = Settings.Glasses;
             pose.Species = Settings.Species;
             pose.Pattern = Settings.Pattern;
-            pose.Accessory = Settings.Accessory;
+            pose.Accessory = LookAccessory();
             if (!Life.Exists) { Life.StartAdult(); veteranNew = true; }   // korisnik iz v1.0 ostaje odrasli
             else if (Life.CatchUp(needs.Vacation || needs.RanAway))
             {
@@ -1037,6 +1037,8 @@ namespace DinoJoe
 
             SetState(State.Happy, 2.5);
             if (Life.Stage == Life.Egg) { SetState(State.Idle, 3); Say(Lang.Get("egg.hello")); }
+            else if (!Program.JustSetUp && Settings.Seasonal && Skins.SeasonKey(DateTime.Now) != null && rnd.Next(2) == 0)
+                Say(Pick(Lang.Gender(Lang.Get("season." + Skins.SeasonKey(DateTime.Now))).Split('|')));
             else Say(Program.JustSetUp ? Lang.Get("pet.hello") : Greeting());
             Achievements.TouchDay();
             if (veteranNew) Achievements.Unlock("veteran");
@@ -1135,7 +1137,7 @@ namespace DinoJoe
                 if (needs.Vacation) Achievements.Unlock("vacation");
             }
             dayCheckT += Dt;
-            if (dayCheckT > 300) { dayCheckT = 0; Achievements.TouchDay(); }
+            if (dayCheckT > 300) { dayCheckT = 0; Achievements.TouchDay(); pose.Accessory = LookAccessory(); }
         }
 
         void NewEgg()
@@ -1146,6 +1148,44 @@ namespace DinoJoe
             forcedSleep = false;
             SetState(State.Idle, 3);
             Say(Lang.Get("egg.hello"));
+        }
+
+        // ---------------- sezonski izgled, savjeti, podsjetnici ----------------
+        static int LookAccessory()
+        {
+            if (Settings.Accessory == 0 && Settings.Seasonal) return Skins.SeasonalAccessory(DateTime.Now);
+            return Settings.Accessory;
+        }
+
+        double tipT = 120, reminderT;
+
+        /// Savjet (prva 3 dana, svakih ~15 min) ili podsjetnik (ustani/voda/oči). Vraća true ako je nešto rekao.
+        bool TipOrReminder()
+        {
+            if (Settings.ReminderMinutes > 0 && reminderT >= Settings.ReminderMinutes * 60 && Triggers.IdleSeconds() < 120)
+            {
+                reminderT = 0;
+                Say(Pick(Lang.Gender(Lang.Get("rem.say")).Split('|')));
+                SetState(State.Happy, 1.2);
+                return true;
+            }
+            if (tipT >= 900 && Achievements.Count("days") <= 3)
+            {
+                tipT = 0;
+                string[] tips = Lang.Get("tip.list").Split('|');
+                if (Settings.TipsNext < tips.Length)
+                {
+                    Say(Lang.Get("tip.prefix") + tips[Settings.TipsNext]);
+                    Settings.TipsNext++; Settings.Save();
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        void TipTick()
+        {
+            tipT += Dt; reminderT += Dt;
         }
 
         GamesForm gamesForm;
@@ -1325,7 +1365,7 @@ namespace DinoJoe
             pose.Glasses = Settings.Glasses;
             pose.Species = Settings.Species;
             pose.Pattern = Settings.Pattern;
-            pose.Accessory = Settings.Accessory;
+            pose.Accessory = LookAccessory();
             // jezik se možda promijenio: napravi meni ponovo
             ContextMenuStrip old = menu;
             BuildMenu();
@@ -1475,6 +1515,27 @@ namespace DinoJoe
             menu.Opening += delegate { miWin.Checked = Settings.WindowWalk; };
             miAutostart = new ToolStripMenuItem(Lang.Get("s.autostart"), null, delegate { ToggleAutostart(); });
             menu.Items.Add(miWin);
+            ToolStripMenuItem miSeason = new ToolStripMenuItem(Lang.Get("m.seasonal"), null, delegate
+            {
+                Settings.Seasonal = !Settings.Seasonal; Settings.Save();
+                pose.Accessory = LookAccessory();
+            });
+            menu.Opening += delegate { miSeason.Checked = Settings.Seasonal; };
+            menu.Items.Add(miSeason);
+            ToolStripMenuItem miRem = new ToolStripMenuItem(Lang.Get("m.reminders"));
+            int[] remOpts = { 0, 30, 45, 60, 90 };
+            foreach (int ro in remOpts)
+            {
+                int v = ro;
+                ToolStripMenuItem it = new ToolStripMenuItem(v == 0 ? Lang.Get("rem.off") : string.Format(Lang.Get("rem.every"), v), null, delegate
+                {
+                    Settings.ReminderMinutes = v; Settings.Save(); reminderT = 0;
+                    Say(v == 0 ? Lang.Get("rem.saidoff") : string.Format(Lang.Get("rem.saidon"), v));
+                });
+                miRem.DropDownItems.Add(it);
+            }
+            menu.Opening += delegate { for (int i = 0; i < remOpts.Length; i++) ((ToolStripMenuItem)miRem.DropDownItems[i]).Checked = Settings.ReminderMinutes == remOpts[i]; };
+            menu.Items.Add(miRem);
             menu.Items.Add(miAutostart);
             menu.Items.Add(Lang.Get("m.newegg"), null, delegate { NewEgg(); });
             menu.Items.Add(Lang.Get("m.report"), null, delegate { ErrorLog.OpenReport(); });
@@ -1920,6 +1981,7 @@ namespace DinoJoe
             if (needs.RanAway) return;
             if (!IsEgg && needs.ShouldRunAway && pose.Bubble == null) { RunAway(); return; }
             LifeStep();
+            TipTick();
             pose.Warmth = Life.Warmth;
 
             pose.T += Dt; stateT += Dt; sinceTalk += Dt;
@@ -2082,6 +2144,7 @@ namespace DinoJoe
                     else if (triggers.LastKey == "trg.monday") Achievements.Unlock("monday");
                 }
                 else if (needs[needs.Lowest] < 30 && !needs.Vacation && sinceTalk > (Needs.Hardcore ? 45 : 100) && rnd.Next(200) == 0) Say(NeedLine(needs.Lowest));
+                else if (TipOrReminder()) { }
                 else if (sinceTalk > nextTalk) TellJoke(false);
             }
 

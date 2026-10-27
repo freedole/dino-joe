@@ -84,7 +84,7 @@ namespace DinoJoe
             catch { cpuFailed = true; return 0; }
         }
 
-        static double IdleSeconds()
+        public static double IdleSeconds()
         {
             try
             {

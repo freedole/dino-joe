@@ -12,15 +12,30 @@ namespace DinoJoe
     static class Skins
     {
         public const int PatternCount = 8;      // 0 = bez šare; 6 i 7 se otključavaju dostignućima
-        public const int AccessoryCount = 11;   // 0 = bez dodatka
+        public const int AccessoryCount = 13;   // 0 = bez dodatka; 11, 12 sezonski (biraju se i ručno)
         public static readonly string[] PatternKeys = { "none", "stripes", "dots", "gradient", "camo", "galaxy", "gold", "rainbow" };
-        public static readonly string[] AccessoryKeys = { "none", "beanie", "tophat", "tie", "headphones", "crown", "helmet", "scarf", "flower", "mustache", "bowtie" };
+        public static readonly string[] AccessoryKeys = { "none", "beanie", "tophat", "tie", "headphones", "crown", "helmet", "scarf", "flower", "mustache", "bowtie", "witchhat", "santahat" };
 
         public static string PatternName(int i) { return Lang.Get("pat." + PatternKeys[Math.Max(0, Math.Min(PatternCount - 1, i))]); }
         public static string AccessoryName(int i) { return Lang.Get("acc." + AccessoryKeys[Math.Max(0, Math.Min(AccessoryCount - 1, i))]); }
 
         /// Dodaci koji pokrivaju vrh glave (tada se mašna ne crta).
-        public static bool CoversHead(int acc) { return acc == 1 || acc == 2 || acc == 5 || acc == 6 || acc == 4; }
+        public static bool CoversHead(int acc) { return acc == 1 || acc == 2 || acc == 5 || acc == 6 || acc == 4 || acc == 11 || acc == 12; }
+
+        /// Sezonski dodatak za danas (0 = nema): Noć vještica 24.10-1.11, Božić/Nova godina 15.12-7.1.
+        public static int SeasonalAccessory(DateTime d)
+        {
+            if ((d.Month == 10 && d.Day >= 24) || (d.Month == 11 && d.Day <= 1)) return 11;
+            if ((d.Month == 12 && d.Day >= 15) || (d.Month == 1 && d.Day <= 7)) return 12;
+            return 0;
+        }
+
+        /// "halloween", "xmas" ili null.
+        public static string SeasonKey(DateTime d)
+        {
+            int a = SeasonalAccessory(d);
+            return a == 11 ? "halloween" : (a == 12 ? "xmas" : null);
+        }
     }
 
     static partial class Painter
@@ -263,6 +278,45 @@ namespace DinoJoe
                             g.DrawPolygon(o, l); g.DrawPolygon(o, r);
                             using (SolidBrush b = new SolidBrush(c)) g.FillEllipse(b, 23, 39, 8, 7);
                             g.DrawEllipse(o, 23, 39, 8, 7);
+                        }
+                        break;
+                    case 11: // vještičiji šešir (Noć vještica)
+                        {
+                            using (GraphicsPath brim = new GraphicsPath())
+                            {
+                                brim.AddEllipse(-2, -4, 58, 12);
+                                using (SolidBrush b = new SolidBrush(Color.FromArgb(55, 40, 80))) g.FillPath(b, brim);
+                                g.DrawPath(o, brim);
+                            }
+                            using (GraphicsPath cone = new GraphicsPath())
+                            {
+                                cone.AddBezier(12, 1, 16, -14, 22, -30, 34, -40);
+                                cone.AddBezier(34, -40, 30, -28, 38, -12, 42, 1);
+                                cone.CloseFigure();
+                                using (SolidBrush b = new SolidBrush(Color.FromArgb(75, 55, 110))) g.FillPath(b, cone);
+                                g.DrawPath(o, cone);
+                            }
+                            using (SolidBrush b = new SolidBrush(Color.FromArgb(245, 150, 40))) g.FillRectangle(b, 14, -6, 27, 5);
+                            using (SolidBrush b = new SolidBrush(Color.FromArgb(255, 220, 90))) g.FillRectangle(b, 24, -7, 7, 7);
+                        }
+                        break;
+                    case 12: // Djed Mrazova kapa (Božić / Nova godina)
+                        {
+                            using (GraphicsPath cap = new GraphicsPath())
+                            {
+                                cap.AddBezier(8, 2, 10, -18, 30, -26, 52, -14);
+                                cap.AddBezier(52, -14, 58, -8, 54, 0, 48, 2);
+                                cap.CloseFigure();
+                                using (SolidBrush b = new SolidBrush(Color.FromArgb(214, 40, 50))) g.FillPath(b, cap);
+                                g.DrawPath(o, cap);
+                            }
+                            using (GraphicsPath band = Theme.Round(new RectangleF(4, -2, 48, 9), 4.5f))
+                            {
+                                using (SolidBrush b = new SolidBrush(Color.FromArgb(248, 248, 248))) g.FillPath(b, band);
+                                g.DrawPath(o, band);
+                            }
+                            using (SolidBrush b = new SolidBrush(Color.FromArgb(248, 248, 248))) g.FillEllipse(b, 49, -10, 11, 11);
+                            g.DrawEllipse(o, 49, -10, 11, 11);
                         }
                         break;
                 }

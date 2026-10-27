@@ -329,6 +329,8 @@ namespace DinoJoe
             Add("acc.flower", "Cvijet", "Cvet", "Cvijet", "Flower");
             Add("acc.mustache", "Brkovi", "Brkovi", "Brkovi", "Mustache");
             Add("acc.bowtie", "Leptir-mašna", "Leptir-mašna", "Leptir-mašna", "Bow tie");
+            Add("acc.witchhat", "Vještičiji šešir", "Veštičiji šešir", "Vještičji šešir", "Witch hat");
+            Add("acc.santahat", "Djed Mrazova kapa", "Deda Mrazova kapa", "Djedica Mrazova kapa", "Santa hat");
 
             // katalog
             Add("cat.menu", "Preuzmi pakete sa interneta...", "Preuzmi pakete sa interneta...", "Preuzmi pakete s interneta...", "Download packs...");
@@ -500,7 +502,10 @@ namespace DinoJoe
         public static string ActiveProfile = "";
         public static string HiddenPersonalities = "";      // id-ovi sakrivenih ugrađenih ličnosti
         public static string SoloPack = "";
-        public static bool WindowWalk = true;               // dino može stajati/šetati po gornjoj ivici prozora                 // "Samo ovaj paket": id paketa ili prazno = svi uključeni
+        public static bool WindowWalk = true;
+        public static bool Seasonal = true;                 // sezonski izgled (Noć vještica, Božić) kad nema dodatka
+        public static int ReminderMinutes = 0;              // podsjetnici: 0 = isključeno
+        public static int TipsNext = 0;                     // sljedeći savjet za nove korisnike               // dino može stajati/šetati po gornjoj ivici prozora                 // "Samo ovaj paket": id paketa ili prazno = svi uključeni
 
         public static bool IsHidden(string id) { return ("," + HiddenPersonalities + ",").Contains("," + id + ","); }
 
@@ -544,6 +549,9 @@ namespace DinoJoe
                         else if (k == "hidden_personalities") HiddenPersonalities = v;
                         else if (k == "solo_pack") SoloPack = v;
                         else if (k == "window_walk") WindowWalk = v != "0";
+                        else if (k == "seasonal") Seasonal = v != "0";
+                        else if (k == "reminder_min" && int.TryParse(v, out n)) ReminderMinutes = Math.Max(0, Math.Min(240, n));
+                        else if (k == "tips_next" && int.TryParse(v, out n)) TipsNext = Math.Max(0, n);
                     }
             }
             catch { }
@@ -573,6 +581,9 @@ namespace DinoJoe
                     "hidden_personalities=" + HiddenPersonalities + "\r\n" +
                     "solo_pack=" + SoloPack + "\r\n" +
                     "window_walk=" + (WindowWalk ? "1" : "0") + "\r\n" +
+                    "seasonal=" + (Seasonal ? "1" : "0") + "\r\n" +
+                    "reminder_min=" + ReminderMinutes + "\r\n" +
+                    "tips_next=" + TipsNext + "\r\n" +
                     "profile=" + ActiveProfile.Replace("\r", "").Replace("\n", "") + "\r\n", new UTF8Encoding(true));
             }
             catch { }
