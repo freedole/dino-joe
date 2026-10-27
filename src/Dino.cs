@@ -258,6 +258,7 @@ namespace DinoJoe
         public int Stage = Life.Adult;  // jaje, beba, mladunče, odrasli
         public double Warmth;           // jaje: 0..100
         public double HatchT = -1;      // jaje: animacija izlijeganja 0..1
+        public int Mouth = -1;          // -1 automatski po stanju, 0 zatvorena, 1 otvorena (npr. pjevanje u videu)
     }
 
     static partial class Painter
@@ -722,7 +723,8 @@ namespace DinoJoe
                     g.FillEllipse(n, hx + 49, hy + 10, 3.5f, 2.5f);
 
                 // usta
-                if (st == State.Roar || st == State.Stretch || (st == State.Happy && ((int)(p.T * 6)) % 2 == 0))
+                bool mouthOpen = p.Mouth >= 0 ? p.Mouth == 1 : (st == State.Roar || st == State.Stretch || (st == State.Happy && ((int)(p.T * 6)) % 2 == 0));
+                if (mouthOpen)
                 {
                     float mw = st == State.Roar ? 18 : 12, mh = st == State.Roar ? 12 : 8;
                     using (GraphicsPath mouth = new GraphicsPath())

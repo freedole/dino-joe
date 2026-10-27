@@ -403,6 +403,10 @@ namespace DinoJoe
                 "Jesi probao restart? Ja sam izumro i vratio se kao emoji.",
                 "Have you tried turning it off and on again? I went extinct and came back as an emoji.",
                 "Informatičar: humor o IT-u, serverima, backupu, DNS-u, korisnicima i helpdesku.");
+            Add("dizajner", "Dizajner", "Dizajner", "Dizajner", "Designer",
+                "Bež nije boja. Bež je stav.",
+                "Beige isn't a color. Beige is an attitude.",
+                "Dizajner enterijera i arhitekta: humor o prostoru, bojama, rasvjeti, materijalima (mermer, hrast, mesing), klijentima, majstorima i rokovima. Elegantan, sa stilom, voli luksuz i detalje.");
             Add("kancelarija", "Kancelarijski", "Kancelarijski", "Uredski", "Office Worker",
                 "Ovaj sastanak je mogao biti mejl. Ovaj mejl je mogao biti tišina.",
                 "This meeting could have been an email. This email could have been silence.",
