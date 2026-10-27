@@ -1756,6 +1756,22 @@ namespace DinoJoe
             if (s == State.Walk && rnd.Next(3) == 0) pose.Dir = -pose.Dir;
         }
 
+        /// Postoji li ekran odmah lijevo (dir -1) ili desno (dir 1) od ekrana na kojem je dino, sa vertikalnim preklapanjem.
+        bool HasNeighbor(int dir)
+        {
+            Screen cur = Screen.FromPoint(new Point((int)(fx + cw / 2), (int)(fy + ch / 2)));
+            Rectangle b = cur.Bounds;
+            foreach (Screen sc in Screen.AllScreens)
+            {
+                if (sc.Equals(cur)) continue;
+                Rectangle o = sc.Bounds;
+                bool touches = dir > 0 ? Math.Abs(o.Left - b.Right) <= 8 : Math.Abs(o.Right - b.Left) <= 8;
+                bool overlap = o.Top < b.Bottom && o.Bottom > b.Top;
+                if (touches && overlap) return true;
+            }
+            return false;
+        }
+
         Rectangle CurrentArea() { return Screen.FromPoint(new Point((int)(fx + cw / 2), (int)(fy + ch / 2))).WorkingArea; }
         double GroundFor(Rectangle wa) { return wa.Bottom - ch + 2 * k; }
 
@@ -1842,9 +1858,11 @@ namespace DinoJoe
             {
                 case State.Walk:
                     fx += pose.Dir * 1.7 * k;
-                    if (fx < wa.Left - 40 * k) { fx = wa.Left - 40 * k; pose.Dir = 1; }
-                    if (fx > wa.Right - cw + 40 * k) { fx = wa.Right - cw + 40 * k; pose.Dir = -1; }
-                    fy = ground;
+                    // više monitora: na ivici se okreće samo ako sa te strane nema susjednog ekrana
+                    if (fx < wa.Left - 40 * k && !HasNeighbor(-1)) { fx = wa.Left - 40 * k; pose.Dir = 1; }
+                    if (fx > wa.Right - cw + 40 * k && !HasNeighbor(1)) { fx = wa.Right - cw + 40 * k; pose.Dir = -1; }
+                    if (fy < ground - 2) { vy = 0; SetState(State.Fall, 0); }   // prešao na viši/niži ekran: padne na njegovo tlo
+                    else fy = ground;
                     break;
                 case State.Fall:
                     vy += 0.9 * k;
