@@ -214,6 +214,7 @@ Pravila:
 - Na ozbiljno tehničko pitanje odgovori tačno i konkretno, pa tek onda dodaj kratku foru.
 - Ne izmišljaj propise, brojeve članova zakona ni tačne podatke. Ako ne znaš, reci to otvoreno.
 - Nikad ne izlaziš iz uloge dinosaurusa i ne spominješ da si jezički model.
+- Ne koristi emoji (ne prikazuju se); ako baš treba, napiši :) ili ;)
 ";
     }
 
@@ -403,7 +404,43 @@ Pravila:
                 t = b < 0 ? t.Substring(0, a) : t.Remove(a, b + 8 - a);
                 a = t.IndexOf("<think>", StringComparison.OrdinalIgnoreCase);
             }
-            return t.Trim();
+            return NoEmoji(t.Trim());
+        }
+
+        /// GDI/RichTextBox na Windowsu ne crta emoji u boji (ispadnu kockice):
+        /// česte smajliće pretvori u tekst, ostale emoji ukloni.
+        public static string NoEmoji(string t)
+        {
+            if (string.IsNullOrEmpty(t)) return t;
+            StringBuilder sb = new StringBuilder(t.Length);
+            for (int i = 0; i < t.Length; i++)
+            {
+                char c = t[i];
+                int cp = c;
+                if (char.IsHighSurrogate(c) && i + 1 < t.Length && char.IsLowSurrogate(t[i + 1])) { cp = char.ConvertToUtf32(c, t[i + 1]); i++; }
+                else if (char.IsSurrogate(c)) continue;
+                string rep = null;
+                if (cp == 0xFE0F || cp == 0xFE0E || cp == 0x200D || (cp >= 0x1F3FB && cp <= 0x1F3FF)) rep = "";
+                else if ((cp >= 0x1F600 && cp <= 0x1F60F) || cp == 0x1F642 || cp == 0x1F917 || cp == 0x1F929 || cp == 0x263A) rep = cp == 0x1F609 ? ";)" : (cp == 0x1F602 || cp == 0x1F606 || cp == 0x1F923 ? "xD" : ":)");
+                else if (cp == 0x1F923) rep = "xD";
+                else if (cp == 0x1F61C || cp == 0x1F61B || cp == 0x1F61D) rep = ":P";
+                else if ((cp >= 0x1F612 && cp <= 0x1F62D) || cp == 0x1F641 || cp == 0x2639) rep = ":(";
+                else if (cp == 0x2764 || (cp >= 0x1F493 && cp <= 0x1F49F)) rep = "<3";
+                else if (cp == 0x1F44D) rep = "(y)";
+                else if (cp > 0xFFFF || (cp >= 0x2600 && cp <= 0x27BF) || (cp >= 0x2B00 && cp <= 0x2BFF)) rep = "";
+                if (rep == null) { if (cp > 0xFFFF) sb.Append(char.ConvertFromUtf32(cp)); else sb.Append((char)cp); }
+                else if (rep.Length > 0)
+                {
+                    if (sb.Length > 0 && sb[sb.Length - 1] != ' ') sb.Append(' ');
+                    sb.Append(rep);
+                }
+            }
+            string r = sb.ToString();
+            while (r.Contains("  ")) r = r.Replace("  ", " ");
+            r = r.Replace(" .", ".").Replace(" !", "!").Replace(" ,", ",");
+            // dupli smajlići jedan do drugog (":) :)") skrati na jedan
+            foreach (string d in new string[] { ":)", "xD", ";)", "<3", "(y)", ":(", ":P" }) while (r.Contains(d + " " + d)) r = r.Replace(d + " " + d, d);
+            return r.Trim();
         }
 
         public static string ExtractContent(string json)
