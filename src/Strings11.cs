@@ -99,6 +99,10 @@ namespace DinoJoe
                                    "Pokretanje s Windowsima: Postavke > Aplikacije > Pokretanje (Dino Joe).",
                                    "Start with Windows: Settings > Apps > Startup (Dino Joe).");
 
+            // log grešaka
+            A("err.bubble", "Ups, nešto me zaboljelo. Desni klik -> Prijavi problem...", "Ups, nešto me zabolelo. Desni klik -> Prijavi problem...", "Ups, nešto me zaboljelo. Desni klik -> Prijavi problem...", "Oops, something hurt. Right-click -> Report a problem...");
+            A("m.report", "Prijavi problem...", "Prijavi problem...", "Prijavi problem...", "Report a problem...");
+
             // "Samo ovaj paket"
             A("pk.solo", "Samo ovaj paket", "Samo ovaj paket", "Samo ovaj paket", "Only this pack");
             A("pk.solo.all", "Svi uključeni paketi", "Svi uključeni paketi", "Svi uključeni paketi", "All enabled packs");

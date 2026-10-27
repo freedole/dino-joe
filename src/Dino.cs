@@ -19,7 +19,7 @@ using Microsoft.Win32;
 
 [assembly: System.Reflection.AssemblyTitle("Dino Joe - Desktop Pet")]
 [assembly: System.Reflection.AssemblyProduct("Dino Joe")]
-[assembly: System.Reflection.AssemblyVersion("1.1.0.0")]
+[assembly: System.Reflection.AssemblyVersion("1.1.1.0")]
 
 namespace DinoJoe
 {
@@ -78,6 +78,7 @@ namespace DinoJoe
                 try { SetProcessDPIAware(); } catch { }
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
+                ErrorLog.Install();
                 Settings.Load();
                 Settings.Apply();
                 Life.Load();
@@ -1003,6 +1004,7 @@ namespace DinoJoe
             pose.Stage = Life.Stage;
             pose.Warmth = Life.Warmth;
             Achievements.Unlocked += OnAchievement;
+            ErrorLog.Logged += OnErrorLogged;
             ai = new AiConfig(dir0);
             ai.Persona();
             ApplySize();
@@ -1446,6 +1448,7 @@ namespace DinoJoe
             miAutostart = new ToolStripMenuItem(Lang.Get("s.autostart"), null, delegate { ToggleAutostart(); });
             menu.Items.Add(miAutostart);
             menu.Items.Add(Lang.Get("m.newegg"), null, delegate { NewEgg(); });
+            menu.Items.Add(Lang.Get("m.report"), null, delegate { ErrorLog.OpenReport(); });
             menu.Items.Add(new ToolStripSeparator());
             menu.Items.Add(Lang.Get("m.exit"), null, delegate { Close(); });
             menu.Opening += delegate
@@ -1849,8 +1852,38 @@ namespace DinoJoe
         }
 
         // ---------------- petlja ----------------
+        // pauza kad korisnik igra / prezentuje preko cijelog ekrana ili je ekran zaključan
+        bool quietHidden;
+        double quietCheckT = 10;
+
+        void QuietStep()
+        {
+            quietCheckT += Dt;
+            if (quietCheckT < 2) return;
+            quietCheckT = 0;
+            bool q = Quiet.ShouldHide;
+            if (q && !quietHidden) { quietHidden = true; Hide(); timer.Interval = 500; }
+            else if (!q && quietHidden) { quietHidden = false; timer.Interval = 33; if (!needs.RanAway) { Show(); Present(); } }
+        }
+
+        DateTime lastErrorBubble = DateTime.MinValue;
+
+        void OnErrorLogged()
+        {
+            try
+            {
+                if ((DateTime.Now - lastErrorBubble).TotalMinutes < 10) return;
+                lastErrorBubble = DateTime.Now;
+                BeginInvoke((MethodInvoker)delegate { Say(Lang.Get("err.bubble")); });
+            }
+            catch { }
+        }
+
         void Step()
         {
+            if (quietHidden) quietCheckT += Dt * 14;   // dok je pauzirano, timer ide sporije (500 ms)
+            QuietStep();
+            if (quietHidden) { if (!IsEgg) needs.Tick(0.5, false); return; }
             // potrebe
             if (!IsEgg) needs.Tick(Dt, pose.State == State.Sleep);
             needsSaveT += Dt;
