@@ -236,7 +236,7 @@ namespace DinoJoe
     // ======================================================================
     //  CRTANJE
     // ======================================================================
-    enum State { Walk, Idle, Sit, Sleep, Happy, Roar, Drag, Fall }
+    enum State { Walk, Idle, Sit, Sleep, Happy, Roar, Drag, Fall, Stretch }
 
     class Pose
     {
@@ -350,6 +350,13 @@ namespace DinoJoe
             g.TranslateTransform(cx, gy - (float)p.JumpY);
             if (p.Dir < 0) g.ScaleTransform(-1, 1);
             if (sc != 1f) g.ScaleTransform(sc, sc);
+            if (p.State == State.Stretch)
+            {
+                // razgibavanje: istezanje gore (squash & stretch oko stopala) i lagano naginjanje
+                float s = (float)Math.Abs(Math.Sin(p.T * 2.4));
+                g.RotateTransform((float)Math.Sin(p.T * 1.2) * 4f);
+                g.ScaleTransform(1f - s * 0.07f, 1f + s * 0.15f);
+            }
             DrawDino(g, p);
             g.Restore(gs);
 
@@ -449,6 +456,7 @@ namespace DinoJoe
             }
             if (st == State.Happy) { armAng = -95 + (float)Math.Sin(t * 18) * 30f; }
             if (st == State.Roar) { armAng = -110 + (float)Math.Sin(t * 30) * 8f; }
+            if (st == State.Stretch) armAng = -150 + (float)Math.Sin(t * 2.4) * 12f;
             if (dragged) { legA = (float)Math.Sin(t * 14) * 20f; legB = -legA; armAng = -120 + (float)Math.Sin(t * 16) * 25f; }
 
             float bY = -bob + breathe * 0.5f;          // pomak tijela
@@ -663,7 +671,7 @@ namespace DinoJoe
         {
             State st = p.State;
             float ex = hx + 30, ey = hy + 16;
-            bool happy = st == State.Happy || st == State.Drag;
+            bool happy = st == State.Happy || st == State.Drag || st == State.Stretch;
             float eyeK = p.Stage == Life.Baby ? 1.3f : (p.Stage == Life.Juvenile ? 1.12f : 1f);
             bool sleeping = st == State.Sleep;
 
@@ -714,7 +722,7 @@ namespace DinoJoe
                     g.FillEllipse(n, hx + 49, hy + 10, 3.5f, 2.5f);
 
                 // usta
-                if (st == State.Roar || (st == State.Happy && ((int)(p.T * 6)) % 2 == 0))
+                if (st == State.Roar || st == State.Stretch || (st == State.Happy && ((int)(p.T * 6)) % 2 == 0))
                 {
                     float mw = st == State.Roar ? 18 : 12, mh = st == State.Roar ? 12 : 8;
                     using (GraphicsPath mouth = new GraphicsPath())
@@ -1791,7 +1799,7 @@ namespace DinoJoe
         void ToggleSleep()
         {
             if (EggBlock()) return;
-            if (pose.State == State.Sleep) { forcedSleep = false; Say(Lang.Get("s.morning")); SetState(State.Idle, 2); }
+            if (pose.State == State.Sleep) { forcedSleep = false; Say(Lang.Get("s.morning")); StartStretch(); }
             else { forcedSleep = true; Say(Lang.Get("s.night")); SetState(State.Sleep, 1e9); }
         }
 
@@ -1925,6 +1933,14 @@ namespace DinoJoe
             bubbleTotal = bubbleLeft = 2.2 + text.Length * 0.065;
             sinceTalk = 0;
             nextTalk = TalkInterval();
+        }
+
+        /// Razgibavanje poslije buđenja (istezanje, ruke gore, zijevanje).
+        void StartStretch()
+        {
+            if (IsEgg) { SetState(State.Idle, 2); return; }
+            SetState(State.Stretch, 2.8);
+            if (pose.Bubble == null || bubbleLeft < 0.5) Say(Pick(Lang.Gender(Lang.Get("say.stretch")).Split('|')));
         }
 
         void SetState(State s, double dur)
@@ -2170,8 +2186,12 @@ namespace DinoJoe
 
             if (st != State.Drag && st != State.Fall && stateT >= stateDur && !forcedSleep)
             {
-                if (st == State.Sleep) Say(Lang.Get("s.yawn"));
-                NextRandomState();
+                if (st == State.Sleep && rnd.Next(10) < 6) StartStretch();
+                else
+                {
+                    if (st == State.Sleep) Say(Lang.Get("s.yawn"));
+                    NextRandomState();
+                }
             }
 
             // pričanje

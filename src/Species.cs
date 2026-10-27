@@ -67,6 +67,7 @@ namespace DinoJoe
             }
             if (st == State.Happy) a.armAng = -95 + (float)Math.Sin(t * 18) * 30f;
             if (st == State.Roar) a.armAng = -110 + (float)Math.Sin(t * 30) * 8f;
+            if (st == State.Stretch) a.armAng = -150 + (float)Math.Sin(t * 2.4) * 12f;
             if (a.dragged) { a.legA = (float)Math.Sin(t * 14) * 18f; a.legB = -a.legA; a.armAng = -120 + (float)Math.Sin(t * 16) * 25f; }
             a.bY = -a.bob + a.breathe * 0.5f;
             if (a.sitting) a.bY = 10 + a.breathe * 0.6f;

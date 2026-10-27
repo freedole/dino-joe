@@ -183,6 +183,12 @@ namespace DinoJoe
                            "Ups, ispričavam se! Kriva dvorana.|Ne obraćajte pažnju na mene, samo prolazim.|Pardon! {Mislio|Mislila} sam da je pauza za kavu.|Ups! Nastavite, odlično vam ide.|Oprostite, je li ovo sastanak za dinosaure?",
                            "Oops, sorry! Wrong room.|Don't mind me, just passing through.|Pardon! I thought it was a coffee break.|Oops! Carry on, you're doing great.|Excuse me, is this the dinosaur meeting?");
 
+            // razgibavanje
+            A("say.stretch", "Aaaah... razgibavanje.|Krc, krc. Kičma od 65 miliona godina.|Jutarnje istezanje, kao pravi sportista.|Još samo malo da se protegnem...|Uh, {ukočio|ukočila} sam se ko fosil.",
+                             "Aaaah... razgibavanje.|Krc, krc. Kičma od 65 miliona godina.|Jutarnje istezanje, kao pravi sportista.|Još samo malo da se protegnem...|Uh, {ukočio|ukočila} sam se ko fosil.",
+                             "Aaaah... razgibavanje.|Krc, krc. Kralježnica od 65 milijuna godina.|Jutarnje istezanje, kao pravi sportaš.|Još se samo malo protegnem...|Uh, {ukočio|ukočila} sam se ko fosil.",
+                             "Aaaah... stretching time.|Crack, crack. A 65-million-year-old spine.|Morning stretch, like a real athlete.|Just a little more stretching...|Ugh, I'm stiff as a fossil.");
+
             // nove šare
             A("pat.gold", "Zlatna", "Zlatna", "Zlatna", "Gold");
             Lang.BsOverride["ach.stylist.d"] = "Promijeni izgled u postavkama.";
