@@ -10,13 +10,19 @@ A tiny dinosaur that lives on your Windows desktop. It hatches from an egg, grow
 - **Tiny.** ~100 KB exe, no runtime to install (uses .NET Framework 4.x that ships with Windows 10/11).
 - **Balkan humor** built in. English packs too.
 
-> **v1.1** - evolution (egg -> baby -> juvenile -> adult), 18 achievements, 6 species (Stegosaurus and Pterodactyl unlockable), 12 colors, 7 patterns, 10 accessories, 9 personalities, care status, ~1000 jokes (SR + EN), joke packs with an online catalog, optional AI.
+> **v1.2** - throw the dino and watch it land on your windows, multi-monitor walking, mini games, seasonal hats, reminders and tips, a Designer personality, ram mode, a dancing theme song, a quiet mode for movies, games and presentations (RDP stays on), global hotkeys (Ctrl+Alt+F joke, Ctrl+Alt+D status) and a cleaner menu.
+>
+> **v1.1** - evolution (egg -> baby -> juvenile -> adult), 21 achievements, 6 species (Stegosaurus and Pterodactyl unlockable), 12 colors, 8 patterns, 10 personalities, care status, ~1000 jokes (SR + EN), joke packs with an online catalog, optional AI.
 
 ![preview](assets/preview.png)
 
 **Theme song:** [ODjordje - All My Friends Are Dead (Chickenosaurus Song)](https://youtu.be/TwNurBImsg0) on YouTube. Music made with Suno.
 
 ## Download
+
+**Microsoft Store:** [Dino Joe - Desktop Pet](https://apps.microsoft.com/detail/9NH8W79H7S60) (signed, auto-updates).
+
+Or as a portable zip:
 
 Grab the latest zip from [Releases](https://github.com/freedole/dino-joe/releases), unzip, run `DinoJoe.exe`.
 
@@ -38,7 +44,8 @@ Output: `build\DinoJoe.exe`. Every push is also built by GitHub Actions; tags `v
 
 - **v1.0** ✓ - first-run wizard, 5 languages, ODjordje / ODjordjina, 4 species, colors, patterns, accessories, 9 personalities incl. *Hardcore Tamagotchi mode*, care status, joke packs & profiles & catalog, AI services (Groq, Gemini, OpenAI, Claude, OpenRouter, Ollama)
 - **v1.1** ✓ - evolution (egg → baby → juvenile → adult), achievements, Stegosaurus & Pterodactyl, Gold & Rainbow patterns, MSIX package for Microsoft Store
-- **v1.2+** - mini games, seasonal skins, physics
+- **v1.2** - physics (throw & land on windows), multi-monitor, mini games, seasonal hats, reminders, tips, update check, quiet mode (fullscreen/locked, RDP exempt), presentation prank, hotkeys, Designer personality, ram mode, theme song with dance, cleaner menu, `defaults.ini` for pre-configured dinos
+- **next** - ideas welcome in [Issues](https://github.com/freedole/dino-joe/issues)
 
 ## Privacy
 
@@ -61,7 +68,7 @@ Mali dinosaurus koji živi na tvom Windows desktopu. Izleže se iz jajeta, raste
 - **Mali.** Exe od ~100 KB, bez instalacije runtime-a.
 - U BCS verziji se zove **ODjordje** / **ODjordjina**.
 
-Preuzimanje: [Releases](https://github.com/freedole/dino-joe/releases). Build: `build.bat`.
+Preuzimanje: [Microsoft Store](https://apps.microsoft.com/detail/9NH8W79H7S60) ili zip sa [Releases](https://github.com/freedole/dino-joe/releases). Build: `build.bat`.
 
 Pjesma: [ODjordje - All My Friends Are Dead (Chickenosaurus Song)](https://youtu.be/TwNurBImsg0) na YouTubeu.
 
