@@ -12,7 +12,7 @@ A tiny dinosaur that lives on your Windows desktop. It hatches from an egg, grow
 
 > **v1.2** - throw the dino and watch it land on your windows, multi-monitor walking, mini games, seasonal hats, reminders and tips, a Designer personality, ram mode, a dancing theme song, a quiet mode for movies, games and presentations (RDP stays on), global hotkeys (Ctrl+Alt+F joke, Ctrl+Alt+D status) and a cleaner menu.
 >
-> **v1.1** - evolution (egg -> baby -> juvenile -> adult), 21 achievements, 6 species (Stegosaurus and Pterodactyl unlockable), 12 colors, 8 patterns, 10 personalities, care status, ~1000 jokes (SR + EN), joke packs with an online catalog, optional AI.
+> **v1.1** - evolution (egg -> baby -> juvenile -> adult), 18 achievements, 6 species (Stegosaurus and Pterodactyl unlockable), 12 colors, 7 patterns, 10 accessories, 9 personalities, care status, ~1000 jokes (SR + EN), joke packs with an online catalog, optional AI.
 
 ![preview](assets/preview.png)
 
