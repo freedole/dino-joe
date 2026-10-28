@@ -1,4 +1,4 @@
-// Dino Joe - prevodi za v1.1 (evolucija, dostignuća, nove vrste i šare).
+﻿// Dino Joe - prevodi za v1.1 (evolucija, dostignuća, nove vrste i šare).
 // Redoslijed: srpski ijekavica, srpski ekavica, hrvatski, engleski (bosanski = ijekavica + BsOverride).
 // C# 5 kompatibilno.
 
@@ -165,10 +165,10 @@ namespace DinoJoe
 
             // savjeti za nove korisnike
             A("tip.prefix", "Savjet: ", "Savet: ", "Savjet: ", "Tip: ");
-            A("tip.list", "desni klik na mene otvara sve opcije.|dupli klik me nahrani.|Ctrl+Alt+D otvara moj Status odakle god.|Ctrl+Alt+F i ispričam foru.|uhvati me mišem i baci. Volim da letim!|spusti me na vrh prozora, pa šetam po njemu.|desni klik -> Igre... za kamen-papir-makaze.|Fore -> Preuzmi pakete sa interneta... ima fore za tvoju struku.|Fore -> Samo ovaj paket, ako hoćeš samo jednu temu.|Dostignuća otključavaju nove vrste i šare.",
-                          "desni klik na mene otvara sve opcije.|dupli klik me nahrani.|Ctrl+Alt+D otvara moj Status odakle god.|Ctrl+Alt+F i ispričam foru.|uhvati me mišem i baci. Volim da letim!|spusti me na vrh prozora, pa šetam po njemu.|desni klik -> Igre... za kamen-papir-makaze.|Fore -> Preuzmi pakete sa interneta... ima fore za tvoju struku.|Fore -> Samo ovaj paket, ako hoćeš samo jednu temu.|Dostignuća otključavaju nove vrste i šare.",
+            A("tip.list", "desni klik na mene otvara sve opcije.|dupli klik me nahrani.|Ctrl+Alt+D otvara moj Status odakle god.|Ctrl+Alt+F i ispričam foru.|uhvati me mišem i baci. Volim da letim!|spusti me na vrh prozora, pa šetam po njemu.|desni klik -> Zabava -> Igre... za kamen-papir-makaze.|Fore -> Preuzmi pakete sa interneta... ima fore za tvoju struku.|Fore -> Samo ovaj paket, ako hoćeš samo jednu temu.|Dostignuća otključavaju nove vrste i šare.",
+                          "desni klik na mene otvara sve opcije.|dupli klik me nahrani.|Ctrl+Alt+D otvara moj Status odakle god.|Ctrl+Alt+F i ispričam foru.|uhvati me mišem i baci. Volim da letim!|spusti me na vrh prozora, pa šetam po njemu.|desni klik -> Zabava -> Igre... za kamen-papir-makaze.|Fore -> Preuzmi pakete sa interneta... ima fore za tvoju struku.|Fore -> Samo ovaj paket, ako hoćeš samo jednu temu.|Dostignuća otključavaju nove vrste i šare.",
                           "desni klik na mene otvara sve opcije.|dvostruki klik me nahrani.|Ctrl+Alt+D otvara moj Status odakle god.|Ctrl+Alt+F i ispričam foru.|uhvati me mišem i baci. Volim letjeti!|spusti me na vrh prozora, pa šećem po njemu.|desni klik -> Igre... za kamen-škare-papir.|Fore -> Preuzmi pakete s interneta... ima fora za tvoju struku.|Fore -> Samo ovaj paket, ako želiš samo jednu temu.|Postignuća otključavaju nove vrste i uzorke.",
-                          "right-click me for all options.|double-click to feed me.|Ctrl+Alt+D opens my Status from anywhere.|Ctrl+Alt+F and I tell a joke.|grab me with the mouse and throw me. I love flying!|drop me on top of a window and I'll walk on it.|right-click -> Games... for rock-paper-scissors.|Jokes -> Download packs... has jokes for your job.|Jokes -> Only this pack, if you want just one topic.|Achievements unlock new species and patterns.");
+                          "right-click me for all options.|double-click to feed me.|Ctrl+Alt+D opens my Status from anywhere.|Ctrl+Alt+F and I tell a joke.|grab me with the mouse and throw me. I love flying!|drop me on top of a window and I'll walk on it.|right-click -> Fun -> Games... for rock-paper-scissors.|Jokes -> Download packs... has jokes for your job.|Jokes -> Only this pack, if you want just one topic.|Achievements unlock new species and patterns.");
 
             // nova verzija
             A("upd.say", "Izašla je nova verzija ({0})! Desni klik na mene -> Preuzmi.", "Izašla je nova verzija ({0})! Desni klik na mene -> Preuzmi.", "Izašla je nova verzija ({0})! Desni klik na mene -> Preuzmi.", "A new version is out ({0})! Right-click me -> Download.");
@@ -195,6 +195,19 @@ namespace DinoJoe
             Lang.BsOverride["ach.days7.d"] = "Druži se s dinom 7 različitih dana.";
             Lang.BsOverride["ach.days30.d"] = "Druži se s dinom 30 različitih dana.";
             A("pat.rainbow", "Duga", "Duga", "Duga", "Rainbow");
+
+            // v1.2: pregledniji meni i pjesma
+            A("m.care", "Brini se", "Brini se", "Brini se", "Care");
+            A("m.fun", "Zabava", "Zabava", "Zabava", "Fun");
+            A("m.options", "Podešavanja", "Podešavanja", "Postavke", "Settings");
+            A("m.look", "Izgled, ime i ličnost...", "Izgled, ime i ličnost...", "Izgled, ime i osobnost...", "Look, name and personality...");
+            A("m.song", "Moja pjesma ♪", "Moja pesma ♪", "Moja pjesma ♪", "My song ♪");
+            A("song.say", "Ovo je moja pjesma! Pojačaj!|Plešem! Ne gledaj mi u noge.|All my friends are dead... ali ja plešem!|Refren! Svi zajedno!",
+                          "Ovo je moja pesma! Pojačaj!|Plešem! Ne gledaj mi u noge.|All my friends are dead... ali ja plešem!|Refren! Svi zajedno!",
+                          "Ovo je moja pjesma! Pojačaj!|Plešem! Ne gledaj mi u noge.|All my friends are dead... ali ja plešem!|Refren! Svi zajedno!",
+                          "This is my song! Turn it up!|I'm dancing! Don't look at my feet.|All my friends are dead... but I'm dancing!|Chorus! Everybody!");
+            Lang.BsOverride["m.options"] = "Postavke";
+            Lang.BsOverride["m.look"] = "Izgled, ime i ličnost...";
         }
     }
 }

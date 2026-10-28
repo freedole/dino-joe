@@ -1570,49 +1570,34 @@ namespace DinoJoe
             ToolStripMenuItem miStatus = new ToolStripMenuItem(Lang.Get("st.menu"), null, delegate { OpenStatus(); });
             miStatus.ShortcutKeyDisplayString = "Ctrl+Alt+D";
             menu.Items.Add(miStatus);
-            menu.Items.Add(Lang.Get("act.feed"), null, delegate { DoAction("feed"); });
-            menu.Items.Add(Lang.Get("act.water"), null, delegate { DoAction("water"); });
-            menu.Items.Add(Lang.Get("act.pet"), null, delegate { DoAction("pet"); });
-            menu.Items.Add(Lang.Get("act.play"), null, delegate { DoAction("play"); });
-            menu.Items.Add(Lang.Get("act.bath"), null, delegate { DoAction("bath"); });
-            menu.Items.Add(Lang.Get("m.roar"), null, delegate { Roar(); });
-            if (WallEnabled) menu.Items.Add(Lang.Get("m.wall"), null, delegate { StartWall(); });
-            menu.Items.Add(Lang.Get("m.chick"), null, delegate { CallChick(); });
-            miGlasses = new ToolStripMenuItem(Lang.Get("m.glasses"), null, delegate { ToggleGlasses(); });
-            menu.Items.Add(miGlasses);
-            miSleep = new ToolStripMenuItem(Lang.Get("m.sleep"), null, delegate { ToggleSleep(); });
-            menu.Items.Add(miSleep);
-            menu.Items.Add(Lang.Get("m.summon"), null, delegate { Summon(); });
             menu.Items.Add(new ToolStripSeparator());
 
-            ToolStripMenuItem size = new ToolStripMenuItem(Lang.Get("m.size"));
-            string[] sn = Lang.Get("m.sizes").Split('|');
-            float[] sv = { 0.75f, 1f, 1.4f };
-            miSize = new ToolStripMenuItem[3];
-            for (int i = 0; i < 3; i++)
-            {
-                float v = sv[i];
-                miSize[i] = new ToolStripMenuItem(sn[i], null, delegate { sizeMul = v; ApplySize(); SaveState(); });
-                size.DropDownItems.Add(miSize[i]);
-            }
-            menu.Items.Add(size);
+            // ---- Brini se ----
+            ToolStripMenuItem care = new ToolStripMenuItem(Lang.Get("m.care"));
+            care.DropDownItems.Add(Lang.Get("act.feed"), null, delegate { DoAction("feed"); });
+            care.DropDownItems.Add(Lang.Get("act.water"), null, delegate { DoAction("water"); });
+            care.DropDownItems.Add(Lang.Get("act.pet"), null, delegate { DoAction("pet"); });
+            care.DropDownItems.Add(Lang.Get("act.play"), null, delegate { DoAction("play"); });
+            care.DropDownItems.Add(Lang.Get("act.bath"), null, delegate { DoAction("bath"); });
+            care.DropDownItems.Add(new ToolStripSeparator());
+            miSleep = new ToolStripMenuItem(Lang.Get("m.sleep"), null, delegate { ToggleSleep(); });
+            care.DropDownItems.Add(miSleep);
+            menu.Items.Add(care);
 
-            ToolStripMenuItem talk = new ToolStripMenuItem(Lang.Get("m.talk"));
-            string[] tn = Lang.Get("m.talks").Split('|');
-            miTalk = new ToolStripMenuItem[3];
-            for (int i = 0; i < 3; i++)
-            {
-                int v = i;
-                miTalk[i] = new ToolStripMenuItem(tn[i], null, delegate { talkLevel = v; nextTalk = TalkInterval(); SaveState(); });
-                talk.DropDownItems.Add(miTalk[i]);
-            }
-            menu.Items.Add(talk);
+            // ---- Zabava ----
+            ToolStripMenuItem funMenu = new ToolStripMenuItem(Lang.Get("m.fun"));
+            funMenu.DropDownItems.Add(Lang.Get("m.games"), null, delegate { OpenGames(); });
+            funMenu.DropDownItems.Add(Lang.Get("m.song"), null, delegate { PlaySong(); });
+            funMenu.DropDownItems.Add(new ToolStripSeparator());
+            funMenu.DropDownItems.Add(Lang.Get("m.roar"), null, delegate { Roar(); });
+            if (WallEnabled) funMenu.DropDownItems.Add(Lang.Get("m.wall"), null, delegate { StartWall(); });
+            funMenu.DropDownItems.Add(Lang.Get("m.chick"), null, delegate { CallChick(); });
+            miGlasses = new ToolStripMenuItem(Lang.Get("m.glasses"), null, delegate { ToggleGlasses(); });
+            funMenu.DropDownItems.Add(miGlasses);
+            funMenu.DropDownItems.Add(Lang.Get("m.summon"), null, delegate { Summon(); });
+            menu.Items.Add(funMenu);
 
-            ToolStripMenuItem aiMenu = new ToolStripMenuItem("AI");
-            aiMenu.DropDownItems.Add(Lang.Get("m.aiset"), null, delegate { OpenAiSettings(); });
-            aiMenu.DropDownItems.Add(Lang.Get("m.persona"), null, delegate { EditPersona(); });
-            aiMenu.DropDownItems.Add(Lang.Get("m.clear"), null, delegate { history.Clear(); if (chat != null) chat.AppendNote(Lang.Get("s.cleared")); Say(Lang.Get("s.forgot")); });
-            menu.Items.Add(aiMenu);
+            // ---- Fore ----
             ToolStripMenuItem fun = new ToolStripMenuItem(Lang.Get("m.jokes"));
             miLike = new ToolStripMenuItem(Lang.Get("pk.like"), null, delegate { if (lastJoke != null) { Packs.Like(lastJoke); Say(Lang.Get("pk.liked")); Profile.LoadJokes(); Achievements.Add("like", 1); } });
             miBlock = new ToolStripMenuItem(Lang.Get("pk.block"), null, delegate { if (lastJoke != null) { Packs.Block(lastJoke); lastJoke = null; recent.Clear(); Profile.LoadJokes(); Say(Lang.Get("pk.blocked")); } });
@@ -1629,31 +1614,33 @@ namespace DinoJoe
             fun.DropDownItems.Add(Lang.Get("m.jokefolder"), null, delegate { OpenCustom(); });
             fun.DropDownItems.Add(Lang.Get("m.reload"), null, delegate { Profile.LoadJokes(); recent.Clear(); Say(string.Format(Lang.Gender(Lang.Get("pk.loaded")), Profile.JokeCount)); });
             menu.Items.Add(fun);
-            menu.Items.Add(Lang.Get("m.games"), null, delegate { OpenGames(); });
             menu.Items.Add(Lang.Get("m.achievements"), null, delegate { OpenAchievements(); });
-            menu.Items.Add(Lang.Get("menu.settings"), null, delegate { OpenSettings(); });
-            ToolStripMenuItem miWin = new ToolStripMenuItem(Lang.Get("m.windowwalk"), null, delegate
+            menu.Items.Add(new ToolStripSeparator());
+
+            // ---- Podešavanja ----
+            ToolStripMenuItem opt = new ToolStripMenuItem(Lang.Get("m.options"));
+            opt.DropDownItems.Add(Lang.Get("m.look"), null, delegate { OpenSettings(); });
+            ToolStripMenuItem size = new ToolStripMenuItem(Lang.Get("m.size"));
+            string[] sn = Lang.Get("m.sizes").Split('|');
+            float[] sv = { 0.75f, 1f, 1.4f };
+            miSize = new ToolStripMenuItem[3];
+            for (int i = 0; i < 3; i++)
             {
-                Settings.WindowWalk = !Settings.WindowWalk; Settings.Save();
-                if (!Settings.WindowWalk) platform = IntPtr.Zero;
-            });
-            menu.Opening += delegate { miWin.Checked = Settings.WindowWalk; };
-            miAutostart = new ToolStripMenuItem(Lang.Get("s.autostart"), null, delegate { ToggleAutostart(); });
-            menu.Items.Add(miWin);
-            ToolStripMenuItem miSeason = new ToolStripMenuItem(Lang.Get("m.seasonal"), null, delegate
+                float v = sv[i];
+                miSize[i] = new ToolStripMenuItem(sn[i], null, delegate { sizeMul = v; ApplySize(); SaveState(); });
+                size.DropDownItems.Add(miSize[i]);
+            }
+            opt.DropDownItems.Add(size);
+            ToolStripMenuItem talk = new ToolStripMenuItem(Lang.Get("m.talk"));
+            string[] tn = Lang.Get("m.talks").Split('|');
+            miTalk = new ToolStripMenuItem[3];
+            for (int i = 0; i < 3; i++)
             {
-                Settings.Seasonal = !Settings.Seasonal; Settings.Save();
-                pose.Accessory = LookAccessory();
-            });
-            menu.Opening += delegate { miSeason.Checked = Settings.Seasonal; };
-            menu.Items.Add(miSeason);
-            ToolStripMenuItem miPrank = new ToolStripMenuItem(Lang.Get("m.prank"), null, delegate
-            {
-                Settings.PrankMode = !Settings.PrankMode; Settings.Save();
-                Say(Settings.PrankMode ? Lang.Get("prank.on") : Lang.Get("prank.off"));
-            });
-            menu.Opening += delegate { miPrank.Checked = Settings.PrankMode; };
-            menu.Items.Add(miPrank);
+                int v = i;
+                miTalk[i] = new ToolStripMenuItem(tn[i], null, delegate { talkLevel = v; nextTalk = TalkInterval(); SaveState(); });
+                talk.DropDownItems.Add(miTalk[i]);
+            }
+            opt.DropDownItems.Add(talk);
             ToolStripMenuItem miRem = new ToolStripMenuItem(Lang.Get("m.reminders"));
             int[] remOpts = { 0, 30, 45, 60, 90 };
             foreach (int ro in remOpts)
@@ -1667,10 +1654,40 @@ namespace DinoJoe
                 miRem.DropDownItems.Add(it);
             }
             menu.Opening += delegate { for (int i = 0; i < remOpts.Length; i++) ((ToolStripMenuItem)miRem.DropDownItems[i]).Checked = Settings.ReminderMinutes == remOpts[i]; };
-            menu.Items.Add(miRem);
-            menu.Items.Add(miAutostart);
-            menu.Items.Add(Lang.Get("m.newegg"), null, delegate { NewEgg(); });
-            menu.Items.Add(Lang.Get("m.report"), null, delegate { ErrorLog.OpenReport(); });
+            opt.DropDownItems.Add(miRem);
+            ToolStripMenuItem aiMenu = new ToolStripMenuItem("AI");
+            aiMenu.DropDownItems.Add(Lang.Get("m.aiset"), null, delegate { OpenAiSettings(); });
+            aiMenu.DropDownItems.Add(Lang.Get("m.persona"), null, delegate { EditPersona(); });
+            aiMenu.DropDownItems.Add(Lang.Get("m.clear"), null, delegate { history.Clear(); if (chat != null) chat.AppendNote(Lang.Get("s.cleared")); Say(Lang.Get("s.forgot")); });
+            opt.DropDownItems.Add(aiMenu);
+            opt.DropDownItems.Add(new ToolStripSeparator());
+            ToolStripMenuItem miWin = new ToolStripMenuItem(Lang.Get("m.windowwalk"), null, delegate
+            {
+                Settings.WindowWalk = !Settings.WindowWalk; Settings.Save();
+                if (!Settings.WindowWalk) platform = IntPtr.Zero;
+            });
+            menu.Opening += delegate { miWin.Checked = Settings.WindowWalk; };
+            opt.DropDownItems.Add(miWin);
+            ToolStripMenuItem miSeason = new ToolStripMenuItem(Lang.Get("m.seasonal"), null, delegate
+            {
+                Settings.Seasonal = !Settings.Seasonal; Settings.Save();
+                pose.Accessory = LookAccessory();
+            });
+            menu.Opening += delegate { miSeason.Checked = Settings.Seasonal; };
+            opt.DropDownItems.Add(miSeason);
+            ToolStripMenuItem miPrank = new ToolStripMenuItem(Lang.Get("m.prank"), null, delegate
+            {
+                Settings.PrankMode = !Settings.PrankMode; Settings.Save();
+                Say(Settings.PrankMode ? Lang.Get("prank.on") : Lang.Get("prank.off"));
+            });
+            menu.Opening += delegate { miPrank.Checked = Settings.PrankMode; };
+            opt.DropDownItems.Add(miPrank);
+            miAutostart = new ToolStripMenuItem(Lang.Get("s.autostart"), null, delegate { ToggleAutostart(); });
+            opt.DropDownItems.Add(miAutostart);
+            opt.DropDownItems.Add(new ToolStripSeparator());
+            opt.DropDownItems.Add(Lang.Get("m.newegg"), null, delegate { NewEgg(); });
+            opt.DropDownItems.Add(Lang.Get("m.report"), null, delegate { ErrorLog.OpenReport(); });
+            menu.Items.Add(opt);
             menu.Items.Add(new ToolStripSeparator());
             menu.Items.Add(Lang.Get("m.exit"), null, delegate { Close(); });
             menu.Opening += delegate
@@ -1899,6 +1916,39 @@ namespace DinoJoe
                 StartWall();
             }
             pose.WallT = wallT;
+        }
+
+        // ---------------- moja pjesma: otvori spot na YouTubeu i pleši ----------------
+        public const string SongUrl = "https://youtu.be/TwNurBImsg0";
+        double danceLeft, nextDanceHeart, nextDanceSay;
+
+        void PlaySong()
+        {
+            try { System.Diagnostics.Process.Start(SongUrl); } catch { }
+            if (IsEgg) return;
+            forcedSleep = false;
+            danceLeft = 147;   // trajanje pjesme
+            nextDanceHeart = pose.T + 7; nextDanceSay = pose.T + 30;
+            SetState(State.Happy, 1.0);
+            heartsStart = pose.T;
+            Say(PickLine(Lang.Get("song.say")));
+        }
+
+        void DanceStep()
+        {
+            if (danceLeft <= 0) return;
+            danceLeft -= Dt;
+            if (pose.State == State.Drag || pose.State == State.Fall || pose.State == State.Sleep || IsEgg) { danceLeft = 0; return; }
+            if (pose.State != State.Happy) SetState(State.Happy, 1.0);
+            else if (stateT > 0.8) { pose.Dir = -pose.Dir; SetState(State.Happy, 1.0); }
+            if (pose.T > nextDanceHeart) { nextDanceHeart = pose.T + 7; heartsStart = pose.T; }
+            if (danceLeft > 3 && pose.T > nextDanceSay && pose.Bubble == null) { nextDanceSay = pose.T + 30; Say(PickLine(Lang.Get("song.say"))); }
+        }
+
+        string PickLine(string all)
+        {
+            string[] p = all.Split('|');
+            return p[rnd.Next(p.Length)];
         }
 
         void Roar()
@@ -2179,6 +2229,7 @@ namespace DinoJoe
             if (!IsEgg && needs.ShouldRunAway && pose.Bubble == null) { RunAway(); return; }
             LifeStep();
             WallStep();
+            DanceStep();
             TipTick();
             pose.Warmth = Life.Warmth;
 
