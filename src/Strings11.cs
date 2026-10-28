@@ -202,10 +202,9 @@ namespace DinoJoe
             A("m.options", "Podešavanja", "Podešavanja", "Postavke", "Settings");
             A("m.look", "Izgled, ime i ličnost...", "Izgled, ime i ličnost...", "Izgled, ime i osobnost...", "Look, name and personality...");
             A("m.song", "Moja pjesma ♪", "Moja pesma ♪", "Moja pjesma ♪", "My song ♪");
-            A("song.say", "Ovo je moja pjesma! Pojačaj!|Plešem! Ne gledaj mi u noge.|All my friends are dead... ali ja plešem!|Refren! Svi zajedno!",
-                          "Ovo je moja pesma! Pojačaj!|Plešem! Ne gledaj mi u noge.|All my friends are dead... ali ja plešem!|Refren! Svi zajedno!",
-                          "Ovo je moja pjesma! Pojačaj!|Plešem! Ne gledaj mi u noge.|All my friends are dead... ali ja plešem!|Refren! Svi zajedno!",
-                          "This is my song! Turn it up!|I'm dancing! Don't look at my feet.|All my friends are dead... but I'm dancing!|Chorus! Everybody!");
+            A("dance.loud", "Pojačaj!", "Pojačaj!", "Pojačaj!", "Turn it up!");
+            A("dance.bow", "Hvala, hvala! Tu sam cijelu sedmicu.", "Hvala, hvala! Tu sam celu nedelju.", "Hvala, hvala! Tu sam cijeli tjedan.", "Thank you, thank you! I'm here all week.");
+            A("dance.stop", "Dobro, dobro, prestajem.", "Dobro, dobro, prestajem.", "Dobro, dobro, prestajem.", "Okay, okay, I'll stop.");
             A("s.packs.persona", "Ličnost: {0} (uvijek uključeno)", "Ličnost: {0} (uvek uključeno)", "Osobnost: {0} (uvijek uključeno)", "Personality: {0} (always on)");
             A("s.packs.note", "Ličnost i pakete fora možeš uvijek promijeniti: desni klik na dina -> Fore -> Paketi fora..., ili Podešavanja -> Izgled, ime i ličnost...",
                               "Ličnost i pakete fora možeš uvek promeniti: desni klik na dina -> Fore -> Paketi fora..., ili Podešavanja -> Izgled, ime i ličnost...",

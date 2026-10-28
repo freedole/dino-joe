@@ -274,6 +274,7 @@ namespace DinoJoe
         public double HatchT = -1;      // jaje: animacija izlijeganja 0..1
         public int Mouth = -1;          // -1 automatski po stanju, 0 zatvorena, 1 otvorena (npr. pjevanje u videu)
         public double WallT = -1;       // "ovan mod": zid i zalet u njega, 0..1 (paket sa feature.wall=1)
+        public bool Notes;              // ples: note iznad glave
     }
 
     static partial class Painter
@@ -383,6 +384,7 @@ namespace DinoJoe
 
             // srca
             if (p.HeartsT >= 0 && p.HeartsT <= 1) DrawHearts(g, cx - p.Dir * 14f * sc, gy + (top - 4) * sc, p.HeartsT);
+            if (p.Notes) DrawNotes(g, cx + p.Dir * 22f * sc, gy + (top - 4) * sc - (float)p.JumpY, p.T);
 
             if (!string.IsNullOrEmpty(p.Bubble)) DrawBubble(g, p.Bubble, cx + p.Dir * 26f * sc, gy + top * sc - (float)p.JumpY, p.BubbleAlpha);
 
@@ -451,6 +453,22 @@ namespace DinoJoe
                     DrawStar(g, sx, sy, 5.5f, Color.FromArgb(alpha, 255, 214, 60));
                 }
             }
+        }
+
+        /// Note koje lebde iznad glave dok dino pleše.
+        static void DrawNotes(Graphics g, float x, float y, double t)
+        {
+            string[] sym = { "\u266A", "\u266B", "\u266A" };
+            using (Font f = new Font("Segoe UI Symbol", 22f, FontStyle.Bold, GraphicsUnit.Pixel))
+                for (int i = 0; i < 3; i++)
+                {
+                    double u = (t * 0.55 + i / 3.0) % 1.0;              // 0..1 put naviše
+                    float nx = x + (i - 1) * 30f + (float)Math.Sin(t * 3 + i * 2) * 6f;
+                    float ny = y - (float)u * 46f;
+                    int a = (int)(255 * Math.Min(1, Math.Min(u / 0.15, (1 - u) / 0.3)));
+                    Color c = i == 1 ? Color.FromArgb(a, 255, 120, 190) : Color.FromArgb(a, 120, 90, 230);
+                    using (SolidBrush b = new SolidBrush(c)) g.DrawString(sym[i], f, b, nx - 8, ny - 14);
+                }
         }
 
         static void DrawStar(Graphics g, float x, float y, float r, Color c)
@@ -1920,29 +1938,65 @@ namespace DinoJoe
 
         // ---------------- moja pjesma: otvori spot na YouTubeu i pleši ----------------
         public const string SongUrl = "https://youtu.be/TwNurBImsg0";
-        double danceLeft, nextDanceHeart, nextDanceSay;
+        double danceLeft;
 
         void PlaySong()
         {
             try { System.Diagnostics.Process.Start(SongUrl); } catch { }
             if (IsEgg) return;
-            forcedSleep = false;
-            danceLeft = 147;   // trajanje pjesme
-            nextDanceHeart = pose.T + 7; nextDanceSay = pose.T + 30;
-            SetState(State.Happy, 1.0);
+            StartDance();
+        }
+
+        // Ples: 24 s, pokreti se smjenjuju (skok, moonwalk, njihanje, okret, rika), note iznad glave, naklon na kraju.
+        const double DanceLen = 24;
+        static readonly string[] DanceMoves = { "hop", "moon", "sway", "spin", "hop", "moon", "roar", "sway" };
+        bool moonwalk, dancePumped;
+        string danceMove = "";
+
+        void StartDance()
+        {
+            forcedSleep = false; vx = 0; platform = IntPtr.Zero;
+            danceLeft = DanceLen; danceMove = ""; dancePumped = false;
             heartsStart = pose.T;
-            Say(PickLine(Lang.Get("song.say")));
+        }
+
+        void StopDance(bool byUser)
+        {
+            if (danceLeft <= 0) return;
+            danceLeft = 0; moonwalk = false; pose.Notes = false; danceMove = "";
+            if (byUser) { Say(Lang.Get("dance.stop")); SetState(State.Idle, 2); }
         }
 
         void DanceStep()
         {
-            if (danceLeft <= 0) return;
+            if (danceLeft <= 0) { pose.Notes = false; moonwalk = false; return; }
+            if (pose.State == State.Drag || pose.State == State.Fall || pose.State == State.Sleep || IsEgg) { StopDance(false); return; }
+            double el = DanceLen - danceLeft;
             danceLeft -= Dt;
-            if (pose.State == State.Drag || pose.State == State.Fall || pose.State == State.Sleep || IsEgg) { danceLeft = 0; return; }
-            if (pose.State != State.Happy) SetState(State.Happy, 1.0);
-            else if (stateT > 0.8) { pose.Dir = -pose.Dir; SetState(State.Happy, 1.0); }
-            if (pose.T > nextDanceHeart) { nextDanceHeart = pose.T + 7; heartsStart = pose.T; }
-            if (danceLeft > 3 && pose.T > nextDanceSay && pose.Bubble == null) { nextDanceSay = pose.T + 30; Say(PickLine(Lang.Get("song.say"))); }
+            pose.Notes = true;
+            if (!dancePumped && el >= 3.5) { dancePumped = true; Say(Lang.Get("dance.loud")); }
+            if (danceLeft <= 0)
+            {
+                // naklon
+                pose.Notes = false; moonwalk = false;
+                SetState(State.Sit, 2.5);
+                heartsStart = pose.T;
+                Say(Lang.Get("dance.bow"));
+                return;
+            }
+            int idx = Math.Min(DanceMoves.Length - 1, (int)(el / 3.0));
+            string mv = DanceMoves[idx];
+            double mt = el - idx * 3.0;   // vrijeme unutar pokreta
+            if (mv != danceMove)
+            {
+                danceMove = mv; moonwalk = false;
+                if (mv == "hop") { SetState(State.Happy, 3.2); heartsStart = pose.T; }
+                else if (mv == "moon") { pose.Dir = -pose.Dir; moonwalk = true; SetState(State.Walk, 3.2); }
+                else if (mv == "sway") SetState(State.Stretch, 3.2);
+                else if (mv == "spin") SetState(State.Happy, 3.2);
+                else if (mv == "roar") { SetState(State.Roar, 3.2); Say("ROAAAR!"); }
+            }
+            if (mv == "spin" && mt < 1.6) pose.Dir = ((int)(mt * 5)) % 2 == 0 ? 1 : -1;
         }
 
         string PickLine(string all)
@@ -2296,7 +2350,7 @@ namespace DinoJoe
             switch (st)
             {
                 case State.Walk:
-                    fx += pose.Dir * 1.7 * k;
+                    fx += pose.Dir * 1.7 * k * (moonwalk ? -0.8 : 1);
                     // više monitora: na ivici se okreće samo ako sa te strane nema susjednog ekrana
                     if (fx < wa.Left - 40 * k && !HasNeighbor(-1)) { fx = wa.Left - 40 * k; pose.Dir = 1; }
                     if (fx > wa.Right - cw + 40 * k && !HasNeighbor(1)) { fx = wa.Right - cw + 40 * k; pose.Dir = -1; }
@@ -2512,6 +2566,7 @@ namespace DinoJoe
         void SingleClick()
         {
             if (IsEgg || mouseDown || dragging) return;
+            if (danceLeft > 0) { StopDance(true); return; }
             if (pose.State == State.Sleep) { forcedSleep = false; Say(Lang.Get("s.notsleep")); SetState(State.Idle, 2); return; }
             if (rnd.Next(3) == 0) Say(Profile.Special("poke", Jokes.Poke)); else Say(PickJoke());
             SetState(State.Happy, 1.2);
