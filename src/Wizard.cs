@@ -562,9 +562,15 @@ namespace DinoJoe
             List<Pack> list = new List<Pack>();
             foreach (Pack x in Packs.All()) if (!x.IsPersonality && Packs.LangCompatible(x.Lang)) list.Add(x);
             if (!packsTouched) packs = Packs.DefaultPacks();
-            if (list.Count == 0) { Lbl(Lang.Get("s.packs.none"), 12, 12, 400, 24).ForeColor = Color.Gray; return; }
+            // paket izabrane ličnosti: na vrhu, uvijek uključen (zaključan)
+            Pack persona = null;
+            foreach (Pack x in Packs.All()) if (x.IsPersonality && x.Personality == personality && Packs.LangCompatible(x.Lang)) { persona = x; break; }
+            int off = persona != null ? 1 : 0;
+            if (list.Count == 0 && persona == null) { Lbl(Lang.Get("s.packs.none"), 12, 12, 400, 24).ForeColor = Color.Gray; return; }
             ModernCheckList cl = new ModernCheckList();
-            cl.SetBounds(10, 8, 425, 300);
+            cl.SetBounds(10, 8, 425, 248);
+            if (persona != null)
+                cl.AddItem(string.Format(Lang.Get("s.packs.persona"), Personality.Find(personality).Name) + "  (" + persona.JokeCount + ")", true, true);
             foreach (Pack pi in list)
             {
                 bool on = ("," + packs + ",").Contains("," + pi.Id + ",");
@@ -573,11 +579,14 @@ namespace DinoJoe
             cl.CheckChanged += delegate
             {
                 List<string> ids = new List<string>();
-                for (int i = 0; i < list.Count; i++) if (cl.GetItemChecked(i)) ids.Add(list[i].Id);
+                for (int i = 0; i < list.Count; i++) if (cl.GetItemChecked(i + off)) ids.Add(list[i].Id);
                 packs = string.Join(",", ids.ToArray());
                 packsTouched = true;
             };
             content.Controls.Add(cl);
+            Label note = Lbl(Lang.Get("s.packs.note"), 12, 262, 425, 44);
+            note.Font = new Font(note.Font, FontStyle.Italic);
+            note.ForeColor = Theme.TextMuted;
         }
 
         // ---------------- 6. AI + autostart ----------------
@@ -654,6 +663,8 @@ namespace DinoJoe
             // korisnik je sam uredio izgled: sezonski šešir (Noć vještica, Božić) više ne smije da ga pregazi
             if (LookKey() != look0) Settings.Seasonal = false;
             Settings.Packs = packs;
+            // izabrana ličnost: njen paket fora je uključen (čarobnjak ga prikazuje kao zaključan)
+            foreach (Pack x in Packs.All()) if (x.IsPersonality && x.Personality == personality && Packs.IsDisabled(x.Id)) Packs.SetDisabled(x.Id, false);
             Settings.Save();
             // prvo pokretanje: izbor paketa i ličnosti postaje prvi profil
             if (firstRun && Packs.LoadProfiles().Count == 0) Packs.SaveCurrentAs(Lang.Get("prof.default"));

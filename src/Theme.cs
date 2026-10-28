@@ -1,4 +1,4 @@
-// Dino Joe - moderna tema za sve prozore (flat dugmad sa zaobljenim ivicama, owner-draw liste,
+﻿// Dino Joe - moderna tema za sve prozore (flat dugmad sa zaobljenim ivicama, owner-draw liste,
 // Windows 11 zaobljeni uglovi i boja naslovne trake). Forme nasljeđuju ThemedForm.
 // C# 5 kompatibilno.
 
@@ -240,6 +240,7 @@ namespace DinoJoe
     class ModernCheckList : ListBox
     {
         readonly List<bool> checks = new List<bool>();
+        readonly List<bool> locked = new List<bool>();
         public event EventHandler CheckChanged;
 
         public ModernCheckList()
@@ -252,13 +253,16 @@ namespace DinoJoe
             SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
         }
 
-        public void AddItem(string text, bool on) { Items.Add(text); checks.Add(on); }
-        public void ClearItems() { Items.Clear(); checks.Clear(); }
+        public void AddItem(string text, bool on) { AddItem(text, on, false); }
+        /// Zaključana stavka: uvijek prikazana kako je postavljena i ne može se mijenjati (npr. paket izabrane ličnosti).
+        public void AddItem(string text, bool on, bool isLocked) { Items.Add(text); checks.Add(on); locked.Add(isLocked); }
+        public void ClearItems() { Items.Clear(); checks.Clear(); locked.Clear(); }
+        public bool IsLocked(int i) { return i >= 0 && i < locked.Count && locked[i]; }
         public bool GetItemChecked(int i) { return i >= 0 && i < checks.Count && checks[i]; }
 
         public void SetItemChecked(int i, bool on)
         {
-            if (i < 0 || i >= checks.Count || checks[i] == on) return;
+            if (i < 0 || i >= checks.Count || checks[i] == on || IsLocked(i)) return;
             checks[i] = on;
             Invalidate(GetItemRectangle(i));
             if (CheckChanged != null) CheckChanged(this, EventArgs.Empty);
@@ -271,9 +275,13 @@ namespace DinoJoe
             bool sel = (e.State & DrawItemState.Selected) != 0;
             using (SolidBrush b = new SolidBrush(sel ? Theme.AccentSoft : (e.Index % 2 == 0 ? Theme.Surface : Color.FromArgb(251, 251, 252))))
                 g.FillRectangle(b, e.Bounds);
-            Theme.DrawCheck(g, new Rectangle(e.Bounds.X + 8, e.Bounds.Y + (e.Bounds.Height - 16) / 2, 16, 16), GetItemChecked(e.Index));
+            Rectangle cb = new Rectangle(e.Bounds.X + 8, e.Bounds.Y + (e.Bounds.Height - 16) / 2, 16, 16);
+            Theme.DrawCheck(g, cb, GetItemChecked(e.Index));
+            bool lk = IsLocked(e.Index);
+            if (lk) using (SolidBrush veil = new SolidBrush(Color.FromArgb(110, 255, 255, 255))) g.FillRectangle(veil, cb.X - 1, cb.Y - 1, cb.Width + 2, cb.Height + 2);
             Rectangle r = new Rectangle(e.Bounds.X + 34, e.Bounds.Y, e.Bounds.Width - 40, e.Bounds.Height);
-            TextRenderer.DrawText(g, Items[e.Index].ToString(), Font, r, Theme.Text, TextFormatFlags.VerticalCenter | TextFormatFlags.EndEllipsis | TextFormatFlags.NoPrefix);
+            using (Font f = lk ? new Font(Font, FontStyle.Bold) : null)
+                TextRenderer.DrawText(g, Items[e.Index].ToString(), f ?? Font, r, Theme.Text, TextFormatFlags.VerticalCenter | TextFormatFlags.EndEllipsis | TextFormatFlags.NoPrefix);
         }
 
         protected override void OnMouseClick(MouseEventArgs e)

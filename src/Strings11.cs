@@ -206,6 +206,12 @@ namespace DinoJoe
                           "Ovo je moja pesma! Pojačaj!|Plešem! Ne gledaj mi u noge.|All my friends are dead... ali ja plešem!|Refren! Svi zajedno!",
                           "Ovo je moja pjesma! Pojačaj!|Plešem! Ne gledaj mi u noge.|All my friends are dead... ali ja plešem!|Refren! Svi zajedno!",
                           "This is my song! Turn it up!|I'm dancing! Don't look at my feet.|All my friends are dead... but I'm dancing!|Chorus! Everybody!");
+            A("s.packs.persona", "Ličnost: {0} (uvijek uključeno)", "Ličnost: {0} (uvek uključeno)", "Osobnost: {0} (uvijek uključeno)", "Personality: {0} (always on)");
+            A("s.packs.note", "Ličnost i pakete fora možeš uvijek promijeniti: desni klik na dina -> Fore -> Paketi fora..., ili Podešavanja -> Izgled, ime i ličnost...",
+                              "Ličnost i pakete fora možeš uvek promeniti: desni klik na dina -> Fore -> Paketi fora..., ili Podešavanja -> Izgled, ime i ličnost...",
+                              "Osobnost i pakete fora možeš uvijek promijeniti: desni klik na dina -> Fore -> Paketi fora..., ili Postavke -> Izgled, ime i osobnost...",
+                              "You can always change the personality and joke packs: right-click the dino -> Jokes -> Joke packs..., or Settings -> Look, name and personality...");
+            Lang.BsOverride["s.packs.note"] = "Ličnost i pakete fora možeš uvijek promijeniti: desni klik na dina -> Fore -> Paketi fora..., ili Postavke -> Izgled, ime i ličnost...";
             Lang.BsOverride["m.options"] = "Postavke";
             Lang.BsOverride["m.look"] = "Izgled, ime i ličnost...";
         }
