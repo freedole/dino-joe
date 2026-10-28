@@ -1956,7 +1956,9 @@ namespace DinoJoe
         void StartDance()
         {
             forcedSleep = false; vx = 0; platform = IntPtr.Zero;
-            danceLeft = DanceLen; danceMove = ""; dancePumped = false;
+            danceLeft = DanceLen; danceMove = "hop"; dancePumped = false;
+            if (pose.State == State.Fall || pose.State == State.Drag) fy = GroundFor(CurrentArea());
+            SetState(State.Happy, 3.2);   // i ako je spavao: pjesma ga budi
             heartsStart = pose.T;
         }
 
