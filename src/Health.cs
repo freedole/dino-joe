@@ -1,4 +1,4 @@
-// Dino Joe - pouzdanost: log grešaka i pauza kad korisnik ne gleda (igra/prezentacija preko cijelog ekrana, zaključan ekran).
+﻿// Dino Joe - pouzdanost: log grešaka i pauza kad korisnik ne gleda (igra/prezentacija preko cijelog ekrana, zaključan ekran).
 // Log: %AppData%\DinoJoe\logs\error-YYYY-MM-DD.log (ista greška se upisuje najviše jednom u minuti).
 // C# 5 kompatibilno.
 
@@ -101,6 +101,43 @@ namespace DinoJoe
             return false;
         }
 
+        [DllImport("user32.dll")] static extern bool IsWindowVisible(IntPtr h);
+        [DllImport("user32.dll")] static extern bool IsIconic(IntPtr h);
+        [DllImport("user32.dll", CharSet = CharSet.Unicode)] static extern int GetClassName(IntPtr h, System.Text.StringBuilder s, int n);
+        [DllImport("user32.dll")] static extern int GetWindowLong(IntPtr h, int idx);
+        [DllImport("user32.dll")] static extern bool GetWindowRect(IntPtr h, out RECT r);
+        [DllImport("user32.dll")] static extern IntPtr MonitorFromWindow(IntPtr h, uint flags);
+        [DllImport("user32.dll")] static extern bool GetMonitorInfo(IntPtr m, ref MONITORINFO mi);
+        [DllImport("dwmapi.dll")] static extern int DwmGetWindowAttribute(IntPtr h, int attr, out int v, int size);
+        [StructLayout(LayoutKind.Sequential)] struct RECT { public int Left, Top, Right, Bottom; }
+        [StructLayout(LayoutKind.Sequential)] struct MONITORINFO { public int cbSize; public RECT rcMonitor, rcWork; public uint dwFlags; }
+
+        static readonly string[] ShellClasses = { "Progman", "WorkerW", "Shell_TrayWnd", "Shell_SecondaryTrayWnd", "NotifyIconOverflowWindow", "Windows.UI.Core.CoreWindow" };
+
+        /// Prozor u fokusu je stvaran (vidljiv, nije desktop/taskbar, nije providni sloj) i pokriva cijeli svoj monitor.
+        static bool RealFullscreenInFront()
+        {
+            try
+            {
+                IntPtr h = GetForegroundWindow();
+                if (h == IntPtr.Zero || !IsWindowVisible(h) || IsIconic(h)) return false;
+                uint pid; GetWindowThreadProcessId(h, out pid);
+                if (pid == (uint)System.Diagnostics.Process.GetCurrentProcess().Id) return false;
+                System.Text.StringBuilder cls = new System.Text.StringBuilder(256);
+                GetClassName(h, cls, cls.Capacity);
+                foreach (string c in ShellClasses) if (cls.ToString() == c) return false;
+                int ex = GetWindowLong(h, -20);                    // GWL_EXSTYLE
+                if ((ex & 0x20) != 0 || (ex & 0x80) != 0) return false;   // WS_EX_TRANSPARENT (click-through sloj), WS_EX_TOOLWINDOW (widget)
+                int cloaked = 0;
+                try { if (DwmGetWindowAttribute(h, 14, out cloaked, 4) == 0 && cloaked != 0) return false; } catch { }
+                RECT r; if (!GetWindowRect(h, out r)) return false;
+                MONITORINFO mi = new MONITORINFO(); mi.cbSize = Marshal.SizeOf(typeof(MONITORINFO));
+                if (!GetMonitorInfo(MonitorFromWindow(h, 2), ref mi)) return false;
+                return r.Left <= mi.rcMonitor.Left && r.Top <= mi.rcMonitor.Top && r.Right >= mi.rcMonitor.Right && r.Bottom >= mi.rcMonitor.Bottom;
+            }
+            catch { return true; }   // ako provjera ne uspije, ponašaj se kao ranije
+        }
+
         public static bool ShouldHide
         {
             get
@@ -112,7 +149,11 @@ namespace DinoJoe
                     if (SHQueryUserNotificationState(out st) != 0) return false;
                     LastState = st;
                     if (st == 1) return true;                                   // zaključan ekran
-                    if (st == 2 || st == 3 || st == 4) return !RemoteInFront();  // cijeli ekran, osim RDP/VM/udaljenog pristupa
+                    if (st == 4) return !RemoteInFront();                       // prezentacijski mod (uključen ručno)
+                    // 2/3: Windows ponekad javlja "cijeli ekran" i kad je u fokusu desktop ili nevidljivi sloj
+                    // (npr. plutajući widgeti antivirusa). Sakrij se samo ako pravi prozor zaista pokriva cijeli monitor.
+                    if (st == 2 || st == 3) return RealFullscreenInFront() && !RemoteInFront();
+                    return false;
                     return false;
                 }
                 catch { failed = true; return false; }   // stariji Windows / mono
