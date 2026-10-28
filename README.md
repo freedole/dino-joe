@@ -14,6 +14,8 @@ A tiny dinosaur that lives on your Windows desktop. It hatches from an egg, grow
 
 ![preview](assets/preview.png)
 
+**Theme song:** [ODjordje - All My Friends Are Dead (Chickenosaurus Song)](https://youtu.be/TwNurBImsg0) on YouTube. Music made with Suno.
+
 ## Download
 
 Grab the latest zip from [Releases](https://github.com/freedole/dino-joe/releases), unzip, run `DinoJoe.exe`.
@@ -60,5 +62,7 @@ Mali dinosaurus koji živi na tvom Windows desktopu. Izleže se iz jajeta, raste
 - U BCS verziji se zove **ODjordje** / **ODjordjina**.
 
 Preuzimanje: [Releases](https://github.com/freedole/dino-joe/releases). Build: `build.bat`.
+
+Pjesma: [ODjordje - All My Friends Are Dead (Chickenosaurus Song)](https://youtu.be/TwNurBImsg0) na YouTubeu.
 
 Autor: Đorđe Kaurinović ([freedole](https://github.com/freedole)) · [cyber-security.ba](https://cyber-security.ba)
