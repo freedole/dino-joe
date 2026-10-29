@@ -184,6 +184,31 @@ namespace DinoJoe
             }
             catch { }
 
+            // 2b) izabrana ličnost ima prednost: njeni paketi nose ~2/3 fora, opšti paketi ostatak
+            try
+            {
+                List<string> personaIds = new List<string>();
+                foreach (Pack p in Packs.All()) if (p.IsPersonality && p.Active) personaIds.Add(p.Id + "/");
+                if (personaIds.Count > 0 && solo == null)
+                {
+                    int pw = 0, ow = 0;
+                    foreach (JokeCat c in Cats)
+                    {
+                        bool isP = false;
+                        foreach (string id in personaIds) if (c.Name.StartsWith(id, StringComparison.OrdinalIgnoreCase)) isP = true;
+                        if (isP) pw += c.Weight; else ow += c.Weight;
+                    }
+                    if (pw > 0 && ow > 0 && pw < 2 * ow)
+                    {
+                        double f = 2.0 * ow / pw;
+                        foreach (JokeCat c in Cats)
+                            foreach (string id in personaIds)
+                                if (c.Name.StartsWith(id, StringComparison.OrdinalIgnoreCase)) { c.Weight = (int)Math.Round(c.Weight * f); break; }
+                    }
+                }
+            }
+            catch { }
+
             // 3) ništa -> ugrađene ODjordje fore
             if (Cats.Count == 0)
             {

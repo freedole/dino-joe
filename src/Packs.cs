@@ -1,4 +1,4 @@
-// Dino Joe - paketi fora: učitavanje, uključi/isključi, težina, uvoz .dinopack, uklanjanje,
+﻿// Dino Joe - paketi fora: učitavanje, uključi/isključi, težina, uvoz .dinopack, uklanjanje,
 // blokirane i omiljene fore, profili (sačuvane kombinacije paketa + ličnosti).
 // Paket = folder sa pack.ini + fore\*.txt (+ opciono kljucne.ini). Samo tekst, nikad kod.
 // C# 5 kompatibilno.
@@ -497,6 +497,31 @@ namespace DinoJoe
             SaveProfiles(list);
             Settings.ActiveProfile = name;
             Settings.Save();
+        }
+
+        /// Profil koji je program sam napravio: "Osnovni"/"Default" ili ime neke ličnosti.
+        public static bool IsAutoProfileName(string n)
+        {
+            if (string.IsNullOrEmpty(n)) return true;
+            if (n.Equals("Osnovni", StringComparison.OrdinalIgnoreCase) || n.Equals("Default", StringComparison.OrdinalIgnoreCase)) return true;
+            foreach (Personality p in Personality.All) foreach (string x in p.Names) if (n.Equals(x, StringComparison.OrdinalIgnoreCase)) return true;
+            return false;
+        }
+
+        /// Aktivni automatski profil nosi ime izabrane ličnosti (npr. "Filozof"), a ne "Osnovni".
+        /// save=true: snimi i trenutne pakete (poslije čarobnjaka). Korisnički imenovani profili se ne diraju.
+        public static void SyncAutoProfile(bool save)
+        {
+            try
+            {
+                string old = Settings.ActiveProfile ?? "";
+                if (!IsAutoProfileName(old)) return;
+                string pname = Personality.Find(Settings.PersonalityId).Name;
+                if (!save && old.Equals(pname, StringComparison.OrdinalIgnoreCase)) return;
+                if (old.Length > 0 && !old.Equals(pname, StringComparison.OrdinalIgnoreCase)) DeleteProfile(old);
+                SaveCurrentAs(pname);
+            }
+            catch { }
         }
 
         public static void Activate(SavedProfile sp)

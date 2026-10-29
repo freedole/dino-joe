@@ -667,7 +667,8 @@ namespace DinoJoe
             foreach (Pack x in Packs.All()) if (x.IsPersonality && x.Personality == personality && Packs.IsDisabled(x.Id)) Packs.SetDisabled(x.Id, false);
             Settings.Save();
             // prvo pokretanje: izbor paketa i ličnosti postaje prvi profil
-            if (firstRun && Packs.LoadProfiles().Count == 0) Packs.SaveCurrentAs(Lang.Get("prof.default"));
+            // aktivni profil = izabrana ličnost (ranije se automatski zvao "Osnovni", što je zbunjivalo)
+            Packs.SyncAutoProfile(true);
             Settings.SetAutostart(autostart);
             Settings.Apply();
         }

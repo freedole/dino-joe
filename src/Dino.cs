@@ -93,6 +93,7 @@ namespace DinoJoe
                     if (firstRun && !Life.Exists) Life.StartEgg();   // novi dino počinje kao jaje
                 }
                 Settings.Apply();
+                Packs.SyncAutoProfile(false);   // stari automatski profil "Osnovni" -> ime ličnosti
                 Application.Run(new PetForm());
             }
         }
@@ -1618,6 +1619,10 @@ namespace DinoJoe
 
             // ---- Fore ----
             ToolStripMenuItem fun = new ToolStripMenuItem(Lang.Get("m.jokes"));
+            ToolStripMenuItem miPersona = new ToolStripMenuItem(string.Format(Lang.Get("m.persona.now"), Personality.Find(Settings.PersonalityId).Name), null, delegate { OpenSettings(); });
+            miPersona.Font = new Font(miPersona.Font, FontStyle.Bold);
+            fun.DropDownItems.Add(miPersona);
+            fun.DropDownItems.Add(new ToolStripSeparator());
             miLike = new ToolStripMenuItem(Lang.Get("pk.like"), null, delegate { if (lastJoke != null) { Packs.Like(lastJoke); Say(Lang.Get("pk.liked")); Profile.LoadJokes(); Achievements.Add("like", 1); } });
             miBlock = new ToolStripMenuItem(Lang.Get("pk.block"), null, delegate { if (lastJoke != null) { Packs.Block(lastJoke); lastJoke = null; recent.Clear(); Profile.LoadJokes(); Say(Lang.Get("pk.blocked")); } });
             fun.DropDownItems.Add(miLike);

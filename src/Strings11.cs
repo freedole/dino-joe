@@ -211,6 +211,7 @@ namespace DinoJoe
                               "Osobnost i pakete fora možeš uvijek promijeniti: desni klik na dina -> Fore -> Paketi fora..., ili Postavke -> Izgled, ime i osobnost...",
                               "You can always change the personality and joke packs: right-click the dino -> Jokes -> Joke packs..., or Settings -> Look, name and personality...");
             Lang.BsOverride["s.packs.note"] = "Ličnost i pakete fora možeš uvijek promijeniti: desni klik na dina -> Fore -> Paketi fora..., ili Postavke -> Izgled, ime i ličnost...";
+            A("m.persona.now", "Ličnost: {0}", "Ličnost: {0}", "Osobnost: {0}", "Personality: {0}");
             Lang.BsOverride["m.options"] = "Postavke";
             Lang.BsOverride["m.look"] = "Izgled, ime i ličnost...";
         }
