@@ -1,4 +1,4 @@
-// Dino Joe - prozor "Paketi fora": uključi/isključi, težina, uvoz .dinopack, uklanjanje, profili.
+﻿// Dino Joe - prozor "Paketi fora": uključi/isključi, težina, uvoz .dinopack, uklanjanje, profili.
 // C# 5 kompatibilno.
 
 using System;
@@ -106,7 +106,7 @@ namespace DinoJoe
             Button bFolder = Btn(Lang.Get("pk.folder"), 190, 428, 130);
             bFolder.Click += delegate
             {
-                try { Directory.CreateDirectory(Packs.UserDir); System.Diagnostics.Process.Start("explorer.exe", "\"" + Packs.UserDir + "\""); } catch { }
+                Packaged.OpenFolder(Packs.UserDir);
             };
             btUnblock.SetBounds(328, 428, 190, 30);
             btUnblock.Click += delegate

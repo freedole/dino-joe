@@ -99,7 +99,7 @@ namespace DinoJoe
         /// Otvori folder sa logovima i stranicu za prijavu problema.
         public static void OpenReport()
         {
-            try { Directory.CreateDirectory(Dir); System.Diagnostics.Process.Start("explorer.exe", "\"" + Dir + "\""); } catch { }
+            Packaged.OpenFolder(Dir);
             try { System.Diagnostics.Process.Start("https://github.com/freedole/dino-joe/issues/new"); } catch { }
         }
     }

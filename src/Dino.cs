@@ -1780,7 +1780,7 @@ namespace DinoJoe
                 if (!File.Exists(p))
                     File.WriteAllText(p, Lang.Get("my.header"), new UTF8Encoding(true));
                 if (!Packs.IsEnabled("my-jokes")) { Packs.SetEnabled("my-jokes", true); Settings.Save(); }
-                System.Diagnostics.Process.Start("explorer.exe", "\"" + MyJokesDir + "\"");
+                Packaged.OpenFolder(MyJokesDir);
                 Say(Lang.Get("s.write"));
             }
             catch (Exception ex) { Say(Lang.Get("s.error") + ex.Message); }
@@ -2155,7 +2155,7 @@ namespace DinoJoe
             try
             {
                 ai.Persona();
-                System.Diagnostics.Process.Start("notepad.exe", "\"" + ai.PersonaPath + "\"");
+                System.Diagnostics.Process.Start("notepad.exe", "\"" + Packaged.RealPath(ai.PersonaPath) + "\"");
                 Say(Lang.Get("s.persona"));
             }
             catch (Exception ex) { Say(Lang.Get("s.error") + ex.Message); }
