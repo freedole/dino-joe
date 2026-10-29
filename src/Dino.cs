@@ -1552,6 +1552,7 @@ namespace DinoJoe
         protected override void OnShown(EventArgs e)
         {
             base.OnShown(e);
+            ErrorLog.SessionStart();
             Updater.CheckDaily(OnUpdateFound);
             try { hotkeyOk = RegisterHotKey(Handle, HotkeyStatus, MOD_CONTROL | MOD_ALT | MOD_NOREPEAT, (uint)Keys.D); } catch { }
             try { hotkeyJokeOk = RegisterHotKey(Handle, HotkeyJoke, MOD_CONTROL | MOD_ALT | MOD_NOREPEAT, (uint)Keys.F); } catch { }
@@ -2284,6 +2285,7 @@ namespace DinoJoe
             if (needs.RanAway) return;
             if (!IsEgg && needs.ShouldRunAway && pose.Bubble == null) { RunAway(); return; }
             LifeStep();
+            ErrorLog.SessionTouch("state=" + pose.State + " stage=" + Life.Stage + " pos=" + (int)fx + "," + (int)fy + " visible=" + Visible + " quiet=" + quietHidden + " q=" + Quiet.LastState + " platform=" + (platform != IntPtr.Zero) + " screens=" + ScreensInfo());
             WallStep();
             DanceStep();
             TipTick();
@@ -2408,10 +2410,12 @@ namespace DinoJoe
                 case State.Drag:
                     break;
                 case State.Happy:
+                    if (fy < ground - 2) { vy = 0; SetState(State.Fall, 0); break; }   // tlo nestalo (prozor maksimizovan/pomjeren): padni
                     pose.JumpY = Math.Abs(Math.Sin(stateT * 7)) * 10;
                     fy = ground;
                     break;
                 case State.Roar:
+                    if (fy < ground - 2) { vy = 0; SetState(State.Fall, 0); break; }
                     fy = ground;
                     break;
                 default:
@@ -2469,6 +2473,17 @@ namespace DinoJoe
         }
 
         int frameNo;
+
+        static string ScreensInfo()
+        {
+            try
+            {
+                StringBuilder b = new StringBuilder();
+                foreach (Screen sc in Screen.AllScreens) b.Append("[").Append(sc.Bounds.X).Append(",").Append(sc.Bounds.Y).Append(" ").Append(sc.Bounds.Width).Append("x").Append(sc.Bounds.Height).Append("]");
+                return b.ToString();
+            }
+            catch { return "?"; }
+        }
 
         void Present()
         {
@@ -2583,6 +2598,7 @@ namespace DinoJoe
             Life.Save();
             Achievements.Save();
             timer.Stop();
+            ErrorLog.SessionEnd();
             if (tray != null) { tray.Visible = false; tray.Dispose(); }
             if (chat != null) chat.Dispose();
             base.OnFormClosing(e);

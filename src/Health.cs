@@ -32,7 +32,42 @@ namespace DinoJoe
             AppDomain.CurrentDomain.UnhandledException += delegate(object s, UnhandledExceptionEventArgs e) { Write("FATAL", e.ExceptionObject as Exception); };
         }
 
-        public static void Write(string where, Exception ex)
+        public static void Write(string where, Exception ex) { Write(where, ex, true); }
+
+        // ---- sesija: ako se prethodno pokretanje nije uredno završilo (proces prekinut bez .NET greške), zapiši to ----
+        static string FlagPath { get { return Path.Combine(Path.GetDirectoryName(Dir), "session.flag"); } }
+        static DateTime lastTouch = DateTime.MinValue;
+
+        public static void SessionStart()
+        {
+            try
+            {
+                if (File.Exists(FlagPath))
+                {
+                    string last = File.ReadAllText(FlagPath, Encoding.UTF8);
+                    Write("NESTAO", new Exception("Prethodno pokretanje nije uredno zatvoreno (proces je prekinut ili se srušio bez .NET greške). Zadnje stanje:\r\n" + last), false);
+                }
+                Directory.CreateDirectory(Path.GetDirectoryName(FlagPath));
+                File.WriteAllText(FlagPath, "start=" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), new UTF8Encoding(false));
+            }
+            catch { }
+        }
+
+        /// Povremeno upiši zadnje stanje (pozicija, stanje, ekrani) - korisno ako dino "nestane".
+        public static void SessionTouch(string info)
+        {
+            try
+            {
+                if ((DateTime.Now - lastTouch).TotalSeconds < 10) return;
+                lastTouch = DateTime.Now;
+                File.WriteAllText(FlagPath, "time=" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "\r\n" + info, new UTF8Encoding(false));
+            }
+            catch { }
+        }
+
+        public static void SessionEnd() { try { if (File.Exists(FlagPath)) File.Delete(FlagPath); } catch { } }
+
+        public static void Write(string where, Exception ex, bool notify)
         {
             try
             {
@@ -54,7 +89,7 @@ namespace DinoJoe
                  .Append(" | ekrana ").Append(ScreenCount()).Append("\r\n");
                 b.Append(ex == null ? "(nepoznata greška)" : ex.ToString()).Append("\r\n\r\n");
                 File.AppendAllText(Path.Combine(Dir, "error-" + DateTime.Now.ToString("yyyy-MM-dd") + ".log"), b.ToString(), new UTF8Encoding(false));
-                if (Logged != null) Logged();
+                if (notify && Logged != null) Logged();
             }
             catch { }
         }
