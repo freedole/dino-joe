@@ -1599,8 +1599,7 @@ namespace DinoJoe
             care.DropDownItems.Add(Lang.Get("act.pet"), null, delegate { DoAction("pet"); });
             care.DropDownItems.Add(Lang.Get("act.play"), null, delegate { DoAction("play"); });
             care.DropDownItems.Add(Lang.Get("act.bath"), null, delegate { DoAction("bath"); });
-            care.DropDownItems.Add(new ToolStripSeparator());
-            miSleep = new ToolStripMenuItem(Lang.Get("m.sleep"), null, delegate { ToggleSleep(); });
+            miSleep = new ToolStripMenuItem(Lang.Get("act.sleep"), null, delegate { ToggleSleep(); });
             care.DropDownItems.Add(miSleep);
             menu.Items.Add(care);
 
@@ -1716,7 +1715,7 @@ namespace DinoJoe
             menu.Items.Add(Lang.Get("m.exit"), null, delegate { Close(); });
             menu.Opening += delegate
             {
-                miSleep.Text = pose.State == State.Sleep ? Lang.Get("m.wake") : Lang.Get("m.sleep");
+                miSleep.Text = pose.State == State.Sleep ? Lang.Get("m.wake") : Lang.Get("act.sleep");
                 miGlasses.Checked = pose.Glasses;
                 miLike.Enabled = miBlock.Enabled = lastJoke != null;
                 BuildProfilesMenu();
