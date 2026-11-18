@@ -63,7 +63,7 @@ namespace DinoJoe
             A("ach.adult", "Veliki dino", "Veliki dino", "Veliki dino", "All grown up");
             A("ach.adult.d", "Odgajaj dinu do odraslog.", "Odgajaj dinu do odraslog.", "Odgoji dina do odraslog.", "Raise your dino to adulthood.");
             A("ach.veteran", "Veteran", "Veteran", "Veteran", "Veteran");
-            A("ach.veteran.d", "Bio si tu od verzije 1.0. Hvala!", "Bio si tu od verzije 1.0. Hvala!", "Bio si tu od verzije 1.0. Hvala!", "You were here since version 1.0. Thanks!");
+            A("ach.veteran.d", "100 dana sa dinom. Pravi veteran!", "100 dana sa dinom. Pravi veteran!", "100 dana s dinom. Pravi veteran!", "100 days with your dino. A true veteran!");
             A("ach.days7", "Sedmica zajedno", "Sedmica zajedno", "Tjedan zajedno", "A week together");
             A("ach.days7.d", "Druži se sa dinom 7 različitih dana.", "Druži se sa dinom 7 različitih dana.", "Druži se s dinom 7 različitih dana.", "Hang out with your dino on 7 different days.");
             A("ach.days30", "Mjesec dana", "Mesec dana", "Mjesec dana", "A month together");

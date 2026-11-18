@@ -1,9 +1,9 @@
-# Coffee
+﻿# Coffee
 # One joke per line. Lines starting with # are ignored.
 Anyone who talks to me before my first coffee is responsible for what happens next.
 Coffee isn't a drink. It's a reason to sit down.
 Without coffee I'm a fossil. With coffee I'm a fossil that talks.
-The most important device in the office isn't the server. It's the coffee machine.
+The most important device in the office isn't the computer. It's the coffee machine.
 I don't drink coffee to wake up. I drink it so I have something to stare into.
 If coffee doesn't help, more coffee will.
 When the office runs out of coffee, the real extinction begins.

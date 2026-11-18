@@ -1,4 +1,4 @@
-// Dino Joe - dostignuća (achievementi): brojači, otključavanje vrsta i šara, prozor sa listom.
+﻿// Dino Joe - dostignuća (achievementi): brojači, otključavanje vrsta i šara, prozor sa listom.
 // Podaci: %AppData%\DinoJoe\achievements.ini (unlocked.<id>=datum, count.<brojač>=n, last_day=datum).
 // C# 5 kompatibilno.
 
@@ -45,7 +45,7 @@ namespace DinoJoe
             Def("hatch", null, 0, null);
             Def("juvenile", null, 0, null);
             Def("adult", null, 0, "pattern:6");          // zlatna šara
-            Def("veteran", null, 0, "species:4");        // Stegosaurus
+            Def("veteran", "days", 100, null);            // 100 dana sa dinom (bilo koja verzija 1.x)
             Def("days7", "days", 7, "species:4");        // Stegosaurus
             Def("days30", "days", 30, "pattern:7");      // duga
             Def("jokes300", "jokes", 300, "species:5");  // Pterodaktil
@@ -167,7 +167,7 @@ namespace DinoJoe
         public static string HowToUnlock(string reward)
         {
             List<string> l = new List<string>();
-            foreach (Achievement a in All) if (a.Reward == reward && a.Id != "veteran") l.Add(a.Name);
+            foreach (Achievement a in All) if (a.Reward == reward) l.Add(a.Name);
             return string.Format(Lang.Gender(Lang.Get("ach.howto")), string.Join(" / ", l.ToArray()));
         }
 

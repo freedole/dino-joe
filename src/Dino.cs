@@ -1164,7 +1164,6 @@ namespace DinoJoe
                 Say(Pick(Lang.Gender(Lang.Get("season." + Skins.SeasonKey(DateTime.Now))).Split('|')));
             else Say(Program.JustSetUp ? Lang.Get("pet.hello") : Greeting());
             Achievements.TouchDay();
-            if (veteranNew) Achievements.Unlock("veteran");
         }
 
         // ---------------- evolucija i dostignuća ----------------
