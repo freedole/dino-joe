@@ -1,4 +1,4 @@
-// Dino Joe - potrebe ljubimca (status): hrana, voda, energija, mazenje, zabava, higijena, zdravlje.
+﻿// Dino Joe - potrebe ljubimca (status): hrana, voda, energija, mazenje, zabava, higijena, zdravlje.
 // Vrijednosti 0..100 (100 = sve super). Zadovoljstvo = ponderisani prosjek, Briga = koliko je zanemaren.
 // Pad se računa i dok je aplikacija ugašena; "Godišnji odmor" pauzira sve.
 // Hardcore Tamagotchi mod: brži pad, nema donje granice, može se razboljeti i "pobjeći".
@@ -23,8 +23,10 @@ namespace DinoJoe
         public bool RanAway;
         DateTime lastUpdate = DateTime.Now;
 
-        // pad po satu (normalni mod); energija u snu raste
-        static readonly double[] DecayPerHour = { 11, 14, 7, 9, 12, 4, 0 };
+        // pad po satu (normalni mod); energija u snu raste.
+        // Dino uglavnom živi na poslovnom računaru koji ostaje upaljen preko noći:
+        // za 24 h bez brige hrana padne sa 100 na ~45%, ostalo slično ili sporije.
+        static readonly double[] DecayPerHour = { 2.3, 2.6, 2.0, 2.2, 2.5, 1.2, 0 };
         static readonly int[] Weight = { 20, 15, 10, 20, 15, 10, 10 };
         public static readonly string[] Keys = { "food", "water", "energy", "love", "fun", "hygiene", "health" };
 
@@ -200,7 +202,7 @@ namespace DinoJoe
 
             // dvije glavne linije
             BigBar(g, 16, 14, Lang.Get("st.happy"), needs.Happiness, false);
-            BigBar(g, 16, 66, Lang.Get("st.worry"), needs.Worry, true);
+            BigBar(g, 16, 66, Lang.Get("st.calm"), 100 - needs.Worry, false);   // spokoj: puna traka = sve u redu
 
             using (Pen sep = new Pen(Color.FromArgb(230, 230, 230))) g.DrawLine(sep, 16, 118, 384, 118);
 
